@@ -66,11 +66,16 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def pickone(self, curr, prev):
         image = self.imageList[int(curr.text())-1]
-        pix = QPixmap.fromImage(image)
+        qimg = self.fitView(image)
+        pix = QPixmap.fromImage(qimg)
         itm = QGraphicsPixmapItem(pix)
         scn = QGraphicsScene(self)
         scn.addItem(itm)
         self.graphicsView.setScene(scn)
+
+    def fitView(self, image):
+        viewSize = self.graphicsView.size()
+        return image.scaled(viewSize.width()-5, viewSize.height()-5, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
 
     def connectSignalsSlots(self):
         self.openAct.triggered.connect(self.open)
