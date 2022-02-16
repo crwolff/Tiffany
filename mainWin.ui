@@ -75,8 +75,6 @@
     <addaction name="zoomInAct"/>
     <addaction name="zoomOutAct"/>
     <addaction name="normalSizeAct"/>
-    <addaction name="separator"/>
-    <addaction name="fitToWindowAct"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -109,7 +107,7 @@
    <addaction name="separator"/>
    <addaction name="zoomInAct"/>
    <addaction name="zoomOutAct"/>
-   <addaction name="fitToWindowAct"/>
+   <addaction name="normalSizeAct"/>
    <addaction name="separator"/>
   </widget>
   <action name="openAct">
@@ -145,6 +143,9 @@
    </property>
   </action>
   <action name="zoomInAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/icn_Toolbar_zoom_in.png</normaloff>:/images/assets/icn_Toolbar_zoom_in.png</iconset>
@@ -154,6 +155,9 @@
    </property>
   </action>
   <action name="zoomOutAct">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/icn_Toolbar_zoom_out.png</normaloff>:/images/assets/icn_Toolbar_zoom_out.png</iconset>
@@ -163,17 +167,15 @@
    </property>
   </action>
   <action name="normalSizeAct">
-   <property name="text">
-    <string>&amp;Normal Size</string>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
-  </action>
-  <action name="fitToWindowAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/icn_Toolbar_fit2window.png</normaloff>:/images/assets/icn_Toolbar_fit2window.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Fit to Window</string>
+    <string>&amp;Normal Size</string>
    </property>
   </action>
   <action name="aboutAct">

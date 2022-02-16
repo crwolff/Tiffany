@@ -17,6 +17,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.connectSignalsSlots()
         self.fileNameList = []
         self.imageList = []
+        self.currImage = None
+        self.scaleFactor = 1.0
 
         # Status bar
         self.statusLabel = QLabel("Ready")
@@ -27,7 +29,17 @@ class Window(QMainWindow, Ui_MainWindow):
         self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
         self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
         self.normalSizeAct.setText(_translate("MainWindow", "&Normal\nSize"))
-        self.fitToWindowAct.setText(_translate("MainWindow", "&Fit to\nWindow"))
+
+    def connectSignalsSlots(self):
+        self.openAct.triggered.connect(self.open)
+        self.exitAct.triggered.connect(self.close)
+        self.zoomInAct.triggered.connect(self.zoomIn)
+        self.zoomOutAct.triggered.connect(self.zoomOut)
+        self.normalSizeAct.triggered.connect(self.normalSize)
+        self.aboutAct.triggered.connect(self.about)
+        self.aboutQtAct.triggered.connect(qApp.aboutQt)
+
+        self.listWidget.currentItemChanged.connect(self.imageSelected)
 
     def open(self):
         options = QFileDialog.Options()
@@ -64,34 +76,33 @@ class Window(QMainWindow, Ui_MainWindow):
         self.statusbar.removeWidget(pbar)
         self.statusLabel.setText("Ready")
 
-    def pickone(self, curr, prev):
-        image = self.imageList[int(curr.text())-1]
-        qimg = self.fitView(image)
+    def imageSelected(self, curr, prev):
+        self.currImage = self.imageList[int(curr.text())-1]
+        self.normalSize()
+
+    def zoomIn(self):
+        self.scaleImage(1.25)
+
+    def zoomOut(self):
+        self.scaleImage(0.8)
+
+    def normalSize(self):
+        self.scaleFactor = 1.0
+        self.scaleImage(1.0)
+
+    def scaleImage(self, factor):
+        self.scaleFactor *= factor
+        viewSize = self.graphicsView.size() * self.scaleFactor - QtCore.QSize(1,1)
+        qimg = self.currImage.scaled(viewSize.width()-5, viewSize.height()-5, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         pix = QPixmap.fromImage(qimg)
         itm = QGraphicsPixmapItem(pix)
         scn = QGraphicsScene(self)
         scn.addItem(itm)
         self.graphicsView.setScene(scn)
 
-    def fitView(self, image):
-        viewSize = self.graphicsView.size()
-        return image.scaled(viewSize.width()-5, viewSize.height()-5, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-
-    def connectSignalsSlots(self):
-        self.openAct.triggered.connect(self.open)
-        self.exitAct.triggered.connect(self.close)
-        self.zoomInAct.triggered.connect(self.zoomIn)
-        self.zoomOutAct.triggered.connect(self.zoomOut)
-        self.aboutAct.triggered.connect(self.about)
-        self.aboutQtAct.triggered.connect(qApp.aboutQt)
-
-        self.listWidget.currentItemChanged.connect(self.pickone)
-
-    def zoomIn(self):
-        pass
-
-    def zoomOut(self):
-        pass
+        self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
+        self.zoomOutAct.setEnabled(self.scaleFactor > 0.2)
+        self.normalSizeAct.setEnabled(True)
 
     def about(self):
         QMessageBox.about(
