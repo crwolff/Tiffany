@@ -37,47 +37,13 @@
         <enum>QListView::IconMode</enum>
        </property>
       </widget>
-      <widget class="QScrollArea" name="scrollArea">
+      <widget class="QGraphicsView" name="graphicsView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="widgetResizable">
-        <bool>true</bool>
-       </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>918</width>
-          <height>778</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="ZoomQLabel" name="imageLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::NoTextInteraction</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
       </widget>
      </widget>
     </item>
@@ -221,13 +187,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ZoomQLabel</class>
-   <extends>QLabel</extends>
-   <header>ZoomQLabel</header>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="rsrc.qrc"/>
  </resources>

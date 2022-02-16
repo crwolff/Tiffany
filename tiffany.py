@@ -5,6 +5,7 @@ import math
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import qApp, QApplication, QMainWindow, QMessageBox, QFileDialog, QListWidgetItem, QProgressBar, QLabel
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 from mainWin import Ui_MainWindow
@@ -65,7 +66,11 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def pickone(self, curr, prev):
         image = self.imageList[int(curr.text())-1]
-        self.imageLabel.setImage(image)
+        pix = QPixmap.fromImage(image)
+        itm = QGraphicsPixmapItem(pix)
+        scn = QGraphicsScene(self)
+        scn.addItem(itm)
+        self.graphicsView.setScene(scn)
 
     def connectSignalsSlots(self):
         self.openAct.triggered.connect(self.open)
@@ -78,10 +83,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.listWidget.currentItemChanged.connect(self.pickone)
 
     def zoomIn(self):
-        self.imageLabel.zoomIn()
+        pass
 
     def zoomOut(self):
-        self.imageLabel.zoomOut()
+        pass
 
     def about(self):
         QMessageBox.about(
