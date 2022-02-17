@@ -58,6 +58,8 @@ class Window(QMainWindow, Ui_MainWindow):
             if image.isNull():
                 QMessageBox.information(self, "Tiffany", "Cannot load %s." % x)
             else:
+                if image.format() == QImage.Format_Indexed8:
+                    image = image.convertToFormat(QImage.Format_Grayscale8)
                 self.fileNameList.append(x)
                 self.imageList.append(image)
 
@@ -95,9 +97,8 @@ class Window(QMainWindow, Ui_MainWindow):
         viewSize = self.graphicsView.size() * self.scaleFactor - QtCore.QSize(1,1)
         qimg = self.currImage.scaled(viewSize.width()-5, viewSize.height()-5, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         pix = QPixmap.fromImage(qimg)
-        itm = QGraphicsPixmapItem(pix)
         scn = QGraphicsScene(self)
-        scn.addItem(itm)
+        scn.addPixmap(pix)
         self.graphicsView.setScene(scn)
 
         self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
