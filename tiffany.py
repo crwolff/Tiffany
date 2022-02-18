@@ -18,7 +18,13 @@ class Window(QMainWindow, Ui_MainWindow):
         self.fileNameList = []
         self.imageList = []
         self.currImage = None
+        self.lastItem = None
         self.scaleFactor = 1.0
+
+        # Set up graphics viewer
+        # TODO: add a logo
+        self.scene = QGraphicsScene(self)
+        self.graphicsView.setScene(self.scene)
 
         # Status bar
         self.statusLabel = QLabel("Ready")
@@ -80,29 +86,39 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def imageSelected(self, curr, prev):
         self.currImage = self.imageList[int(curr.text())-1]
+        pix = QPixmap.fromImage(self.currImage)
+        if self.lastItem is not None:
+            self.scene.removeItem(self.lastItem)
+        self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
+        self.lastItem = self.scene.addPixmap(pix)
         self.normalSize()
 
     def zoomIn(self):
-        self.scaleImage(1.25)
+        self.graphicsView.scale(1.25, 1.25)
+        self.scaleFactor = self.scaleFactor * 1.25
+        self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
 
     def zoomOut(self):
-        self.scaleImage(0.8)
+        self.graphicsView.scale(0.8, 0.8)
+        self.scaleFactor = self.scaleFactor * 0.8
+        self.zoomOutAct.setEnabled(self.scaleFactor > 0.2)
 
     def normalSize(self):
+        # Compute reference scale factor
+        viewW = self.graphicsView.size().width()
+        viewH = self.graphicsView.size().height()
+        pixW = self.currImage.size().width() + 20
+        pixH = self.currImage.size().height() + 20
+        if (viewW * pixH > viewH * pixW):
+            scale = 0.995 * viewH / pixH
+        else:
+            scale = 0.995 * viewW / pixW
+        self.graphicsView.resetTransform()
+        self.graphicsView.scale(scale, scale)
+
         self.scaleFactor = 1.0
-        self.scaleImage(1.0)
-
-    def scaleImage(self, factor):
-        self.scaleFactor *= factor
-        viewSize = self.graphicsView.size() * self.scaleFactor - QtCore.QSize(1,1)
-        qimg = self.currImage.scaled(viewSize.width()-5, viewSize.height()-5, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        pix = QPixmap.fromImage(qimg)
-        scn = QGraphicsScene(self)
-        scn.addPixmap(pix)
-        self.graphicsView.setScene(scn)
-
-        self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
-        self.zoomOutAct.setEnabled(self.scaleFactor > 0.2)
+        self.zoomInAct.setEnabled(True)
+        self.zoomOutAct.setEnabled(True)
         self.normalSizeAct.setEnabled(True)
 
     def about(self):
