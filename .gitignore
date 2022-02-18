@@ -1,6 +1,4 @@
 /__pycache__/*
-/qt5/*
-/ref/*
 /samples/*
-untitled.*
 mainWin.py
+rsrc_rc.py
