@@ -105,8 +105,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 self.listWidget.addItem(item)
 
                 if self.listWidget.count() == 1:
-                    itm = self.listWidget.findItems("1", QtCore.Qt.MatchExactly)
-                    self.listWidget.setCurrentItem(itm[0])
+                    self.listWidget.setCurrentItem(item)
             pbar.setValue(pbar.value() + 1)
         self.statusbar.removeWidget(pbar)
         self.statusLabel.setText("Ready")
