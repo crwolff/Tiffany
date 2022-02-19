@@ -68,11 +68,36 @@
     <addaction name="separator"/>
     <addaction name="saveAct"/>
     <addaction name="saveAsAct"/>
-    <addaction name="saveTIFFAct"/>
+    <addaction name="createTIFFAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
+   <widget class="QMenu" name="menu_Edit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="selectAllAct"/>
+    <addaction name="selectOddAct"/>
+    <addaction name="selectEvenAct"/>
+    <addaction name="separator"/>
+    <addaction name="deleteAct"/>
+    <addaction name="moveAct"/>
+    <addaction name="separator"/>
+    <addaction name="rotateCWAct"/>
+    <addaction name="rotateCCWAct"/>
+    <addaction name="rotate180Act"/>
+   </widget>
+   <widget class="QMenu" name="menu7View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="zoomInAct"/>
+    <addaction name="zoomOutAct"/>
+    <addaction name="fitToWindowAct"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menu7View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -134,21 +159,110 @@
     <string>Save &amp;As</string>
    </property>
   </action>
-  <action name="saveTIFFAct">
+  <action name="createTIFFAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/icn_Toolbar_multifeed.png</normaloff>:/images/assets/icn_Toolbar_multifeed.png</iconset>
    </property>
    <property name="text">
-    <string>Save &amp;TIFF</string>
+    <string>Create &amp;TIFF</string>
    </property>
    <property name="toolTip">
-    <string>Save TIFF</string>
+    <string>Create TIFF</string>
    </property>
   </action>
   <action name="exitAct">
    <property name="text">
     <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="selectAllAct">
+   <property name="text">
+    <string>Select &amp;All</string>
+   </property>
+  </action>
+  <action name="selectOddAct">
+   <property name="text">
+    <string>Select &amp;Odd</string>
+   </property>
+  </action>
+  <action name="selectEvenAct">
+   <property name="text">
+    <string>Select &amp;Even</string>
+   </property>
+  </action>
+  <action name="deleteAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_delete.png</normaloff>:/images/assets/icn_Toolbar_delete.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+  </action>
+  <action name="moveAct">
+   <property name="text">
+    <string>&amp;Move</string>
+   </property>
+  </action>
+  <action name="rotateCWAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_rotate90.png</normaloff>:/images/assets/icn_Toolbar_rotate90.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Rotate CW</string>
+   </property>
+  </action>
+  <action name="rotateCCWAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_rotate-90.png</normaloff>:/images/assets/icn_Toolbar_rotate-90.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate CCW</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate CCW</string>
+   </property>
+  </action>
+  <action name="rotate180Act">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_rotate180.png</normaloff>:/images/assets/icn_Toolbar_rotate180.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate 180</string>
+   </property>
+  </action>
+  <action name="zoomInAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_zoom_in.png</normaloff>:/images/assets/icn_Toolbar_zoom_in.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom &amp;In</string>
+   </property>
+  </action>
+  <action name="zoomOutAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_zoom_out.png</normaloff>:/images/assets/icn_Toolbar_zoom_out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom &amp;Out</string>
+   </property>
+  </action>
+  <action name="fitToWindowAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_fit2window.png</normaloff>:/images/assets/icn_Toolbar_fit2window.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Fit to Window</string>
+   </property>
+   <property name="toolTip">
+    <string>Fit To Window</string>
    </property>
   </action>
  </widget>

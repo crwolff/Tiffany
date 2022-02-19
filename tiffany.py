@@ -16,8 +16,6 @@ class Window(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.connectSignalsSlots()
-        self.fileNameList = []
-        self.imageList = []
         self.currImage = None
         self.lastItem = None
         self.scaleFactor = 1.0
@@ -44,26 +42,41 @@ class Window(QMainWindow, Ui_MainWindow):
 
         # Better fit
         _translate = QtCore.QCoreApplication.translate
-        #self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
-        #self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
-        #self.normalSizeAct.setText(_translate("MainWindow", "&Normal\nSize"))
+        self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
+        self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
+        self.fitToWindowAct.setText(_translate("MainWindow", "&Normal\nSize"))
 
     def connectSignalsSlots(self):
         self.openAct.triggered.connect(self.open)
+        self.insertAct.triggered.connect(self.open)
+        self.replaceAct.triggered.connect(self.open)
         self.exitAct.triggered.connect(self.close)
-        #self.zoomInAct.triggered.connect(self.zoomIn)
-        #self.zoomOutAct.triggered.connect(self.zoomOut)
-        #self.normalSizeAct.triggered.connect(self.normalSize)
+        self.zoomInAct.triggered.connect(self.zoomIn)
+        self.zoomOutAct.triggered.connect(self.zoomOut)
+        self.fitToWindowAct.triggered.connect(self.fitToWindow)
         #self.aboutAct.triggered.connect(self.about)
         #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
         self.listWidget.currentItemChanged.connect(self.imageSelected)
 
     def open(self):
+        # Determine button pressed
+        whom = self.sender().objectName()
+        if whom == "insertAct":
+            txt = 'Insert Files'
+        elif whom == "replaceAct":
+            txt = 'Replace Files'
+        else:
+            txt = 'Open Files'
+
+        # Popup file dialog
         options = QFileDialog.Options()
-        fileNames,_ = QFileDialog.getOpenFileNames(self, 'Open Files', '', 'Images (*.png)', options=options)
+        fileNames,_ = QFileDialog.getOpenFileNames(self, txt, '', 'Images (*.png)', options=options)
         if len(fileNames) == 0:
             return
+
+        #for x in self.listWidget.selectedItems():
+        #    print(x.text())
 
         # Add progress to status bar
         self.statusLabel.setText("Reading...")
@@ -71,6 +84,8 @@ class Window(QMainWindow, Ui_MainWindow):
         pbar.setRange(0, len(fileNames))
         pbar.setValue(0)
         self.statusbar.addWidget(pbar)
+
+        # Open each file in turn and add to listWidget
         for x in fileNames:
             image = QImage(x)
             if image.isNull():
@@ -78,11 +93,11 @@ class Window(QMainWindow, Ui_MainWindow):
             else:
                 if image.format() == QImage.Format_Indexed8:
                     image = image.convertToFormat(QImage.Format_Grayscale8)
-                self.fileNameList.append(x)
-                self.imageList.append(image)
-
                 item = QListWidgetItem();
-                item.setText(str(len(self.imageList)))
+                item.setText(str(self.listWidget.count() + 1))
+                item.setToolTip(x)
+                item.setData(QtCore.Qt.UserRole, image)
+
                 qimg = image.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 qpix = QPixmap.fromImage(qimg)
                 icon = QtGui.QIcon(qpix)
@@ -97,25 +112,31 @@ class Window(QMainWindow, Ui_MainWindow):
         self.statusLabel.setText("Ready")
 
     def imageSelected(self, curr, prev):
-        self.currImage = self.imageList[int(curr.text())-1]
+        self.currImage = curr.data(QtCore.Qt.UserRole)
         pix = QPixmap.fromImage(self.currImage)
         if self.lastItem is not None:
             self.scene.removeItem(self.lastItem)
         self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
         self.lastItem = self.scene.addPixmap(pix)
-        self.normalSize()
+        self.fitToWindow()
 
     def zoomIn(self):
+        if self.currImage is None:
+            return
         self.graphicsView.scale(1.25, 1.25)
         self.scaleFactor = self.scaleFactor * 1.25
         self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
 
     def zoomOut(self):
+        if self.currImage is None:
+            return
         self.graphicsView.scale(0.8, 0.8)
         self.scaleFactor = self.scaleFactor * 0.8
         self.zoomOutAct.setEnabled(self.scaleFactor > 0.2)
 
-    def normalSize(self):
+    def fitToWindow(self):
+        if self.currImage is None:
+            return
         # Compute reference scale factor
         viewW = self.graphicsView.size().width()
         viewH = self.graphicsView.size().height()
@@ -129,9 +150,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self.graphicsView.scale(scale, scale)
 
         self.scaleFactor = 1.0
-        #self.zoomInAct.setEnabled(True)
-        #self.zoomOutAct.setEnabled(True)
-        #self.normalSizeAct.setEnabled(True)
+        self.zoomInAct.setEnabled(True)
+        self.zoomOutAct.setEnabled(True)
+        self.fitToWindowAct.setEnabled(True)
 
     def about(self):
         QMessageBox.about(
