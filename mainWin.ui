@@ -63,29 +63,16 @@
      <string>&amp;File</string>
     </property>
     <addaction name="openAct"/>
+    <addaction name="insertAct"/>
+    <addaction name="replaceAct"/>
+    <addaction name="separator"/>
     <addaction name="saveAct"/>
     <addaction name="saveAsAct"/>
+    <addaction name="saveTIFFAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
-   <widget class="QMenu" name="menu_View">
-    <property name="title">
-     <string>&amp;View</string>
-    </property>
-    <addaction name="zoomInAct"/>
-    <addaction name="zoomOutAct"/>
-    <addaction name="normalSizeAct"/>
-   </widget>
-   <widget class="QMenu" name="menu_Help">
-    <property name="title">
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="aboutAct"/>
-    <addaction name="aboutQtAct"/>
-   </widget>
    <addaction name="menu_File"/>
-   <addaction name="menu_View"/>
-   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -101,22 +88,32 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="openAct"/>
-   <addaction name="saveAct"/>
-   <addaction name="saveAsAct"/>
-   <addaction name="separator"/>
-   <addaction name="zoomInAct"/>
-   <addaction name="zoomOutAct"/>
-   <addaction name="normalSizeAct"/>
-   <addaction name="separator"/>
   </widget>
   <action name="openAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_simpleopenFile.png</normaloff>:/images/assets/icn_Toolbar_simpleopenFile.png</iconset>
+     <normaloff>:/images/assets/icn_Toolbar_simplescan.png</normaloff>:/images/assets/icn_Toolbar_simplescan.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="insertAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_add.png</normaloff>:/images/assets/icn_Toolbar_add.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Insert</string>
+   </property>
+  </action>
+  <action name="replaceAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_replace.png</normaloff>:/images/assets/icn_Toolbar_replace.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Replace</string>
    </property>
   </action>
   <action name="saveAct">
@@ -137,55 +134,21 @@
     <string>Save &amp;As</string>
    </property>
   </action>
+  <action name="saveTIFFAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_multifeed.png</normaloff>:/images/assets/icn_Toolbar_multifeed.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save &amp;TIFF</string>
+   </property>
+   <property name="toolTip">
+    <string>Save TIFF</string>
+   </property>
+  </action>
   <action name="exitAct">
    <property name="text">
     <string>E&amp;xit</string>
-   </property>
-  </action>
-  <action name="zoomInAct">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_zoom_in.png</normaloff>:/images/assets/icn_Toolbar_zoom_in.png</iconset>
-   </property>
-   <property name="text">
-    <string>Zoom &amp;In (25%)</string>
-   </property>
-  </action>
-  <action name="zoomOutAct">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_zoom_out.png</normaloff>:/images/assets/icn_Toolbar_zoom_out.png</iconset>
-   </property>
-   <property name="text">
-    <string>Zoom &amp;Out (25%)</string>
-   </property>
-  </action>
-  <action name="normalSizeAct">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_fit2window.png</normaloff>:/images/assets/icn_Toolbar_fit2window.png</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Normal Size</string>
-   </property>
-  </action>
-  <action name="aboutAct">
-   <property name="text">
-    <string>&amp;About</string>
-   </property>
-  </action>
-  <action name="aboutQtAct">
-   <property name="text">
-    <string>About &amp;Qt</string>
    </property>
   </action>
  </widget>

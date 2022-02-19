@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 from mainWin import Ui_MainWindow
+from PopupQToolButton import PopupQToolButton
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -30,20 +31,31 @@ class Window(QMainWindow, Ui_MainWindow):
         self.statusLabel = QLabel("Ready")
         self.statusbar.addWidget(self.statusLabel)
 
+        # Hand assemble toolbar items
+        self.openMenu = QtWidgets.QMenu(self)
+        self.openMenu.addAction(self.openAct)
+        self.openMenu.addAction(self.insertAct)
+        self.openMenu.addAction(self.replaceAct)
+        self.openToolButton = PopupQToolButton()
+        self.openToolButton.setMenu(self.openMenu)
+        self.openToolButton.setDefaultAction(self.openAct)
+        self.toolBar.addWidget(self.openToolButton)
+        self.toolBar.addAction(self.saveAct)
+
         # Better fit
         _translate = QtCore.QCoreApplication.translate
-        self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
-        self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
-        self.normalSizeAct.setText(_translate("MainWindow", "&Normal\nSize"))
+        #self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
+        #self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
+        #self.normalSizeAct.setText(_translate("MainWindow", "&Normal\nSize"))
 
     def connectSignalsSlots(self):
         self.openAct.triggered.connect(self.open)
         self.exitAct.triggered.connect(self.close)
-        self.zoomInAct.triggered.connect(self.zoomIn)
-        self.zoomOutAct.triggered.connect(self.zoomOut)
-        self.normalSizeAct.triggered.connect(self.normalSize)
-        self.aboutAct.triggered.connect(self.about)
-        self.aboutQtAct.triggered.connect(qApp.aboutQt)
+        #self.zoomInAct.triggered.connect(self.zoomIn)
+        #self.zoomOutAct.triggered.connect(self.zoomOut)
+        #self.normalSizeAct.triggered.connect(self.normalSize)
+        #self.aboutAct.triggered.connect(self.about)
+        #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
         self.listWidget.currentItemChanged.connect(self.imageSelected)
 
@@ -117,9 +129,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self.graphicsView.scale(scale, scale)
 
         self.scaleFactor = 1.0
-        self.zoomInAct.setEnabled(True)
-        self.zoomOutAct.setEnabled(True)
-        self.normalSizeAct.setEnabled(True)
+        #self.zoomInAct.setEnabled(True)
+        #self.zoomOutAct.setEnabled(True)
+        #self.normalSizeAct.setEnabled(True)
 
     def about(self):
         QMessageBox.about(
