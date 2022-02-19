@@ -94,7 +94,7 @@ class Window(QMainWindow, Ui_MainWindow):
                 if image.format() == QImage.Format_Indexed8:
                     image = image.convertToFormat(QImage.Format_Grayscale8)
                 item = QListWidgetItem();
-                item.setText(str(self.listWidget.count() + 1))
+                #item.setText(str(self.listWidget.count() + 1))
                 item.setToolTip(x)
                 item.setData(QtCore.Qt.UserRole, image)
 
@@ -103,12 +103,14 @@ class Window(QMainWindow, Ui_MainWindow):
                 icon = QtGui.QIcon(qpix)
                 item.setIcon(icon)
                 self.listWidget.addItem(item)
-
                 if self.listWidget.count() == 1:
                     self.listWidget.setCurrentItem(item)
             pbar.setValue(pbar.value() + 1)
+
         self.statusbar.removeWidget(pbar)
         self.statusLabel.setText("Ready")
+        for x in range(self.listWidget.count()):
+            self.listWidget.item(x).setText(str(x+1))
 
     def imageSelected(self, curr, prev):
         self.currImage = curr.data(QtCore.Qt.UserRole)
