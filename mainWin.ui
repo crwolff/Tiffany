@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QListWidget" name="listWidget">
+      <widget class="Bookmarks" name="listWidget">
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
        </property>
@@ -286,6 +286,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Bookmarks</class>
+   <extends>QListWidget</extends>
+   <header>Bookmarks</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="rsrc.qrc"/>
  </resources>
