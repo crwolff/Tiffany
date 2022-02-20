@@ -77,7 +77,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         # For replace or insert, get list of items
         rows = []
-        if (txt[0] == 'I') or (txt[0] == 'R'):
+        if (whom == 'insertAct') or (whom == 'replaceAct'):
             for x in self.listWidget.selectedItems():
                 rows.append(int(x.text()) - 1)
             rows.sort()
@@ -114,18 +114,18 @@ class Window(QMainWindow, Ui_MainWindow):
                 item.setIcon(icon)
 
                 # Insert list item at appropriate place
-                if txt[0] == 'O':       # Append to list
+                if whom == 'openAct':                   # Append to list
                     self.listWidget.addItem(item)
-                elif txt[0] == 'I':     # Insert before first selection
+                elif whom == 'insertAct':               # Insert before selection
                     self.listWidget.insertItem(rows[0], item)
                     rows[0] = rows[0] + 1
-                elif txt[0] == 'R':     # Remove selection, then insert
+                elif whom == 'replaceAct':              # Replace selection, then treat as insert
                     self.listWidget.takeItem(rows[0])
                     self.listWidget.insertItem(rows[0], item)
                     if len(rows) > 1:
                         rows = rows[1:]
                     else:
-                        txt = 'Insert Files'
+                        whom = 'insertAct'
                         rows[0] = rows[0] + 1
 
             # Update progress bar
