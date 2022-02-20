@@ -94,6 +94,8 @@
     <addaction name="zoomInAct"/>
     <addaction name="zoomOutAct"/>
     <addaction name="fitToWindowAct"/>
+    <addaction name="fitWidthAct"/>
+    <addaction name="fit100Act"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -263,6 +265,24 @@
    </property>
    <property name="toolTip">
     <string>Fit To Window</string>
+   </property>
+  </action>
+  <action name="fitWidthAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_fit2width.png</normaloff>:/images/assets/icn_Toolbar_fit2width.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fit &amp;Width</string>
+   </property>
+  </action>
+  <action name="fit100Act">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_100.png</normaloff>:/images/assets/icn_Toolbar_100.png</iconset>
+   </property>
+   <property name="text">
+    <string>Fit &amp;100</string>
    </property>
   </action>
  </widget>

@@ -30,26 +30,23 @@ class Window(QMainWindow, Ui_MainWindow):
         self.statusbar.addWidget(self.statusLabel)
 
         # Hand assemble toolbar items
-        self.openMenu = QtWidgets.QMenu(self)
-        self.openMenu.addAction(self.openAct)
-        self.openMenu.addAction(self.insertAct)
-        self.openMenu.addAction(self.replaceAct)
-        self.openToolButton = PopupQToolButton()
-        self.openToolButton.setMenu(self.openMenu)
-        self.openToolButton.setDefaultAction(self.openAct)
-        self.toolBar.addWidget(self.openToolButton)
-        self.toolBar.addAction(self.saveAct)
+        self.buildToolBar()
 
         # Better fit
         _translate = QtCore.QCoreApplication.translate
+        self.rotateCWAct.setText(_translate("MainWindow", "Rotate\nCW"))
+        self.rotateCCWAct.setText(_translate("MainWindow", "Rotate\nCCW"))
+        self.rotate180Act.setText(_translate("MainWindow", "Rotate\n180"))
         self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
         self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
-        self.fitToWindowAct.setText(_translate("MainWindow", "&Normal\nSize"))
 
     def connectSignalsSlots(self):
-        self.openAct.triggered.connect(self.open)
-        self.insertAct.triggered.connect(self.open)
-        self.replaceAct.triggered.connect(self.open)
+        self.openAct.triggered.connect(self.readFiles)
+        self.insertAct.triggered.connect(self.readFiles)
+        self.replaceAct.triggered.connect(self.readFiles)
+        self.saveAct.triggered.connect(self.writeFiles)
+        self.saveAsAct.triggered.connect(self.writeFiles)
+        self.createTIFFAct.triggered.connect(self.writeFiles)
         self.exitAct.triggered.connect(self.close)
         self.zoomInAct.triggered.connect(self.zoomIn)
         self.zoomOutAct.triggered.connect(self.zoomOut)
@@ -59,7 +56,48 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.listWidget.currentItemChanged.connect(self.imageSelected)
 
-    def open(self):
+    def buildToolBar(self):
+        self.openMenu = QtWidgets.QMenu(self)
+        self.openMenu.addAction(self.openAct)
+        self.openMenu.addAction(self.insertAct)
+        self.openMenu.addAction(self.replaceAct)
+        self.openToolButton = PopupQToolButton()
+        self.openToolButton.setMenu(self.openMenu)
+        self.openToolButton.setDefaultAction(self.openAct)
+        self.toolBar.addWidget(self.openToolButton)
+
+        self.saveMenu = QtWidgets.QMenu(self)
+        self.saveMenu.addAction(self.saveAct)
+        self.saveMenu.addAction(self.saveAsAct)
+        self.saveMenu.addAction(self.createTIFFAct)
+        self.saveToolButton = PopupQToolButton()
+        self.saveToolButton.setMenu(self.saveMenu)
+        self.saveToolButton.setDefaultAction(self.saveAct)
+        self.toolBar.addWidget(self.saveToolButton)
+
+        self.rotateMenu = QtWidgets.QMenu(self)
+        self.rotateMenu.addAction(self.rotateCWAct)
+        self.rotateMenu.addAction(self.rotateCCWAct)
+        self.rotateMenu.addAction(self.rotate180Act)
+        self.rotateToolButton = PopupQToolButton()
+        self.rotateToolButton.setMenu(self.rotateMenu)
+        self.rotateToolButton.setDefaultAction(self.rotateCWAct)
+        self.toolBar.addWidget(self.rotateToolButton)
+
+        self.toolBar.addAction(self.deleteAct)
+        self.toolBar.addAction(self.zoomOutAct)
+        self.toolBar.addAction(self.zoomInAct)
+
+        self.zoomMenu = QtWidgets.QMenu(self)
+        self.zoomMenu.addAction(self.fitToWindowAct)
+        self.zoomMenu.addAction(self.fitWidthAct)
+        self.zoomMenu.addAction(self.fit100Act)
+        self.zoomToolButton = PopupQToolButton()
+        self.zoomToolButton.setMenu(self.zoomMenu)
+        self.zoomToolButton.setDefaultAction(self.fitToWindowAct)
+        self.toolBar.addWidget(self.zoomToolButton)
+
+    def readFiles(self):
         # Determine button pressed
         whom = self.sender().objectName()
         if whom == "insertAct":
@@ -138,6 +176,17 @@ class Window(QMainWindow, Ui_MainWindow):
         # (Re)number all the loaded pages
         for x in range(self.listWidget.count()):
             self.listWidget.item(x).setText(str(x+1))
+
+    def writeFiles(self):
+        # Determine button pressed
+        whom = self.sender().objectName()
+        if whom == "saveAct":
+            txt = 'Save Files'
+        elif whom == "saveAsAct":
+            txt = 'Save As Files'
+        else:
+            txt = 'Create TIFF'
+        print(txt + " not implemented")
 
     def imageSelected(self, curr, prev):
         self.currImage = curr.data(QtCore.Qt.UserRole)
