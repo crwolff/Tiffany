@@ -75,8 +75,15 @@ class Window(QMainWindow, Ui_MainWindow):
         if len(fileNames) == 0:
             return
 
-        #for x in self.listWidget.selectedItems():
-        #    print(x.text())
+        # For replace or insert, get list of items
+        rows = []
+        if (txt[0] == 'I') or (txt[0] == 'R'):
+            for x in self.listWidget.selectedItems():
+                rows.append(int(x.text()) - 1)
+            rows.sort()
+            if len(rows) == 0:
+                QMessageBox.information(self, txt, "Insertion point must be selected")
+                return
 
         # Add progress to status bar
         self.statusLabel.setText("Reading...")
@@ -91,24 +98,44 @@ class Window(QMainWindow, Ui_MainWindow):
             if image.isNull():
                 QMessageBox.information(self, "Tiffany", "Cannot load %s." % x)
             else:
+                # Convert from indexed to grayscale
                 if image.format() == QImage.Format_Indexed8:
                     image = image.convertToFormat(QImage.Format_Grayscale8)
-                item = QListWidgetItem();
-                #item.setText(str(self.listWidget.count() + 1))
-                item.setToolTip(x)
-                item.setData(QtCore.Qt.UserRole, image)
 
+                # Make icon
                 qimg = image.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                 qpix = QPixmap.fromImage(qimg)
                 icon = QtGui.QIcon(qpix)
+
+                # Build list item
+                item = QListWidgetItem();
+                item.setToolTip(x)
+                item.setData(QtCore.Qt.UserRole, image)
                 item.setIcon(icon)
-                self.listWidget.addItem(item)
-                if self.listWidget.count() == 1:
-                    self.listWidget.setCurrentItem(item)
+
+                # Insert list item at appropriate place
+                if txt[0] == 'O':       # Append to list
+                    self.listWidget.addItem(item)
+                elif txt[0] == 'I':     # Insert before first selection
+                    self.listWidget.insertItem(rows[0], item)
+                    rows[0] = rows[0] + 1
+                elif txt[0] == 'R':     # Remove selection, then insert
+                    self.listWidget.takeItem(rows[0])
+                    self.listWidget.insertItem(rows[0], item)
+                    if len(rows) > 1:
+                        rows = rows[1:]
+                    else:
+                        txt = 'Insert Files'
+                        rows[0] = rows[0] + 1
+
+            # Update progress bar
             pbar.setValue(pbar.value() + 1)
 
+        # Cleanup status bar
         self.statusbar.removeWidget(pbar)
         self.statusLabel.setText("Ready")
+
+        # (Re)number all the loaded pages
         for x in range(self.listWidget.count()):
             self.listWidget.item(x).setText(str(x+1))
 
