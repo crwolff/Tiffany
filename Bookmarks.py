@@ -89,6 +89,7 @@ class Bookmarks(QListWidget):
         # (Re)number all the loaded pages
         for x in range(self.count()):
             self.item(x).setText(str(x+1))
+        self.setSpacing(0)
 
     def writeFiles(self):
         # Determine button pressed
