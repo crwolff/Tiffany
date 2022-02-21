@@ -31,10 +31,15 @@ class Bookmarks(QListWidget):
         if (whom == 'insertAct') or (whom == 'replaceAct'):
             for x in self.selectedItems():
                 rows.append(int(x.text()) - 1)
-            rows.sort()
             if len(rows) == 0:
                 QMessageBox.information(self, txt, "Insertion point must be selected")
                 return
+            rows.sort()
+
+        # For replace, remove old pages
+        if (whom == 'replaceAct'):
+            for idx in sorted(rows,reverse=True):
+                self.takeItem(idx)
 
         # Add progress to status bar
         self.progressSig.emit("Reading...", len(fileNames))
@@ -64,16 +69,14 @@ class Bookmarks(QListWidget):
                 # Insert list item at appropriate place
                 if whom == 'openAct':                   # Append to list
                     self.addItem(item)
-                elif whom == 'insertAct':               # Insert before selection
+                elif whom == 'insertAct':               # Insert all before first selection
                     self.insertItem(rows[0], item)
                     rows[0] = rows[0] + 1
-                elif whom == 'replaceAct':              # Replace selection, then treat as insert
-                    self.takeItem(rows[0])
+                elif whom == 'replaceAct':              # Insert before selection
                     self.insertItem(rows[0], item)
                     if len(rows) > 1:
                         rows = rows[1:]
                     else:
-                        whom = 'insertAct'
                         rows[0] = rows[0] + 1
 
             # Update progress bar
