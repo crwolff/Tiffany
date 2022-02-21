@@ -55,6 +55,7 @@ class Window(QMainWindow, Ui_MainWindow):
         #self.aboutAct.triggered.connect(self.about)
         #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
+        self.listWidget.progressSig.connect(self.updateProgress)
         self.listWidget.currentItemChanged.connect(self.imageSelected)
 
     def buildToolBar(self):
@@ -97,6 +98,21 @@ class Window(QMainWindow, Ui_MainWindow):
         self.zoomToolButton.setMenu(self.zoomMenu)
         self.zoomToolButton.setDefaultAction(self.fitToWindowAct)
         self.toolBar.addWidget(self.zoomToolButton)
+
+    def updateProgress(self, txt, val):
+        if txt != "":
+            # Add progress to status bar
+            self.statusLabel.setText(txt)
+            self.pbar = QProgressBar()
+            self.pbar.setRange(0, val)
+            self.pbar.setValue(0)
+            self.statusbar.addWidget(self.pbar)
+        elif val < 0:
+            # Clean up status bar
+            self.statusbar.removeWidget(self.pbar)
+            self.statusLabel.setText("Ready")
+        else:
+            self.pbar.setValue(val)
 
     def imageSelected(self, curr, prev):
         self.currImage = curr.data(QtCore.Qt.UserRole)

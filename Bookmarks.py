@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidget, QListWidgetIt
 from PyQt5.QtGui import QImage, QPixmap
 
 class Bookmarks(QListWidget):
+    progressSig = QtCore.pyqtSignal(str, int)
+
     def __init__(self, parent=None):
         QListWidget.__init__(self, parent)
 
@@ -34,14 +36,11 @@ class Bookmarks(QListWidget):
                 QMessageBox.information(self, txt, "Insertion point must be selected")
                 return
 
-#        # Add progress to status bar
-#        self.statusLabel.setText("Reading...")
-#        pbar = QProgressBar()
-#        pbar.setRange(0, len(fileNames))
-#        pbar.setValue(0)
-#        self.statusbar.addWidget(pbar)
+        # Add progress to status bar
+        self.progressSig.emit("Reading...", len(fileNames))
 
         # Open each file in turn and add to listWidget
+        progress = 1
         for x in fileNames:
             image = QImage(x)
             if image.isNull():
@@ -77,12 +76,12 @@ class Bookmarks(QListWidget):
                         whom = 'insertAct'
                         rows[0] = rows[0] + 1
 
-#            # Update progress bar
-#            pbar.setValue(pbar.value() + 1)
-#
-#        # Cleanup status bar
-#        self.statusbar.removeWidget(pbar)
-#        self.statusLabel.setText("Ready")
+            # Update progress bar
+            self.progressSig.emit("", progress)
+            progress = progress + 1
+
+        # Cleanup status bar
+        self.progressSig.emit("", -1)
 
         # (Re)number all the loaded pages
         for x in range(self.count()):
