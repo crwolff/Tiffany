@@ -114,7 +114,12 @@ class Bookmarks(QListWidget):
         for x in self.selectedItems():
             rows.append(int(x.text()) - 1)
 
+        # Add progress to status bar
+        if len(rows) > 0:
+            self.progressSig.emit("Turning...", len(rows))
+
         # Update items in place
+        progress = 0
         if len(rows) > 0:
             for idx in rows:
                 oldImage = self.item(idx).data(QtCore.Qt.UserRole)
@@ -123,6 +128,14 @@ class Bookmarks(QListWidget):
                 # Update item
                 self.item(idx).setData(QtCore.Qt.UserRole, rotImage)
                 self.item(idx).setIcon(self.makeIcon(rotImage))
+
+                # Update progress bar
+                self.progressSig.emit("", progress)
+                progress = progress + 1
+
+        # Cleanup status bar
+        if len(rows) > 0:
+            self.progressSig.emit("", -1)
 
         # Signal redraw
         self.currentItemChanged.emit(self.currentItem(), None)
