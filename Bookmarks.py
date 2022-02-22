@@ -2,7 +2,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidget, QListWidgetItem
-from PyQt5.QtGui import QImage, QPixmap, QTransform
+from PyQt5.QtGui import QImage, QPixmap, QTransform, QPainter
 
 class Bookmarks(QListWidget):
     progressSig = QtCore.pyqtSignal(str, int)
@@ -157,7 +157,22 @@ class Bookmarks(QListWidget):
         self.setSpacing(0)
 
     def makeIcon(self,image):
-        qimg = image.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        # Fill background
+        qimg = QImage(100, 100, QImage.Format_RGB32)
+        qimg.fill(QtGui.QColor(240, 240, 240))
+
+        # Draw image
+        painter = QPainter(qimg)
+        scaledImage = image.scaled(100, 100, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        if scaledImage.width() > scaledImage.height():
+            m = (100 - scaledImage.height()) / 2
+            painter.drawImage(QtCore.QPoint(0,m), scaledImage)
+        else:
+            m = (100 - scaledImage.width()) / 2
+            painter.drawImage(QtCore.QPoint(m,0), scaledImage)
+        painter.end()
+
+        # Convert to icon
         qpix = QPixmap.fromImage(qimg)
         icon = QtGui.QIcon(qpix)
         return icon
