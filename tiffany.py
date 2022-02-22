@@ -115,13 +115,18 @@ class Window(QMainWindow, Ui_MainWindow):
             self.pbar.setValue(val)
 
     def imageSelected(self, curr, prev):
-        self.currImage = curr.data(QtCore.Qt.UserRole)
-        pix = QPixmap.fromImage(self.currImage)
-        if self.lastItem is not None:
-            self.scene.removeItem(self.lastItem)
-        self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
-        self.lastItem = self.scene.addPixmap(pix)
-        self.fitToWindow()
+        if curr is not None:
+            self.currImage = curr.data(QtCore.Qt.UserRole)
+            pix = QPixmap.fromImage(self.currImage)
+            if self.lastItem is not None:
+                self.scene.removeItem(self.lastItem)
+            self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
+            self.lastItem = self.scene.addPixmap(pix)
+            self.fitToWindow()
+        else:
+            if self.lastItem is not None:
+                self.scene.removeItem(self.lastItem)
+                self.lastItem = None
 
     def zoomIn(self):
         if self.currImage is None:
