@@ -87,7 +87,7 @@
     <addaction name="rotateCCWAct"/>
     <addaction name="rotate180Act"/>
    </widget>
-   <widget class="QMenu" name="menu7View">
+   <widget class="QMenu" name="menu_View">
     <property name="title">
      <string>&amp;View</string>
     </property>
@@ -99,7 +99,7 @@
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
-   <addaction name="menu7View"/>
+   <addaction name="menu_View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">

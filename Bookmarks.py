@@ -36,13 +36,13 @@ class Bookmarks(QListWidget):
                 return
             rows.sort()
 
+        # Add progress to status bar
+        self.progressSig.emit("Reading...", len(fileNames))
+
         # For replace, remove old pages
         if (whom == 'replaceAct'):
             for idx in sorted(rows,reverse=True):
                 self.takeItem(idx)
-
-        # Add progress to status bar
-        self.progressSig.emit("Reading...", len(fileNames))
 
         # Open each file in turn and add to listWidget
         progress = 1
@@ -89,6 +89,8 @@ class Bookmarks(QListWidget):
         # (Re)number all the loaded pages
         for x in range(self.count()):
             self.item(x).setText(str(x+1))
+
+        # Force re-layout
         self.setSpacing(0)
 
     def writeFiles(self):
