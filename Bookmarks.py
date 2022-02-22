@@ -35,14 +35,11 @@ class Bookmarks(QListWidget):
                 QMessageBox.information(self, txt, "Insertion point must be selected")
                 return
             rows.sort()
+        else:
+            rows.append(self.count())
 
         # Add progress to status bar
         self.progressSig.emit("Reading...", len(fileNames))
-
-        # For replace, remove old pages
-        if (whom == 'replaceAct'):
-            for idx in sorted(rows,reverse=True):
-                self.takeItem(idx)
 
         # Open each file in turn and add to listWidget
         progress = 1
@@ -55,28 +52,32 @@ class Bookmarks(QListWidget):
                 if image.format() == QImage.Format_Indexed8:
                     image = image.convertToFormat(QImage.Format_Grayscale8)
 
-                # Create the list item
-                item = QListWidgetItem();
-                item.setToolTip(fname)
-                item.setData(QtCore.Qt.UserRole, image)
-                item.setIcon(self.makeIcon(image))
-
                 # Insert list item at appropriate place
-                if whom == 'openAct':                   # Append to list
-                    self.addItem(item)
-                elif whom == 'insertAct':               # Insert all before first selection
-                    self.insertItem(rows[0], item)
+                if whom == 'openAct' or whom == 'insertAct':
+                    newItem = QListWidgetItem();
+                    newItem.setToolTip(fname)
+                    newItem.setData(QtCore.Qt.UserRole, image)
+                    newItem.setIcon(self.makeIcon(image))
+                    self.insertItem(rows[0], newItem)
                     rows[0] = rows[0] + 1
-                elif whom == 'replaceAct':              # Insert before selection
-                    self.insertItem(rows[0], item)
+                else:
+                    self.item(rows[0]).setToolTip(fname)
+                    self.item(rows[0]).setData(QtCore.Qt.UserRole, image)
+                    self.item(rows[0]).setIcon(self.makeIcon(image))
                     if len(rows) > 1:
                         rows = rows[1:]
                     else:
+                        whom = 'insertAct'
                         rows[0] = rows[0] + 1
 
             # Update progress bar
             self.progressSig.emit("", progress)
             progress = progress + 1
+
+        # Remove any remaining selections
+        if (whom == 'replaceAct'):
+            for idx in sorted(rows,reverse=True):
+                self.takeItem(idx)
 
         # Cleanup status bar
         self.progressSig.emit("", -1)
@@ -85,8 +86,8 @@ class Bookmarks(QListWidget):
         for idx in range(self.count()):
             self.item(idx).setText(str(idx+1))
 
-        # Force re-layout
-        self.setSpacing(0)
+        # Signal redraw
+        self.currentItemChanged.emit(self.currentItem(), None)
 
     def writeFiles(self):
         # Determine button pressed
@@ -140,9 +141,6 @@ class Bookmarks(QListWidget):
         # Signal redraw
         self.currentItemChanged.emit(self.currentItem(), None)
 
-        # Force re-layout
-        self.setSpacing(0)
-
     def deleteSelection(self):
         # Make a list of all selected items
         rows = []
@@ -165,9 +163,6 @@ class Bookmarks(QListWidget):
             self.setCurrentItem(self.item(rows[-1]))
         else:
             self.setCurrentItem(self.item(self.count()-1))
-
-        # Force re-layout
-        self.setSpacing(0)
 
     def makeIcon(self,image):
         # Fill background
