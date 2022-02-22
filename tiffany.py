@@ -11,20 +11,13 @@ from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 from mainWin import Ui_MainWindow
 from PopupQToolButton import PopupQToolButton
 from Bookmarks import Bookmarks
+from Viewer import Viewer
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         self.connectSignalsSlots()
-        self.currImage = None
-        self.lastItem = None
-        self.scaleFactor = 1.0
-
-        # Set up graphics viewer
-        # TODO: add a logo
-        self.scene = QGraphicsScene(self)
-        self.graphicsView.setScene(self.scene)
 
         # Status bar
         self.statusLabel = QLabel("Ready")
@@ -53,14 +46,14 @@ class Window(QMainWindow, Ui_MainWindow):
         self.rotate180Act.triggered.connect(self.listWidget.rotateSelection)
         self.deleteAct.triggered.connect(self.listWidget.deleteSelection)
         self.exitAct.triggered.connect(self.close)
-        self.zoomInAct.triggered.connect(self.zoomIn)
-        self.zoomOutAct.triggered.connect(self.zoomOut)
-        self.fitToWindowAct.triggered.connect(self.fitToWindow)
+        self.zoomInAct.triggered.connect(self.graphicsView.zoomIn)
+        self.zoomOutAct.triggered.connect(self.graphicsView.zoomOut)
+        self.fitToWindowAct.triggered.connect(self.graphicsView.fitToWindow)
         #self.aboutAct.triggered.connect(self.about)
         #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
         self.listWidget.progressSig.connect(self.updateProgress)
-        self.listWidget.currentItemChanged.connect(self.imageSelected)
+        self.listWidget.currentItemChanged.connect(self.graphicsView.imageSelected)
 
     def buildToolBar(self):
         self.openMenu = QtWidgets.QMenu(self)
@@ -117,54 +110,6 @@ class Window(QMainWindow, Ui_MainWindow):
             self.statusLabel.setText("Ready")
         else:
             self.pbar.setValue(val)
-
-    def imageSelected(self, curr, prev):
-        if curr is not None:
-            self.currImage = curr.data(QtCore.Qt.UserRole)
-            pix = QPixmap.fromImage(self.currImage)
-            if self.lastItem is not None:
-                self.scene.removeItem(self.lastItem)
-            self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
-            self.lastItem = self.scene.addPixmap(pix)
-            self.fitToWindow()
-        else:
-            if self.lastItem is not None:
-                self.scene.removeItem(self.lastItem)
-                self.lastItem = None
-
-    def zoomIn(self):
-        if self.currImage is None:
-            return
-        self.graphicsView.scale(1.25, 1.25)
-        self.scaleFactor = self.scaleFactor * 1.25
-        self.zoomInAct.setEnabled(self.scaleFactor < 5.0)
-
-    def zoomOut(self):
-        if self.currImage is None:
-            return
-        self.graphicsView.scale(0.8, 0.8)
-        self.scaleFactor = self.scaleFactor * 0.8
-        self.zoomOutAct.setEnabled(self.scaleFactor > 0.2)
-
-    def fitToWindow(self):
-        if self.currImage is None:
-            return
-        # Compute reference scale factor
-        viewW = self.graphicsView.size().width()
-        viewH = self.graphicsView.size().height()
-        pixW = self.currImage.size().width() + 20
-        pixH = self.currImage.size().height() + 20
-        if (viewW * pixH > viewH * pixW):
-            scale = 0.995 * viewH / pixH
-        else:
-            scale = 0.995 * viewW / pixW
-        self.graphicsView.resetTransform()
-        self.graphicsView.scale(scale, scale)
-
-        self.scaleFactor = 1.0
-        self.zoomInAct.setEnabled(True)
-        self.zoomOutAct.setEnabled(True)
-        self.fitToWindowAct.setEnabled(True)
 
     def about(self):
         QMessageBox.about(

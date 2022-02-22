@@ -40,7 +40,7 @@
         <enum>QListView::IconMode</enum>
        </property>
       </widget>
-      <widget class="QGraphicsView" name="graphicsView">
+      <widget class="Viewer" name="graphicsView">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
@@ -294,6 +294,11 @@
    <class>Bookmarks</class>
    <extends>QListWidget</extends>
    <header>Bookmarks</header>
+  </customwidget>
+  <customwidget>
+   <class>Viewer</class>
+   <extends>QGraphicsView</extends>
+   <header>Viewer</header>
   </customwidget>
  </customwidgets>
  <resources>
