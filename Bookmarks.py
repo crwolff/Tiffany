@@ -69,6 +69,8 @@ class Bookmarks(QListWidget):
                     else:
                         whom = 'insertAct'
                         rows[0] = rows[0] + 1
+                if self.count() == 1:
+                    self.setCurrentItem(self.item(0))
 
             # Update progress bar
             self.progressSig.emit("", progress)
