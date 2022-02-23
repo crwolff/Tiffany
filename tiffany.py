@@ -33,6 +33,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.rotate180Act.setText(_translate("MainWindow", "Rotate\n180"))
         self.zoomInAct.setText(_translate("MainWindow", "Zoom\n&In (25%)"))
         self.zoomOutAct.setText(_translate("MainWindow", "Zoom\n&Out (25%)"))
+        self.fitToWindowAct.setText(_translate("MainWindow", "&Fit to\nWindow"))
 
     def connectSignalsSlots(self):
         self.openAct.triggered.connect(self.listWidget.readFiles)
@@ -49,6 +50,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.zoomInAct.triggered.connect(self.graphicsView.zoomIn)
         self.zoomOutAct.triggered.connect(self.graphicsView.zoomOut)
         self.fitToWindowAct.triggered.connect(self.graphicsView.fitToWindow)
+        self.fitWidthAct.triggered.connect(self.graphicsView.fitWidth)
+        self.fillWindowAct.triggered.connect(self.graphicsView.fillWindow)
         #self.aboutAct.triggered.connect(self.about)
         #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
@@ -92,7 +95,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.zoomMenu = QtWidgets.QMenu(self)
         self.zoomMenu.addAction(self.fitToWindowAct)
         self.zoomMenu.addAction(self.fitWidthAct)
-        self.zoomMenu.addAction(self.fit100Act)
+        self.zoomMenu.addAction(self.fillWindowAct)
         self.zoomToolButton = PopupQToolButton()
         self.zoomToolButton.setMenu(self.zoomMenu)
         self.zoomToolButton.setDefaultAction(self.fitToWindowAct)

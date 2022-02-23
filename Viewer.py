@@ -95,3 +95,38 @@ class Viewer(QGraphicsView):
         self.scale(scale, scale)
         self.scaleFactor = 1.0
         self.zoomSig.emit()
+
+    def fitWidth(self):
+        if self.currImage is None:
+            return
+        # Compute reference scale factor
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        viewW = self.size().width() - self.verticalScrollBar().width()
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        pixW = self.currImage.size().width() + 20
+        scale = 0.995 * viewW / pixW
+        self.resetTransform()
+        self.scale(scale, scale)
+        self.scaleFactor = 1.0
+        self.zoomSig.emit()
+
+    def fillWindow(self):
+        if self.currImage is None:
+            return
+        # Compute reference scale factor
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        viewW = self.size().width() - self.verticalScrollBar().width()
+        viewH = self.size().height() - self.horizontalScrollBar().height()
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        pixW = self.currImage.size().width() + 20
+        pixH = self.currImage.size().height() + 20
+        if (viewW * pixH > viewH * pixW):
+            scale = 0.995 * viewW / pixW
+        else:
+            scale = 0.995 * viewH / pixH
+        self.resetTransform()
+        self.scale(scale, scale)
+        self.scaleFactor = 1.0
+        self.zoomSig.emit()
