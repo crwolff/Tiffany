@@ -9,14 +9,44 @@ from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 class Viewer(QGraphicsView):
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent)
+        #self.setDragMode(QGraphicsView.RubberBandDrag);
         self.currImage = None
         self.lastItem = None
         self.scaleFactor = 1.0
+        self.lastPos = None
+        self.panning = False
 
         # Set up graphics viewer
         # TODO: add a logo
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
+
+    def mousePressEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.lastPos = event.pos()
+            self.panning = True
+            self.setCursor(QtCore.Qt.ClosedHandCursor)
+            event.accept()
+        else:
+            QGraphicsView.mousePressEvent(self, event)
+
+    def mouseMoveEvent(self, event):
+        if self.panning:
+            delta = event.pos() - self.lastPos
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
+            self.lastPos = event.pos()
+            event.accept()
+        else:
+            QGraphicsView.mouseMoveEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.RightButton:
+            self.panning = False
+            self.setCursor(QtCore.Qt.ArrowCursor)
+            event.accept()
+        else:
+            QGraphicsView.mouseReleaseEvent(self, event)
 
     def imageSelected(self, curr, prev):
         if curr is not None:
