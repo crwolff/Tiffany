@@ -12,7 +12,7 @@ class Viewer(QGraphicsView):
 
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent)
-        #self.setDragMode(QGraphicsView.RubberBandDrag);
+        self.setDragMode(QGraphicsView.RubberBandDrag);
         self.currImage = None
         self.lastItem = None
         self.scaleFactor = 1.0
@@ -48,6 +48,11 @@ class Viewer(QGraphicsView):
             self.panning = False
             self.setCursor(QtCore.Qt.ArrowCursor)
             event.accept()
+        elif event.button() == QtCore.Qt.LeftButton:
+            topLeft = self.mapToScene(self.rubberBandRect().topLeft())
+            bottomRight = self.mapToScene(self.rubberBandRect().bottomRight())
+            self.fitInView(QtCore.QRectF(topLeft, bottomRight), QtCore.Qt.KeepAspectRatio)
+            QGraphicsView.mouseReleaseEvent(self, event)
         else:
             QGraphicsView.mouseReleaseEvent(self, event)
 
@@ -78,6 +83,10 @@ class Viewer(QGraphicsView):
         self.scale(0.8, 0.8)
         self.scaleFactor = self.scaleFactor * 0.8
         self.zoomSig.emit()
+
+    def zoomSelect(self):
+        if self.currImage is None:
+            return
 
     def fitToWindow(self):
         if self.currImage is None:
