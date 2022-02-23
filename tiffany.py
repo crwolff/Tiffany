@@ -53,6 +53,8 @@ class Window(QMainWindow, Ui_MainWindow):
         #self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
         self.listWidget.progressSig.connect(self.updateProgress)
+        self.graphicsView.progressSig.connect(self.updateProgress)
+        self.graphicsView.zoomSig.connect(self.updateActions)
         self.listWidget.currentItemChanged.connect(self.graphicsView.imageSelected)
 
     def buildToolBar(self):
@@ -110,6 +112,10 @@ class Window(QMainWindow, Ui_MainWindow):
             self.statusLabel.setText("Ready")
         else:
             self.pbar.setValue(val)
+
+    def updateActions(self):
+        self.zoomInAct.setEnabled(self.graphicsView.scaleFactor < 10.0)
+        self.zoomOutAct.setEnabled(self.graphicsView.scaleFactor > 0.1)
 
     def about(self):
         QMessageBox.about(

@@ -7,6 +7,9 @@ from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 
 class Viewer(QGraphicsView):
+    progressSig = QtCore.pyqtSignal(str, int)
+    zoomSig = QtCore.pyqtSignal()
+
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent)
         #self.setDragMode(QGraphicsView.RubberBandDrag);
@@ -67,12 +70,14 @@ class Viewer(QGraphicsView):
             return
         self.scale(1.25, 1.25)
         self.scaleFactor = self.scaleFactor * 1.25
+        self.zoomSig.emit()
 
     def zoomOut(self):
         if self.currImage is None:
             return
         self.scale(0.8, 0.8)
         self.scaleFactor = self.scaleFactor * 0.8
+        self.zoomSig.emit()
 
     def fitToWindow(self):
         if self.currImage is None:
@@ -89,4 +94,4 @@ class Viewer(QGraphicsView):
         self.resetTransform()
         self.scale(scale, scale)
         self.scaleFactor = 1.0
-
+        self.zoomSig.emit()
