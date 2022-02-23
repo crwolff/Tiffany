@@ -52,8 +52,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.fitToWindowAct.triggered.connect(self.graphicsView.fitToWindow)
         self.fitWidthAct.triggered.connect(self.graphicsView.fitWidth)
         self.fillWindowAct.triggered.connect(self.graphicsView.fillWindow)
-        #self.aboutAct.triggered.connect(self.about)
-        #self.aboutQtAct.triggered.connect(qApp.aboutQt)
+        self.aboutAct.triggered.connect(self.about)
+        self.aboutQtAct.triggered.connect(qApp.aboutQt)
 
         self.listWidget.progressSig.connect(self.updateProgress)
         self.graphicsView.progressSig.connect(self.updateProgress)

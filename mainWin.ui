@@ -100,9 +100,17 @@
     <addaction name="fitWidthAct"/>
     <addaction name="fillWindowAct"/>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="aboutAct"/>
+    <addaction name="aboutQtAct"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -286,6 +294,16 @@
    </property>
    <property name="text">
     <string>Fil&amp;l Window</string>
+   </property>
+  </action>
+  <action name="aboutAct">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="aboutQtAct">
+   <property name="text">
+    <string>About &amp;Qt</string>
    </property>
   </action>
  </widget>
