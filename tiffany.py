@@ -97,7 +97,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.toolsMenu = QtWidgets.QMenu(self)
         self.toolsMenu.addAction(self.pointerAct)
-        self.toolsMenu.addAction(self.brushAct)
+        self.toolsMenu.addAction(self.pencilAct)
         self.toolsMenu.addAction(self.eraserAct)
         self.toolsMenu.addAction(self.areaFillAct)
         self.toolsToolButton = PopupQToolButton()
@@ -116,12 +116,12 @@ class Window(QMainWindow, Ui_MainWindow):
         self.toolBar.addWidget(self.toolSizeToolButton)
 
         self.toolColorMenu = QtWidgets.QMenu(self)
-        self.toolColorMenu.addAction(self.whiteAct)
         self.toolColorMenu.addAction(self.blackAct)
         self.toolColorMenu.addAction(self.redAct)
+        self.toolColorMenu.addAction(self.whiteAct)
         self.toolColorToolButton = PopupQToolButton()
         self.toolColorToolButton.setMenu(self.toolColorMenu)
-        self.toolColorToolButton.setDefaultAction(self.whiteAct)
+        self.toolColorToolButton.setDefaultAction(self.blackAct)
         self.toolBar.addWidget(self.toolColorToolButton)
 
     def updateProgress(self, txt, val):

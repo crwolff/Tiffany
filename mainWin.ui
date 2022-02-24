@@ -105,7 +105,7 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="pointerAct"/>
-    <addaction name="brushAct"/>
+    <addaction name="pencilAct"/>
     <addaction name="eraserAct"/>
     <addaction name="areaFillAct"/>
    </widget>
@@ -118,9 +118,9 @@
     <addaction name="pix8Act"/>
     <addaction name="pix12Act"/>
     <addaction name="separator"/>
-    <addaction name="whiteAct"/>
     <addaction name="blackAct"/>
     <addaction name="redAct"/>
+    <addaction name="whiteAct"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -329,7 +329,7 @@
     <string>&amp;Pointer</string>
    </property>
   </action>
-  <action name="brushAct">
+  <action name="pencilAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/pencil-svgrepo-com.svg</normaloff>:/images/assets/pencil-svgrepo-com.svg</iconset>
@@ -398,15 +398,6 @@
     <string>12px</string>
    </property>
   </action>
-  <action name="whiteAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/white.svg</normaloff>:/images/assets/white.svg</iconset>
-   </property>
-   <property name="text">
-    <string>White</string>
-   </property>
-  </action>
   <action name="blackAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
@@ -423,6 +414,15 @@
    </property>
    <property name="text">
     <string>Red</string>
+   </property>
+  </action>
+  <action name="whiteAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/white.svg</normaloff>:/images/assets/white.svg</iconset>
+   </property>
+   <property name="text">
+    <string>White</string>
    </property>
   </action>
   <action name="aboutAct">
