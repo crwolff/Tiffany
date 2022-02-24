@@ -100,6 +100,28 @@
     <addaction name="fitWidthAct"/>
     <addaction name="fillWindowAct"/>
    </widget>
+   <widget class="QMenu" name="menu_Tools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="pointerAct"/>
+    <addaction name="brushAct"/>
+    <addaction name="eraserAct"/>
+    <addaction name="areaFillAct"/>
+   </widget>
+   <widget class="QMenu" name="menuTool_Size">
+    <property name="title">
+     <string>Tool &amp;Size</string>
+    </property>
+    <addaction name="pix1Act"/>
+    <addaction name="pix4Act"/>
+    <addaction name="pix8Act"/>
+    <addaction name="pix12Act"/>
+    <addaction name="separator"/>
+    <addaction name="whiteAct"/>
+    <addaction name="blackAct"/>
+    <addaction name="redAct"/>
+   </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
      <string>&amp;Help</string>
@@ -110,6 +132,8 @@
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
+   <addaction name="menu_Tools"/>
+   <addaction name="menuTool_Size"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -294,6 +318,111 @@
    </property>
    <property name="text">
     <string>Fil&amp;l Window</string>
+   </property>
+  </action>
+  <action name="pointerAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/cursor-edit-tools-svgrepo-com.svg</normaloff>:/images/assets/cursor-edit-tools-svgrepo-com.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Pointer</string>
+   </property>
+  </action>
+  <action name="brushAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/pencil-svgrepo-com.svg</normaloff>:/images/assets/pencil-svgrepo-com.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Brush</string>
+   </property>
+  </action>
+  <action name="eraserAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/eraser-svgrepo-com.svg</normaloff>:/images/assets/eraser-svgrepo-com.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Eraser</string>
+   </property>
+  </action>
+  <action name="areaFillAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/vector-design-svgrepo-com.svg</normaloff>:/images/assets/vector-design-svgrepo-com.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Fill Area</string>
+   </property>
+  </action>
+  <action name="pix1Act">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/pix1.svg</normaloff>:/images/assets/pix1.svg</iconset>
+   </property>
+   <property name="text">
+    <string>1px</string>
+   </property>
+  </action>
+  <action name="pix4Act">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/pix4.svg</normaloff>:/images/assets/pix4.svg</iconset>
+   </property>
+   <property name="text">
+    <string>4px</string>
+   </property>
+  </action>
+  <action name="pix8Act">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/pix8.svg</normaloff>:/images/assets/pix8.svg</iconset>
+   </property>
+   <property name="text">
+    <string>8px</string>
+   </property>
+  </action>
+  <action name="pix12Act">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/pix12.svg</normaloff>:/images/assets/pix12.svg</iconset>
+   </property>
+   <property name="text">
+    <string>12px</string>
+   </property>
+   <property name="toolTip">
+    <string>12px</string>
+   </property>
+  </action>
+  <action name="whiteAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/white.svg</normaloff>:/images/assets/white.svg</iconset>
+   </property>
+   <property name="text">
+    <string>White</string>
+   </property>
+  </action>
+  <action name="blackAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/black.svg</normaloff>:/images/assets/black.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Black</string>
+   </property>
+  </action>
+  <action name="redAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/red.svg</normaloff>:/images/assets/red.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Red</string>
    </property>
   </action>
   <action name="aboutAct">

@@ -166,6 +166,18 @@ class Bookmarks(QListWidget):
         else:
             self.setCurrentItem(self.item(self.count()-1))
 
+    def selectAll(self):
+        for idx in range(self.count()):
+            self.item(idx).setSelected(True)
+
+    def selectEven(self):
+        for idx in range(self.count()):
+            self.item(idx).setSelected(idx&1==0)
+
+    def selectOdd(self):
+        for idx in range(self.count()):
+            self.item(idx).setSelected(idx&1==1)
+
     def makeIcon(self,image):
         # Fill background
         qimg = QImage(100, 100, QImage.Format_RGB32)
