@@ -109,18 +109,14 @@
     <addaction name="eraserAct"/>
     <addaction name="areaFillAct"/>
    </widget>
-   <widget class="QMenu" name="menuTool_Size">
+   <widget class="QMenu" name="menu_Stroke">
     <property name="title">
-     <string>Tool &amp;Size</string>
+     <string>&amp;Stroke</string>
     </property>
     <addaction name="pix1Act"/>
     <addaction name="pix4Act"/>
     <addaction name="pix8Act"/>
     <addaction name="pix12Act"/>
-    <addaction name="separator"/>
-    <addaction name="blackAct"/>
-    <addaction name="redAct"/>
-    <addaction name="whiteAct"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -133,7 +129,7 @@
    <addaction name="menu_Edit"/>
    <addaction name="menu_View"/>
    <addaction name="menu_Tools"/>
-   <addaction name="menuTool_Size"/>
+   <addaction name="menu_Stroke"/>
    <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -335,7 +331,7 @@
      <normaloff>:/images/assets/pencil-svgrepo-com.svg</normaloff>:/images/assets/pencil-svgrepo-com.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Brush</string>
+    <string>&amp;Pencil</string>
    </property>
   </action>
   <action name="eraserAct">
@@ -398,33 +394,6 @@
     <string>12px</string>
    </property>
   </action>
-  <action name="blackAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/black.svg</normaloff>:/images/assets/black.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Black</string>
-   </property>
-  </action>
-  <action name="redAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/red.svg</normaloff>:/images/assets/red.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Red</string>
-   </property>
-  </action>
-  <action name="whiteAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/white.svg</normaloff>:/images/assets/white.svg</iconset>
-   </property>
-   <property name="text">
-    <string>White</string>
-   </property>
-  </action>
   <action name="aboutAct">
    <property name="text">
     <string>&amp;About</string>
@@ -433,6 +402,18 @@
   <action name="aboutQtAct">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="colorAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/icn_Toolbar_color.png</normaloff>:/images/assets/icn_Toolbar_color.png</iconset>
+   </property>
+   <property name="text">
+    <string>Color</string>
+   </property>
+   <property name="toolTip">
+    <string>Color Picker</string>
    </property>
   </action>
  </widget>

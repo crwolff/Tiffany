@@ -115,14 +115,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.toolSizeToolButton.setDefaultAction(self.pix1Act)
         self.toolBar.addWidget(self.toolSizeToolButton)
 
-        self.toolColorMenu = QtWidgets.QMenu(self)
-        self.toolColorMenu.addAction(self.blackAct)
-        self.toolColorMenu.addAction(self.redAct)
-        self.toolColorMenu.addAction(self.whiteAct)
-        self.toolColorToolButton = PopupQToolButton()
-        self.toolColorToolButton.setMenu(self.toolColorMenu)
-        self.toolColorToolButton.setDefaultAction(self.blackAct)
-        self.toolBar.addWidget(self.toolColorToolButton)
+        self.toolBar.addAction(self.colorAct)
 
     def updateProgress(self, txt, val):
         if txt != "":
