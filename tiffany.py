@@ -36,28 +36,43 @@ class Window(QMainWindow, Ui_MainWindow):
         self.fitToWindowAct.setText(_translate("MainWindow", "&Fit to\nWindow"))
 
     def connectSignalsSlots(self):
+        # File menu
         self.openAct.triggered.connect(self.listWidget.readFiles)
         self.insertAct.triggered.connect(self.listWidget.readFiles)
         self.replaceAct.triggered.connect(self.listWidget.readFiles)
         self.saveAct.triggered.connect(self.listWidget.writeFiles)
         self.saveAsAct.triggered.connect(self.listWidget.writeFiles)
         self.createTIFFAct.triggered.connect(self.listWidget.writeFiles)
-        self.rotateCWAct.triggered.connect(self.listWidget.rotateSelection)
-        self.rotateCCWAct.triggered.connect(self.listWidget.rotateSelection)
-        self.rotate180Act.triggered.connect(self.listWidget.rotateSelection)
+        self.exitAct.triggered.connect(self.close)
+        # Edit menu
         self.selectAllAct.triggered.connect(self.listWidget.selectAll)
         self.selectEvenAct.triggered.connect(self.listWidget.selectEven)
         self.selectOddAct.triggered.connect(self.listWidget.selectOdd)
         self.deleteAct.triggered.connect(self.listWidget.deleteSelection)
-        self.exitAct.triggered.connect(self.close)
+        #self.moveAct.triggered.connect(???)
+        self.rotateCWAct.triggered.connect(self.listWidget.rotateSelection)
+        self.rotateCCWAct.triggered.connect(self.listWidget.rotateSelection)
+        self.rotate180Act.triggered.connect(self.listWidget.rotateSelection)
+        # View menu
         self.zoomInAct.triggered.connect(self.graphicsView.zoomIn)
         self.zoomOutAct.triggered.connect(self.graphicsView.zoomOut)
         self.fitToWindowAct.triggered.connect(self.graphicsView.fitToWindow)
         self.fitWidthAct.triggered.connect(self.graphicsView.fitWidth)
         self.fillWindowAct.triggered.connect(self.graphicsView.fillWindow)
+        # Tools menu
+        self.pointerAct.triggered.connect(self.graphicsView.pointerMode)
+        self.pencilAct.triggered.connect(self.graphicsView.pencilMode)
+        self.eraserAct.triggered.connect(self.graphicsView.eraserMode)
+        self.areaFillAct.triggered.connect(self.graphicsView.areaFillMode)
+        # Stroke menu
+        #self.pix1Act.triggered.connect(???)
+        #self.pix4Act.triggered.connect(???)
+        #self.pix8Act.triggered.connect(???)
+        #self.pix12Act.triggered.connect(???)
+        # Help menu
         self.aboutAct.triggered.connect(self.about)
         self.aboutQtAct.triggered.connect(qApp.aboutQt)
-
+        # Interconnects
         self.listWidget.progressSig.connect(self.updateProgress)
         self.graphicsView.progressSig.connect(self.updateProgress)
         self.graphicsView.zoomSig.connect(self.updateActions)

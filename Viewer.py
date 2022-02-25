@@ -18,6 +18,9 @@ class Viewer(QGraphicsView):
         self.scaleFactor = 1.0
         self.lastPos = None
         self.panning = False
+        self.drawing = False
+        self.erasing = False
+        self.areaFill = False
 
         # Set up graphics viewer
         # TODO: add a logo
@@ -69,6 +72,26 @@ class Viewer(QGraphicsView):
             if self.lastItem is not None:
                 self.scene.removeItem(self.lastItem)
                 self.lastItem = None
+
+    def pointerMode(self):
+        self.drawing = False
+        self.erasing = False
+        self.areaFill = False
+
+    def pencilMode(self):
+        self.drawing = True
+        self.erasing = False
+        self.areaFill = False
+
+    def eraserMode(self):
+        self.drawing = False
+        self.erasing = True
+        self.areaFill = False
+
+    def areaFillMode(self):
+        self.drawing = False
+        self.erasing = False
+        self.areaFill = True
 
     def zoomIn(self):
         if self.currImage is None:
