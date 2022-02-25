@@ -380,9 +380,6 @@
    </property>
   </action>
   <action name="pix12Act">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/pix12.svg</normaloff>:/images/assets/pix12.svg</iconset>
