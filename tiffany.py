@@ -4,7 +4,7 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import qApp, QApplication, QMainWindow, QMessageBox, QProgressBar, QLabel
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem, QColorDialog
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 from mainWin import Ui_MainWindow
@@ -69,6 +69,8 @@ class Window(QMainWindow, Ui_MainWindow):
         #self.pix4Act.triggered.connect(???)
         #self.pix8Act.triggered.connect(???)
         #self.pix12Act.triggered.connect(???)
+        # Color button
+        self.colorAct.triggered.connect(self.colorMagic)
         # Help menu
         self.aboutAct.triggered.connect(self.about)
         self.aboutQtAct.triggered.connect(qApp.aboutQt)
@@ -77,6 +79,20 @@ class Window(QMainWindow, Ui_MainWindow):
         self.graphicsView.progressSig.connect(self.updateProgress)
         self.graphicsView.zoomSig.connect(self.updateActions)
         self.listWidget.currentItemChanged.connect(self.graphicsView.imageSelected)
+
+    def colorMagic(self):
+        if self.colorToolButton.mode == "Foreground":
+            self.graphicsView.foregroundColor = QColorDialog.getColor()
+        elif self.colorToolButton.mode == "Background":
+            self.graphicsView.backgroundColor = QColorDialog.getColor()
+        elif self.colorToolButton.mode == "Swap":
+            tmp = self.graphicsView.foregroundColor
+            self.graphicsView.foregroundColor = self.graphicsView.backgroundColor
+            self.graphicsView.backgroundColor = tmp
+        elif self.colorToolButton.mode == "Reset":
+            self.graphicsView.foregroundColor = QtCore.Qt.black
+            self.graphicsView.backgroundColor = QtCore.Qt.white
+        self.colorToolButton.setIcon(self.graphicsView.foregroundColor, self.graphicsView.backgroundColor)
 
     def buildToolBar(self):
         self.openMenu = QtWidgets.QMenu(self)
@@ -132,7 +148,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.colorToolButton = ColorQToolButton()
         self.colorToolButton.setDefaultAction(self.colorAct)
-        self.colorToolButton.setIcon()
+        self.colorToolButton.setIcon(self.graphicsView.foregroundColor, self.graphicsView.backgroundColor)
         self.toolBar.addWidget(self.colorToolButton)
 
     def updateProgress(self, txt, val):

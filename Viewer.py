@@ -17,6 +17,8 @@ class Viewer(QGraphicsView):
         self.lastItem = None
         self.scaleFactor = 1.0
         self.lastPos = None
+        self.foregroundColor = QtCore.Qt.black
+        self.backgroundColor = QtCore.Qt.white
         self.panning = False
         self.drawing = False
         self.erasing = False
