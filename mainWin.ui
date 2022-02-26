@@ -150,7 +150,7 @@
   <action name="openAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_simplescan.png</normaloff>:/images/assets/icn_Toolbar_simplescan.png</iconset>
+     <normaloff>:/images/assets/file_open.svg</normaloff>:/images/assets/file_open.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Open</string>
@@ -159,7 +159,7 @@
   <action name="insertAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_add.png</normaloff>:/images/assets/icn_Toolbar_add.png</iconset>
+     <normaloff>:/images/assets/file_add.svg</normaloff>:/images/assets/file_add.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Insert</string>
@@ -168,7 +168,7 @@
   <action name="replaceAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_replace.png</normaloff>:/images/assets/icn_Toolbar_replace.png</iconset>
+     <normaloff>:/images/assets/file_replace.svg</normaloff>:/images/assets/file_replace.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Replace</string>
@@ -177,7 +177,7 @@
   <action name="saveAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_save.png</normaloff>:/images/assets/icn_Toolbar_save.png</iconset>
+     <normaloff>:/images/assets/file_save.svg</normaloff>:/images/assets/file_save.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Save</string>
@@ -186,7 +186,7 @@
   <action name="saveAsAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_save.png</normaloff>:/images/assets/icn_Toolbar_save.png</iconset>
+     <normaloff>:/images/assets/file_saveas.svg</normaloff>:/images/assets/file_saveas.svg</iconset>
    </property>
    <property name="text">
     <string>Save &amp;As</string>
@@ -195,7 +195,7 @@
   <action name="createTIFFAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_multifeed.png</normaloff>:/images/assets/icn_Toolbar_multifeed.png</iconset>
+     <normaloff>:/images/assets/create_tiff.svg</normaloff>:/images/assets/create_tiff.svg</iconset>
    </property>
    <property name="text">
     <string>Create &amp;TIFF</string>
@@ -227,7 +227,7 @@
   <action name="deleteAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_delete.png</normaloff>:/images/assets/icn_Toolbar_delete.png</iconset>
+     <normaloff>:/images/assets/delete.svg</normaloff>:/images/assets/delete.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Delete</string>
@@ -241,7 +241,7 @@
   <action name="rotateCWAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_rotate90.png</normaloff>:/images/assets/icn_Toolbar_rotate90.png</iconset>
+     <normaloff>:/images/assets/rotate_CW.svg</normaloff>:/images/assets/rotate_CW.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Rotate CW</string>
@@ -250,7 +250,7 @@
   <action name="rotateCCWAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_rotate-90.png</normaloff>:/images/assets/icn_Toolbar_rotate-90.png</iconset>
+     <normaloff>:/images/assets/rotate_CCW.svg</normaloff>:/images/assets/rotate_CCW.svg</iconset>
    </property>
    <property name="text">
     <string>Rotate CCW</string>
@@ -262,7 +262,7 @@
   <action name="rotate180Act">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_rotate180.png</normaloff>:/images/assets/icn_Toolbar_rotate180.png</iconset>
+     <normaloff>:/images/assets/rotate_180.svg</normaloff>:/images/assets/rotate_180.svg</iconset>
    </property>
    <property name="text">
     <string>Rotate 180</string>
@@ -271,7 +271,7 @@
   <action name="zoomInAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_zoom_in.png</normaloff>:/images/assets/icn_Toolbar_zoom_in.png</iconset>
+     <normaloff>:/images/assets/zoom_in.svg</normaloff>:/images/assets/zoom_in.svg</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;In</string>
@@ -280,7 +280,7 @@
   <action name="zoomOutAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_zoom_out.png</normaloff>:/images/assets/icn_Toolbar_zoom_out.png</iconset>
+     <normaloff>:/images/assets/zoom_out.svg</normaloff>:/images/assets/zoom_out.svg</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
@@ -289,7 +289,7 @@
   <action name="fitToWindowAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_fit2window.png</normaloff>:/images/assets/icn_Toolbar_fit2window.png</iconset>
+     <normaloff>:/images/assets/fit_window.svg</normaloff>:/images/assets/fit_window.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Fit to Window</string>
@@ -301,7 +301,7 @@
   <action name="fitWidthAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_fit2width.png</normaloff>:/images/assets/icn_Toolbar_fit2width.png</iconset>
+     <normaloff>:/images/assets/fit_width.svg</normaloff>:/images/assets/fit_width.svg</iconset>
    </property>
    <property name="text">
     <string>Fit &amp;Width</string>
@@ -310,7 +310,7 @@
   <action name="fillWindowAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_100.png</normaloff>:/images/assets/icn_Toolbar_100.png</iconset>
+     <normaloff>:/images/assets/fill_window.svg</normaloff>:/images/assets/fill_window.svg</iconset>
    </property>
    <property name="text">
     <string>Fil&amp;l Window</string>
@@ -319,7 +319,7 @@
   <action name="pointerAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/cursor-edit-tools-svgrepo-com.svg</normaloff>:/images/assets/cursor-edit-tools-svgrepo-com.svg</iconset>
+     <normaloff>:/images/assets/pointer.svg</normaloff>:/images/assets/pointer.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Pointer</string>
@@ -328,7 +328,7 @@
   <action name="pencilAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/pencil-svgrepo-com.svg</normaloff>:/images/assets/pencil-svgrepo-com.svg</iconset>
+     <normaloff>:/images/assets/pencil.svg</normaloff>:/images/assets/pencil.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Pencil</string>
@@ -337,7 +337,7 @@
   <action name="eraserAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/eraser-svgrepo-com.svg</normaloff>:/images/assets/eraser-svgrepo-com.svg</iconset>
+     <normaloff>:/images/assets/eraser.svg</normaloff>:/images/assets/eraser.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Eraser</string>
@@ -346,7 +346,7 @@
   <action name="areaFillAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/vector-design-svgrepo-com.svg</normaloff>:/images/assets/vector-design-svgrepo-com.svg</iconset>
+     <normaloff>:/images/assets/fill_area.svg</normaloff>:/images/assets/fill_area.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Fill Area</string>
@@ -404,7 +404,7 @@
   <action name="colorAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/icn_Toolbar_color.png</normaloff>:/images/assets/icn_Toolbar_color.png</iconset>
+     <normaloff>:/images/assets/fg_color.ico</normaloff>:/images/assets/fg_color.ico</iconset>
    </property>
    <property name="text">
     <string>Color</string>

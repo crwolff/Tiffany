@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import math
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import qApp, QApplication, QMainWindow, QMessageBox, QProgressBar, QLabel
@@ -9,8 +8,9 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsPixmapItem
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 from mainWin import Ui_MainWindow
-from PopupQToolButton import PopupQToolButton
 from Bookmarks import Bookmarks
+from ColorQToolButton import ColorQToolButton
+from PopupQToolButton import PopupQToolButton
 from Viewer import Viewer
 
 class Window(QMainWindow, Ui_MainWindow):
@@ -130,7 +130,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.toolSizeToolButton.setDefaultAction(self.pix1Act)
         self.toolBar.addWidget(self.toolSizeToolButton)
 
-        self.toolBar.addAction(self.colorAct)
+        self.colorToolButton = ColorQToolButton()
+        self.colorToolButton.setDefaultAction(self.colorAct)
+        self.colorToolButton.setIcon()
+        self.toolBar.addWidget(self.colorToolButton)
 
     def updateProgress(self, txt, val):
         if txt != "":

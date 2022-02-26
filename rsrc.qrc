@@ -1,0 +1,28 @@
+<RCC>
+  <qresource prefix="images">
+    <file>assets/create_tiff.svg</file>
+    <file>assets/delete.svg</file>
+    <file>assets/eraser.svg</file>
+    <file>assets/fg_color.ico</file>
+    <file>assets/file_add.svg</file>
+    <file>assets/file_open.svg</file>
+    <file>assets/file_replace.svg</file>
+    <file>assets/file_save.svg</file>
+    <file>assets/file_saveas.svg</file>
+    <file>assets/fill_area.svg</file>
+    <file>assets/fill_window.svg</file>
+    <file>assets/fit_width.svg</file>
+    <file>assets/fit_window.svg</file>
+    <file>assets/pencil.svg</file>
+    <file>assets/pix1.svg</file>
+    <file>assets/pix4.svg</file>
+    <file>assets/pix8.svg</file>
+    <file>assets/pix12.svg</file>
+    <file>assets/pointer.svg</file>
+    <file>assets/rotate_180.svg</file>
+    <file>assets/rotate_CCW.svg</file>
+    <file>assets/rotate_CW.svg</file>
+    <file>assets/zoom_in.svg</file>
+    <file>assets/zoom_out.svg</file>
+  </qresource>
+</RCC>
