@@ -49,7 +49,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.selectEvenAct.triggered.connect(self.listWidget.selectEven)
         self.selectOddAct.triggered.connect(self.listWidget.selectOdd)
         self.deleteAct.triggered.connect(self.listWidget.deleteSelection)
-        #self.moveAct.triggered.connect(???)
+        self.moveAct.triggered.connect(self.listWidget.moveMode)
         self.rotateCWAct.triggered.connect(self.listWidget.rotateSelection)
         self.rotateCCWAct.triggered.connect(self.listWidget.rotateSelection)
         self.rotate180Act.triggered.connect(self.listWidget.rotateSelection)

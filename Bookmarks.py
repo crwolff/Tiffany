@@ -143,6 +143,9 @@ class Bookmarks(QListWidget):
         # Signal redraw
         self.currentItemChanged.emit(self.currentItem(), None)
 
+    def moveMode(self):
+        pass
+
     def deleteSelection(self):
         # Make a list of all selected items
         rows = []
