@@ -20,7 +20,9 @@ class Viewer(QGraphicsView):
         self.lastPos = None
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
+        self.brushSize = 1
         self.panning = False
+        self.drawing = False
         self.leftMode = "Zoom"
 
         # Set up graphics viewer
@@ -34,6 +36,14 @@ class Viewer(QGraphicsView):
             self.panning = True
             self.setCursor(QtCore.Qt.ClosedHandCursor)
             event.accept()
+        elif event.button() == QtCore.Qt.LeftButton:
+            if (self.leftMode == "Draw") or (self.leftMode == "Erase"):
+                self.lastPos = event.pos()
+                self.drawing = True
+                self.setCursor(QtCore.Qt.CrossCursor)
+                event.accept()
+            else:
+                QGraphicsView.mousePressEvent(self, event)
         else:
             QGraphicsView.mousePressEvent(self, event)
 
@@ -43,6 +53,27 @@ class Viewer(QGraphicsView):
             self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
             self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
             self.lastPos = event.pos()
+            event.accept()
+        elif self.drawing:
+            painter = QPainter(self.currImage)
+            if self.leftMode == "Draw":
+                brushColor = self.foregroundColor
+            else:
+                brushColor = self.backgroundColor
+            painter.setPen(QtGui.QPen(brushColor, self.brushSize, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+            painter.drawLine(self.mapToScene(self.lastPos), self.mapToScene(event.pos()))
+            self.lastPos = event.pos()
+            painter.end()
+
+            # Update list widget with new image
+            self.lastListItem.setData(QtCore.Qt.UserRole, self.currImage)
+
+            # Replace current pixmap with new one
+            self.currPixmap = QPixmap.fromImage(self.currImage)
+            if self.lastSceneItem is not None:
+                self.scene.removeItem(self.lastSceneItem)
+            self.scene.addPixmap(self.currPixmap)
+            self.lastSceneItem = self.scene.addPixmap(self.currPixmap)
             event.accept()
         else:
             QGraphicsView.mouseMoveEvent(self, event)
@@ -57,6 +88,7 @@ class Viewer(QGraphicsView):
                 topLeft = self.mapToScene(self.rubberBandRect().topLeft())
                 bottomRight = self.mapToScene(self.rubberBandRect().bottomRight())
                 self.fitInView(QtCore.QRectF(topLeft, bottomRight), QtCore.Qt.KeepAspectRatio)
+                QGraphicsView.mouseReleaseEvent(self, event)
             elif self.leftMode == "Fill":
                 # Find corners of area
                 topLeft = self.mapToScene(self.rubberBandRect().topLeft())
@@ -77,7 +109,12 @@ class Viewer(QGraphicsView):
                     self.scene.removeItem(self.lastSceneItem)
                 self.scene.addPixmap(self.currPixmap)
                 self.lastSceneItem = self.scene.addPixmap(self.currPixmap)
-            QGraphicsView.mouseReleaseEvent(self, event)
+                QGraphicsView.mouseReleaseEvent(self, event)
+            else:
+                self.drawing = False
+                self.setCursor(QtCore.Qt.ArrowCursor)
+                self.imageChangedSig.emit()
+                event.accept()
         else:
             QGraphicsView.mouseReleaseEvent(self, event)
 
@@ -111,6 +148,17 @@ class Viewer(QGraphicsView):
     def areaFillMode(self):
         self.leftMode = "Fill"
         self.setDragMode(QGraphicsView.RubberBandDrag);
+
+    def setBrush(self):
+        whom = self.sender().objectName()
+        if whom == "pix1Act":
+            self.brushSize = 1
+        elif whom == "pix4Act":
+            self.brushSize = 4
+        elif whom == "pix8Act":
+            self.brushSize = 8
+        else:
+            self.brushSize = 12
 
     def zoomIn(self):
         if self.currImage is None:

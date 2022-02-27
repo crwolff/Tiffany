@@ -65,10 +65,10 @@ class Window(QMainWindow, Ui_MainWindow):
         self.eraserAct.triggered.connect(self.graphicsView.eraserMode)
         self.areaFillAct.triggered.connect(self.graphicsView.areaFillMode)
         # Stroke menu
-        #self.pix1Act.triggered.connect(???)
-        #self.pix4Act.triggered.connect(???)
-        #self.pix8Act.triggered.connect(???)
-        #self.pix12Act.triggered.connect(???)
+        self.pix1Act.triggered.connect(self.graphicsView.setBrush)
+        self.pix4Act.triggered.connect(self.graphicsView.setBrush)
+        self.pix8Act.triggered.connect(self.graphicsView.setBrush)
+        self.pix12Act.triggered.connect(self.graphicsView.setBrush)
         # Color button
         self.colorAct.triggered.connect(self.colorMagic)
         # Help menu
