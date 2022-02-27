@@ -78,6 +78,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.listWidget.progressSig.connect(self.updateProgress)
         self.graphicsView.progressSig.connect(self.updateProgress)
         self.graphicsView.zoomSig.connect(self.updateActions)
+        self.graphicsView.imageChangedSig.connect(self.listWidget.updateIcon)
         self.listWidget.currentItemChanged.connect(self.graphicsView.imageSelected)
 
     def colorMagic(self):

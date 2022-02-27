@@ -9,20 +9,19 @@ from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 class Viewer(QGraphicsView):
     progressSig = QtCore.pyqtSignal(str, int)
     zoomSig = QtCore.pyqtSignal()
+    imageChangedSig = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent)
         self.setDragMode(QGraphicsView.RubberBandDrag);
         self.currImage = None
-        self.lastItem = None
+        self.lastSceneItem = None
         self.scaleFactor = 1.0
         self.lastPos = None
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
         self.panning = False
-        self.drawing = False
-        self.erasing = False
-        self.areaFill = False
+        self.leftMode = "Zoom"
 
         # Set up graphics viewer
         # TODO: add a logo
@@ -54,9 +53,30 @@ class Viewer(QGraphicsView):
             self.setCursor(QtCore.Qt.ArrowCursor)
             event.accept()
         elif event.button() == QtCore.Qt.LeftButton:
-            topLeft = self.mapToScene(self.rubberBandRect().topLeft())
-            bottomRight = self.mapToScene(self.rubberBandRect().bottomRight())
-            self.fitInView(QtCore.QRectF(topLeft, bottomRight), QtCore.Qt.KeepAspectRatio)
+            if self.leftMode == "Zoom":
+                topLeft = self.mapToScene(self.rubberBandRect().topLeft())
+                bottomRight = self.mapToScene(self.rubberBandRect().bottomRight())
+                self.fitInView(QtCore.QRectF(topLeft, bottomRight), QtCore.Qt.KeepAspectRatio)
+            elif self.leftMode == "Fill":
+                # Find corners of area
+                topLeft = self.mapToScene(self.rubberBandRect().topLeft())
+                bottomRight = self.mapToScene(self.rubberBandRect().bottomRight())
+
+                # Paint rectangle in background color
+                painter = QPainter(self.currImage)
+                painter.fillRect(QtCore.QRectF(topLeft, bottomRight), self.backgroundColor)
+                painter.end()
+
+                # Update list widget with new image
+                self.lastListItem.setData(QtCore.Qt.UserRole, self.currImage)
+                self.imageChangedSig.emit()
+
+                # Replace current pixmap with new one
+                self.currPixmap = QPixmap.fromImage(self.currImage)
+                if self.lastSceneItem is not None:
+                    self.scene.removeItem(self.lastSceneItem)
+                self.scene.addPixmap(self.currPixmap)
+                self.lastSceneItem = self.scene.addPixmap(self.currPixmap)
             QGraphicsView.mouseReleaseEvent(self, event)
         else:
             QGraphicsView.mouseReleaseEvent(self, event)
@@ -65,35 +85,32 @@ class Viewer(QGraphicsView):
         if curr is not None:
             self.currImage = curr.data(QtCore.Qt.UserRole)
             pix = QPixmap.fromImage(self.currImage)
-            if self.lastItem is not None:
-                self.scene.removeItem(self.lastItem)
+            if self.lastSceneItem is not None:
+                self.scene.removeItem(self.lastSceneItem)
             self.scene.setSceneRect(-10.0, -10.0, pix.size().width() + 20.0, pix.size().height() + 20.0)
-            self.lastItem = self.scene.addPixmap(pix)
+            self.lastSceneItem = self.scene.addPixmap(pix)
             self.fitToWindow()
         else:
-            if self.lastItem is not None:
-                self.scene.removeItem(self.lastItem)
-                self.lastItem = None
+            if self.lastSceneItem is not None:
+                self.scene.removeItem(self.lastSceneItem)
+                self.lastSceneItem = None
+        self.lastListItem = curr
 
     def pointerMode(self):
-        self.drawing = False
-        self.erasing = False
-        self.areaFill = False
+        self.leftMode = "Zoom"
+        self.setDragMode(QGraphicsView.RubberBandDrag);
 
     def pencilMode(self):
-        self.drawing = True
-        self.erasing = False
-        self.areaFill = False
+        self.leftMode = "Draw"
+        self.setDragMode(QGraphicsView.NoDrag);
 
     def eraserMode(self):
-        self.drawing = False
-        self.erasing = True
-        self.areaFill = False
+        self.leftMode = "Erase"
+        self.setDragMode(QGraphicsView.NoDrag);
 
     def areaFillMode(self):
-        self.drawing = False
-        self.erasing = False
-        self.areaFill = True
+        self.leftMode = "Fill"
+        self.setDragMode(QGraphicsView.RubberBandDrag);
 
     def zoomIn(self):
         if self.currImage is None:

@@ -143,6 +143,11 @@ class Bookmarks(QListWidget):
         # Signal redraw
         self.currentItemChanged.emit(self.currentItem(), None)
 
+    def updateIcon(self):
+        item = self.currentItem()
+        image = item.data(QtCore.Qt.UserRole)
+        item.setIcon(self.makeIcon(image))
+
     def moveMode(self):
         pass
 
