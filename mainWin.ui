@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="centralWidgetLayout">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -40,13 +40,41 @@
         <enum>QListView::IconMode</enum>
        </property>
       </widget>
-      <widget class="Viewer" name="graphicsView">
+      <widget class="QScrollArea" name="scrollArea">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>1</horstretch>
-         <verstretch>0</verstretch>
+         <verstretch>1</verstretch>
         </sizepolicy>
        </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>918</width>
+          <height>822</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="scrollAreaLayout">
+         <item>
+          <widget class="Viewer" name="label">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -422,7 +450,7 @@
   </customwidget>
   <customwidget>
    <class>Viewer</class>
-   <extends>QGraphicsView</extends>
+   <extends>QLabel</extends>
    <header>Viewer</header>
   </customwidget>
  </customwidgets>

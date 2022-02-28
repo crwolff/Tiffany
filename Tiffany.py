@@ -54,21 +54,21 @@ class Window(QMainWindow, Ui_MainWindow):
         self.rotateCCWAct.triggered.connect(self.listWidget.rotateSelection)
         self.rotate180Act.triggered.connect(self.listWidget.rotateSelection)
         # View menu
-        self.zoomInAct.triggered.connect(self.graphicsView.zoomIn)
-        self.zoomOutAct.triggered.connect(self.graphicsView.zoomOut)
-        self.fitToWindowAct.triggered.connect(self.graphicsView.fitToWindow)
-        self.fitWidthAct.triggered.connect(self.graphicsView.fitWidth)
-        self.fillWindowAct.triggered.connect(self.graphicsView.fillWindow)
+        self.zoomInAct.triggered.connect(self.label.zoomIn)
+        self.zoomOutAct.triggered.connect(self.label.zoomOut)
+        self.fitToWindowAct.triggered.connect(self.label.fitToWindow)
+        self.fitWidthAct.triggered.connect(self.label.fitWidth)
+        self.fillWindowAct.triggered.connect(self.label.fillWindow)
         # Tools menu
-        self.pointerAct.triggered.connect(self.graphicsView.pointerMode)
-        self.pencilAct.triggered.connect(self.graphicsView.pencilMode)
-        self.eraserAct.triggered.connect(self.graphicsView.eraserMode)
-        self.areaFillAct.triggered.connect(self.graphicsView.areaFillMode)
+        self.pointerAct.triggered.connect(self.label.pointerMode)
+        self.pencilAct.triggered.connect(self.label.pencilMode)
+        self.eraserAct.triggered.connect(self.label.eraserMode)
+        self.areaFillAct.triggered.connect(self.label.areaFillMode)
         # Stroke menu
-        self.pix1Act.triggered.connect(self.graphicsView.setBrush)
-        self.pix4Act.triggered.connect(self.graphicsView.setBrush)
-        self.pix8Act.triggered.connect(self.graphicsView.setBrush)
-        self.pix12Act.triggered.connect(self.graphicsView.setBrush)
+        self.pix1Act.triggered.connect(self.label.setBrush)
+        self.pix4Act.triggered.connect(self.label.setBrush)
+        self.pix8Act.triggered.connect(self.label.setBrush)
+        self.pix12Act.triggered.connect(self.label.setBrush)
         # Color button
         self.colorAct.triggered.connect(self.colorMagic)
         # Help menu
@@ -76,24 +76,24 @@ class Window(QMainWindow, Ui_MainWindow):
         self.aboutQtAct.triggered.connect(qApp.aboutQt)
         # Interconnects
         self.listWidget.progressSig.connect(self.updateProgress)
-        self.graphicsView.progressSig.connect(self.updateProgress)
-        self.graphicsView.zoomSig.connect(self.updateActions)
-        self.graphicsView.imageChangedSig.connect(self.listWidget.updateIcon)
-        self.listWidget.currentItemChanged.connect(self.graphicsView.imageSelected)
+        self.label.progressSig.connect(self.updateProgress)
+        self.label.zoomSig.connect(self.updateActions)
+        self.label.imageChangedSig.connect(self.listWidget.updateIcon)
+        self.listWidget.currentItemChanged.connect(self.label.imageSelected)
 
     def colorMagic(self):
         if self.colorToolButton.mode == "Foreground":
-            self.graphicsView.foregroundColor = QColorDialog.getColor()
+            self.label.foregroundColor = QColorDialog.getColor()
         elif self.colorToolButton.mode == "Background":
-            self.graphicsView.backgroundColor = QColorDialog.getColor()
+            self.label.backgroundColor = QColorDialog.getColor()
         elif self.colorToolButton.mode == "Swap":
-            tmp = self.graphicsView.foregroundColor
-            self.graphicsView.foregroundColor = self.graphicsView.backgroundColor
-            self.graphicsView.backgroundColor = tmp
+            tmp = self.label.foregroundColor
+            self.label.foregroundColor = self.label.backgroundColor
+            self.label.backgroundColor = tmp
         elif self.colorToolButton.mode == "Reset":
-            self.graphicsView.foregroundColor = QtCore.Qt.black
-            self.graphicsView.backgroundColor = QtCore.Qt.white
-        self.colorToolButton.setIcon(self.graphicsView.foregroundColor, self.graphicsView.backgroundColor)
+            self.label.foregroundColor = QtCore.Qt.black
+            self.label.backgroundColor = QtCore.Qt.white
+        self.colorToolButton.setIcon(self.label.foregroundColor, self.label.backgroundColor)
 
     def buildToolBar(self):
         self.openMenu = QtWidgets.QMenu(self)
@@ -149,7 +149,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
         self.colorToolButton = ColorQToolButton()
         self.colorToolButton.setDefaultAction(self.colorAct)
-        self.colorToolButton.setIcon(self.graphicsView.foregroundColor, self.graphicsView.backgroundColor)
+        self.colorToolButton.setIcon(self.label.foregroundColor, self.label.backgroundColor)
         self.toolBar.addWidget(self.colorToolButton)
 
     def updateProgress(self, txt, val):
@@ -168,8 +168,8 @@ class Window(QMainWindow, Ui_MainWindow):
             self.pbar.setValue(val)
 
     def updateActions(self):
-        self.zoomInAct.setEnabled(self.graphicsView.scaleFactor < 10.0)
-        self.zoomOutAct.setEnabled(self.graphicsView.scaleFactor > 0.1)
+        self.zoomInAct.setEnabled(self.label.scaleFactor < 10.0)
+        self.zoomOutAct.setEnabled(self.label.scaleFactor > 0.1)
 
     def about(self):
         QMessageBox.about(
