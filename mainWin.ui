@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="Bookmarks" name="listWidget">
+      <widget class="Bookmarks" name="bookmarks">
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOff</enum>
        </property>
@@ -53,27 +53,22 @@
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents">
+       <widget class="Viewer" name="viewer">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>918</width>
-          <height>822</height>
+          <x>450</x>
+          <y>402</y>
+          <width>18</width>
+          <height>18</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="scrollAreaLayout">
-         <item>
-          <widget class="Viewer" name="label">
-           <property name="text">
-            <string/>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QHBoxLayout" name="scrollAreaLayout"/>
        </widget>
       </widget>
      </widget>
@@ -450,8 +445,9 @@
   </customwidget>
   <customwidget>
    <class>Viewer</class>
-   <extends>QLabel</extends>
+   <extends>QWidget</extends>
    <header>Viewer</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

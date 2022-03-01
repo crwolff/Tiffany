@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QLabel, QMessageBox
+from PyQt5.QtWidgets import QWidget, QMessageBox
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
-class Viewer(QLabel):
+class Viewer(QWidget):
     progressSig = QtCore.pyqtSignal(str, int)
     zoomSig = QtCore.pyqtSignal()
     imageChangedSig = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
-        QLabel.__init__(self, parent)
-        self.setBackgroundRole(QPalette.Base)
+        super().__init__(parent)
         self.currImage = None
-        self.imageRect = None
         self.scaleFactor = 1.0
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
@@ -21,13 +19,24 @@ class Viewer(QLabel):
         self.leftMode = "Zoom"
         self.panning = False
 
+    def paintEvent(self, event):
+        if self.currImage is not None:
+            p = QPainter(self)
+            p.scale(self.scaleFactor, self.scaleFactor)
+            p.drawImage(self.currImage.rect().topLeft(), self.currImage)
+
     def imageSelected(self, curr, prev):
         if curr is not None:
             self.currImage = curr.data(QtCore.Qt.UserRole)
-            self.setPixmap(QPixmap.fromImage(self.currImage))
-            self.adjustSize()
+            self.updateGeometry()
         else:
             self.currImage = None
+    
+    def sizeHint(self):
+        if self.currImage is not None:
+            return self.currImage.size()
+        else:
+            return super().sizeHint()
 
     def pointerMode(self):
         self.leftMode = "Zoom"
@@ -55,16 +64,10 @@ class Viewer(QLabel):
     def zoomIn(self):
         if self.currImage is None:
             return
-        self.scaleFactor = self.scaleFactor * 1.25
-        self.update()
-        self.zoomSig.emit()
 
     def zoomOut(self):
         if self.currImage is None:
             return
-        self.scaleFactor = self.scaleFactor * 0.8
-        self.update()
-        self.zoomSig.emit()
 
     def zoomSelect(self):
         if self.currImage is None:
@@ -73,17 +76,11 @@ class Viewer(QLabel):
     def fitToWindow(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
-        self.zoomSig.emit()
 
     def fitWidth(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
-        self.zoomSig.emit()
 
     def fillWindow(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
-        self.zoomSig.emit()
