@@ -12,6 +12,7 @@ class Viewer(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.currImage = None
+        self.scaleBase = 1.0
         self.scaleFactor = 1.0
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
@@ -22,19 +23,19 @@ class Viewer(QWidget):
     def paintEvent(self, event):
         if self.currImage is not None:
             p = QPainter(self)
-            p.scale(self.scaleFactor, self.scaleFactor)
+            p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
 
     def imageSelected(self, curr, prev):
         if curr is not None:
             self.currImage = curr.data(QtCore.Qt.UserRole)
-            self.updateGeometry()
+            self.fitToWindow()
         else:
             self.currImage = None
     
     def sizeHint(self):
         if self.currImage is not None:
-            return self.currImage.size()
+            return self.currImage.size() * self.scaleFactor * self.scaleBase
         else:
             return super().sizeHint()
 
@@ -64,23 +65,100 @@ class Viewer(QWidget):
     def zoomIn(self):
         if self.currImage is None:
             return
+        self.scaleFactor = self.scaleFactor * 1.25
+        self.updateGeometry()
+        self.zoomSig.emit()
 
     def zoomOut(self):
         if self.currImage is None:
             return
+        self.scaleFactor = self.scaleFactor * 0.8
+        self.updateGeometry()
+        self.zoomSig.emit()
 
     def zoomSelect(self):
         if self.currImage is None:
             return
 
+    def measureAll(self):
+        # Size of viewport without scrollbars
+        scrollBarExtent = self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+        if self.parentWidget().parentWidget().verticalScrollBar().isVisible():
+            viewW = self.parentWidget().width() + scrollBarExtent
+        else:
+            viewW = self.parentWidget().width()
+        if self.parentWidget().parentWidget().horizontalScrollBar().isVisible():
+            viewH = self.parentWidget().height() + scrollBarExtent
+        else:
+            viewH = self.parentWidget().height()
+        # Size of image
+        pixW = self.currImage.size().width()
+        pixH = self.currImage.size().height()
+        # Compute larger dimension and scale to it
+        if (viewW * pixH > viewH * pixW):
+            #print("H",scrollBarExtent,(viewW,viewH),(pixW,pixH))
+            return("H",scrollBarExtent,(viewW,viewH),(pixW,pixH))
+        else:
+            #print("W",scrollBarExtent,(viewW,viewH),(pixW,pixH))
+            return("W",scrollBarExtent,(viewW,viewH),(pixW,pixH))
+
+    # Fit with no scroll bars
     def fitToWindow(self):
         if self.currImage is None:
             return
+        self.scaleFactor = 1.0
+        # Dimensions of viewport
+        mode,scrollBarSize,view,pix = self.measureAll()
+        # Scale to larger dimension
+        if mode == "H":
+            self.scaleBase = view[1] / pix[1]
+        else:
+            self.scaleBase = view[0] / pix[0]
+        # Update scrollArea
+        self.updateGeometry()
+        self.zoomSig.emit()
 
+    # Fit with vertical scrollbar visible
     def fitWidth(self):
         if self.currImage is None:
             return
+        self.scaleFactor = 1.0
+        # Dimensions of viewport
+        mode,scrollBarSize,view,pix = self.measureAll()
+        # If height is larger dimension, leave space for vertical scroll bar
+        if mode == "H":
+            self.scaleBase = (view[0] - scrollBarSize) / pix[0]
+        else:
+            self.scaleBase = view[0] / pix[0]
+        # Update scrollArea
+        self.updateGeometry()
+        self.zoomSig.emit()
 
+    # Fit with horizontal scrollbar visible
+    def fitHeight(self):
+        if self.currImage is None:
+            return
+        self.scaleFactor = 1.0
+        # Dimensions of viewport
+        mode,scrollBarSize,view,pix = self.measureAll()
+        # If width is larger dimension, leave space for horizontal scroll bar
+        if mode == "H":
+            self.scaleBase = view[1] / pix[1]
+        else:
+            self.scaleBase = (view[1] - scrollBarSize) / pix[1]
+        # Update scrollArea
+        self.updateGeometry()
+        self.zoomSig.emit()
+
+    # Fit with only one scrollbar
     def fillWindow(self):
         if self.currImage is None:
             return
+        self.scaleFactor = 1.0
+        # Dimensions of viewport
+        mode,scrollBarSize,view,pix = self.measureAll()
+        # Find smaller ratio
+        if mode == "H":
+            self.fitWidth()
+        else:
+            self.fitHeight()

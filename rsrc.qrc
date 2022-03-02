@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>assets/fit_height.svg</file>
     <file>assets/tiffany.png</file>
     <file>assets/create_tiff.svg</file>
     <file>assets/delete.svg</file>

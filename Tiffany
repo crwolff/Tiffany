@@ -60,8 +60,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self.zoomInAct.triggered.connect(self.viewer.zoomIn)
         self.zoomOutAct.triggered.connect(self.viewer.zoomOut)
         self.fitToWindowAct.triggered.connect(self.viewer.fitToWindow)
-        self.fitWidthAct.triggered.connect(self.viewer.fitWidth)
         self.fillWindowAct.triggered.connect(self.viewer.fillWindow)
+        self.fitWidthAct.triggered.connect(self.viewer.fitWidth)
+        self.fitHeightAct.triggered.connect(self.viewer.fitHeight)
         # Tools menu
         self.pointerAct.triggered.connect(self.viewer.pointerMode)
         self.pencilAct.triggered.connect(self.viewer.pencilMode)

@@ -120,8 +120,9 @@
     <addaction name="zoomInAct"/>
     <addaction name="zoomOutAct"/>
     <addaction name="fitToWindowAct"/>
-    <addaction name="fitWidthAct"/>
     <addaction name="fillWindowAct"/>
+    <addaction name="fitWidthAct"/>
+    <addaction name="fitHeightAct"/>
    </widget>
    <widget class="QMenu" name="menu_Tools">
     <property name="title">
@@ -321,6 +322,15 @@
     <string>Fit To Window</string>
    </property>
   </action>
+  <action name="fillWindowAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/fill_window.svg</normaloff>:/images/assets/fill_window.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Fil&amp;l Window</string>
+   </property>
+  </action>
   <action name="fitWidthAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
@@ -330,13 +340,13 @@
     <string>Fit &amp;Width</string>
    </property>
   </action>
-  <action name="fillWindowAct">
+  <action name="fitHeightAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/fill_window.svg</normaloff>:/images/assets/fill_window.svg</iconset>
+     <normaloff>:/images/assets/fit_height.svg</normaloff>:/images/assets/fit_height.svg</iconset>
    </property>
    <property name="text">
-    <string>Fil&amp;l Window</string>
+    <string>Fit &amp;Height</string>
    </property>
   </action>
   <action name="pointerAct">
