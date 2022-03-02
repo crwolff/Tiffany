@@ -66,6 +66,7 @@ class Viewer(QWidget):
         if self.currImage is None:
             return
         self.scaleFactor = self.scaleFactor * 1.25
+        self.adjustScrollBars(1.25)
         self.updateGeometry()
         self.zoomSig.emit()
 
@@ -73,12 +74,19 @@ class Viewer(QWidget):
         if self.currImage is None:
             return
         self.scaleFactor = self.scaleFactor * 0.8
+        self.adjustScrollBars(0.8)
         self.updateGeometry()
         self.zoomSig.emit()
 
     def zoomSelect(self):
         if self.currImage is None:
             return
+
+    def adjustScrollBars(self, factor):
+        scrollBar = self.parentWidget().parentWidget().horizontalScrollBar
+        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
+        scrollBar = self.parentWidget().parentWidget().verticalScrollBar
+        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
 
     def measureAll(self):
         # Size of viewport without scrollbars
