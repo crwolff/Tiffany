@@ -164,6 +164,7 @@ class Window(QMainWindow, Ui_MainWindow):
             # Add progress to status bar
             self.statusLabel.setText(txt)
             self.pbar = QProgressBar()
+            self.pbar.setMaximumHeight(17)
             self.pbar.setRange(0, val)
             self.pbar.setValue(0)
             self.statusbar.addWidget(self.pbar)
