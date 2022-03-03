@@ -38,6 +38,9 @@ class Window(QMainWindow, Ui_MainWindow):
         # Recolor
         self.scrollArea.setBackgroundRole(QPalette.Base)
 
+        # Pass scrollArea to viewer for scrollbar manipulation
+        self.viewer.scrollArea = self.scrollArea
+
     def connectSignalsSlots(self):
         # File menu
         self.openAct.triggered.connect(self.bookmarks.readFiles)

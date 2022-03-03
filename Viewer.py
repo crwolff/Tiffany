@@ -19,6 +19,7 @@ class Viewer(QWidget):
         self.brushSize = 1
         self.leftMode = "Zoom"
         self.panning = False
+        self.scrollArea = None
 
     def paintEvent(self, event):
         if self.currImage is not None:
@@ -66,16 +67,20 @@ class Viewer(QWidget):
         if self.currImage is None:
             return
         self.scaleFactor = self.scaleFactor * 1.25
+        self.setVisible(False)
         self.adjustScrollBars(1.25)
         self.updateGeometry()
+        self.setVisible(True)
         self.zoomSig.emit()
 
     def zoomOut(self):
         if self.currImage is None:
             return
         self.scaleFactor = self.scaleFactor * 0.8
+        self.setVisible(False)
         self.adjustScrollBars(0.8)
         self.updateGeometry()
+        self.setVisible(True)
         self.zoomSig.emit()
 
     def zoomSelect(self):
@@ -83,19 +88,19 @@ class Viewer(QWidget):
             return
 
     def adjustScrollBars(self, factor):
-        scrollBar = self.parentWidget().parentWidget().horizontalScrollBar
+        scrollBar = self.scrollArea.horizontalScrollBar
         scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
-        scrollBar = self.parentWidget().parentWidget().verticalScrollBar
+        scrollBar = self.scrollArea.verticalScrollBar
         scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
 
     def measureAll(self):
         # Size of viewport without scrollbars
         scrollBarExtent = self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
-        if self.parentWidget().parentWidget().verticalScrollBar().isVisible():
+        if self.scrollArea.verticalScrollBar().isVisible():
             viewW = self.parentWidget().width() + scrollBarExtent
         else:
             viewW = self.parentWidget().width()
-        if self.parentWidget().parentWidget().horizontalScrollBar().isVisible():
+        if self.scrollArea.horizontalScrollBar().isVisible():
             viewH = self.parentWidget().height() + scrollBarExtent
         else:
             viewH = self.parentWidget().height()
