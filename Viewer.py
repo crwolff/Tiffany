@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QMessageBox
+from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
 
 class Viewer(QWidget):
@@ -11,15 +11,39 @@ class Viewer(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.scrollArea = None  # Set by main window
         self.currImage = None
+        self.rubberBand = None
+        self.origin = None
         self.scaleBase = 1.0
         self.scaleFactor = 1.0
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
         self.brushSize = 1
         self.leftMode = "Zoom"
-        self.panning = False
-        self.scrollArea = None
+
+    def mousePressEvent(self, event):
+        # if left mouse button is pressed
+        if self.rubberBand is None:
+            self.rubberBand = QRubberBand(QRubberBand.Rectangle,self)
+        if event.button() == QtCore.Qt.LeftButton:
+            if self.leftMode == "Zoom":
+                self.origin = event.pos()
+                self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
+                self.rubberBand.show()
+
+    # method for tracking mouse activity
+    def mouseMoveEvent(self, event):
+        if event.buttons() & QtCore.Qt.LeftButton:
+            if self.leftMode == "Zoom":
+                self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
+
+    # method for mouse left button release
+    def mouseReleaseEvent(self, event):
+        if event.button() == QtCore.Qt.LeftButton:
+            if self.leftMode == "Zoom":
+                self.rubberBand.hide()
+                self.zoomArea(self.rubberBand.geometry())
 
     def paintEvent(self, event):
         if self.currImage is not None:
@@ -33,7 +57,7 @@ class Viewer(QWidget):
             self.fitToWindow()
         else:
             self.currImage = None
-    
+
     def sizeHint(self):
         if self.currImage is not None:
             return self.currImage.size() * self.scaleFactor * self.scaleBase
@@ -63,35 +87,78 @@ class Viewer(QWidget):
         else:
             self.brushSize = 12
 
+    def updateScrollBars(self):
+        # Cheesy way to force qscrollArea to recalculate scrollbars
+        self.scrollArea.setWidgetResizable(True)
+
+    def adjustScrollBars(self, factor):
+        self.updateScrollBars()
+        scrollBar = self.scrollArea.horizontalScrollBar
+        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
+        scrollBar = self.scrollArea.verticalScrollBar
+        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
+
     def zoomIn(self):
         if self.currImage is None:
             return
-        self.scaleFactor = self.scaleFactor * 1.25
         self.setVisible(False)
-        self.adjustScrollBars(1.25)
+        self.scaleFactor = self.scaleFactor * 1.25
         self.updateGeometry()
+        self.adjustScrollBars(1.25)
         self.setVisible(True)
         self.zoomSig.emit()
 
     def zoomOut(self):
         if self.currImage is None:
             return
-        self.scaleFactor = self.scaleFactor * 0.8
         self.setVisible(False)
-        self.adjustScrollBars(0.8)
+        self.scaleFactor = self.scaleFactor * 0.8
         self.updateGeometry()
+        self.adjustScrollBars(0.8)
         self.setVisible(True)
         self.zoomSig.emit()
 
-    def zoomSelect(self):
+    def zoomArea(self, rect):
         if self.currImage is None:
             return
+        
+        # Center of rubberBand in percentage
+        centerX = rect.center().x() / self.geometry().width()
+        centerY = rect.center().y() / self.geometry().height()
 
-    def adjustScrollBars(self, factor):
+        # Size of rectangle
+        rectW = rect.width()
+        rectH = rect.height()
+
+        # Size of viewport with scrollbars
+        scrollBarExtent = self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
+        if self.scrollArea.verticalScrollBar().isVisible():
+            viewW = self.parentWidget().width()
+        else:
+            viewW = self.parentWidget().width() - scrollBarExtent
+        if self.scrollArea.horizontalScrollBar().isVisible():
+            viewH = self.parentWidget().height()
+        else:
+            viewH = self.parentWidget().height() - scrollBarExtent
+
+        # Compute larger dimension and scale to it
+        if (rectW * viewH > rectH * viewW):
+            scale = viewW / rectW
+        else:
+            scale = viewH / rectH
+        self.setVisible(False)
+        self.scaleFactor = self.scaleFactor * scale
+        self.updateGeometry()
+        self.updateScrollBars()
+
+        # Adjust scrollbars so center of rect is center of viewport
         scrollBar = self.scrollArea.horizontalScrollBar
-        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
+        scrollBar().setValue(int(centerX * scrollBar().maximum() + ((centerX - 1/2) * scrollBar().pageStep())))
         scrollBar = self.scrollArea.verticalScrollBar
-        scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
+        scrollBar().setValue(int(centerY * scrollBar().maximum() + ((centerY - 1/2) * scrollBar().pageStep())))
+
+        self.setVisible(True)
+        self.zoomSig.emit()
 
     def measureAll(self):
         # Size of viewport without scrollbars
@@ -109,10 +176,8 @@ class Viewer(QWidget):
         pixH = self.currImage.size().height()
         # Compute larger dimension and scale to it
         if (viewW * pixH > viewH * pixW):
-            #print("H",scrollBarExtent,(viewW,viewH),(pixW,pixH))
             return("H",scrollBarExtent,(viewW,viewH),(pixW,pixH))
         else:
-            #print("W",scrollBarExtent,(viewW,viewH),(pixW,pixH))
             return("W",scrollBarExtent,(viewW,viewH),(pixW,pixH))
 
     # Fit with no scroll bars
