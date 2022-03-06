@@ -12,7 +12,9 @@ class Viewer(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.scrollArea = None  # Set by main window
+        self.currListItem = None
         self.currImage = None
+        self.currTransform = None
         self.rubberBand = None
         self.origin = None
         self.scaleBase = 1.0
@@ -27,7 +29,7 @@ class Viewer(QWidget):
         if self.rubberBand is None:
             self.rubberBand = QRubberBand(QRubberBand.Rectangle,self)
         if event.button() == QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom":
+            if self.leftMode == "Zoom" or self.leftMode == "Fill":
                 self.origin = event.pos()
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
                 self.rubberBand.show()
@@ -35,7 +37,7 @@ class Viewer(QWidget):
     # method for tracking mouse activity
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom":
+            if self.leftMode == "Zoom" or self.leftMode == "Fill":
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
 
     # method for mouse left button release
@@ -44,18 +46,24 @@ class Viewer(QWidget):
             if self.leftMode == "Zoom":
                 self.rubberBand.hide()
                 self.zoomArea(self.rubberBand.geometry())
+            elif self.leftMode == "Fill":
+                self.rubberBand.hide()
+                self.fillArea(self.rubberBand.geometry())
 
     def paintEvent(self, event):
         if self.currImage is not None:
             p = QPainter(self)
             p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
+            self.currTransform = p.transform()
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
 
     def imageSelected(self, curr, prev):
         if curr is not None:
+            self.currListItem = curr
             self.currImage = curr.data(QtCore.Qt.UserRole)
             self.fitToWindow()
         else:
+            self.currListItem = None
             self.currImage = None
 
     def sizeHint(self):
@@ -92,7 +100,6 @@ class Viewer(QWidget):
         self.scrollArea.setWidgetResizable(True)
 
     def adjustScrollBars(self, factor):
-        #self.updateScrollBars()
         scrollBar = self.scrollArea.horizontalScrollBar
         scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
         scrollBar = self.scrollArea.verticalScrollBar
@@ -121,7 +128,7 @@ class Viewer(QWidget):
     def zoomArea(self, rect):
         if self.currImage is None:
             return
-        
+
         # Center of rubberBand in percentage
         centerX = rect.center().x() / self.geometry().width()
         centerY = rect.center().y() / self.geometry().height()
@@ -240,3 +247,21 @@ class Viewer(QWidget):
             self.fitWidth()
         else:
             self.fitHeight()
+
+    # fill rectangle with background color
+    def fillArea(self, rect):
+        if self.currImage is None:
+            return
+
+        # Paint the rectangle
+        p = QPainter(self.currImage)
+        #p.scale(1/(self.scaleFactor * self.scaleBase), 1/(self.scaleFactor * self.scaleBase))
+        (transform,_) = self.currTransform.inverted()
+        p.setTransform(transform)
+        p.fillRect(rect, self.backgroundColor)
+        p.end()
+
+        # Update list widget with new image
+        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+        self.imageChangedSig.emit()
+        self.update()
