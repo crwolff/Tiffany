@@ -92,7 +92,7 @@ class Viewer(QWidget):
         self.scrollArea.setWidgetResizable(True)
 
     def adjustScrollBars(self, factor):
-        self.updateScrollBars()
+        #self.updateScrollBars()
         scrollBar = self.scrollArea.horizontalScrollBar
         scrollBar().setValue(int(factor * scrollBar().value() + ((factor - 1) * scrollBar().pageStep() / 2)))
         scrollBar = self.scrollArea.verticalScrollBar
