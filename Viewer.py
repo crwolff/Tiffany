@@ -15,6 +15,7 @@ class Viewer(QWidget):
         self.currListItem = None
         self.currImage = None
         self.currTransform = None
+        self.currInverse = None
         self.rubberBand = None
         self.origin = None
         self.scaleBase = 1.0
@@ -53,9 +54,14 @@ class Viewer(QWidget):
     def paintEvent(self, event):
         if self.currImage is not None:
             p = QPainter(self)
-            p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
-            self.currTransform = p.transform()
+            p.setTransform(self.currTransform)
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
+
+    def setTransform(self):
+        p = QtGui.QTransform()
+        p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
+        self.currTransform = p
+        (self.currInverse,_) = self.currTransform.inverted()
 
     def imageSelected(self, curr, prev):
         if curr is not None:
@@ -110,6 +116,7 @@ class Viewer(QWidget):
             return
         self.setVisible(False)
         self.scaleFactor = self.scaleFactor * 1.25
+        self.setTransform()
         self.updateGeometry()
         self.adjustScrollBars(1.25)
         self.setVisible(True)
@@ -120,6 +127,7 @@ class Viewer(QWidget):
             return
         self.setVisible(False)
         self.scaleFactor = self.scaleFactor * 0.8
+        self.setTransform()
         self.updateGeometry()
         self.adjustScrollBars(0.8)
         self.setVisible(True)
@@ -155,6 +163,7 @@ class Viewer(QWidget):
             scale = viewH / rectH
         self.setVisible(False)
         self.scaleFactor = self.scaleFactor * scale
+        self.setTransform()
         self.updateGeometry()
         self.updateScrollBars()
 
@@ -191,14 +200,15 @@ class Viewer(QWidget):
     def fitToWindow(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
         # Dimensions of viewport
         mode,scrollBarSize,view,pix = self.measureAll()
         # Scale to larger dimension
+        self.scaleFactor = 1.0
         if mode == "H":
             self.scaleBase = view[1] / pix[1]
         else:
             self.scaleBase = view[0] / pix[0]
+        self.setTransform()
         # Update scrollArea
         self.updateGeometry()
         self.zoomSig.emit()
@@ -207,14 +217,15 @@ class Viewer(QWidget):
     def fitWidth(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
         # Dimensions of viewport
         mode,scrollBarSize,view,pix = self.measureAll()
         # If height is larger dimension, leave space for vertical scroll bar
+        self.scaleFactor = 1.0
         if mode == "H":
             self.scaleBase = (view[0] - scrollBarSize) / pix[0]
         else:
             self.scaleBase = view[0] / pix[0]
+        self.setTransform()
         # Update scrollArea
         self.updateGeometry()
         self.zoomSig.emit()
@@ -223,14 +234,15 @@ class Viewer(QWidget):
     def fitHeight(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
         # Dimensions of viewport
         mode,scrollBarSize,view,pix = self.measureAll()
         # If width is larger dimension, leave space for horizontal scroll bar
+        self.scaleFactor = 1.0
         if mode == "H":
             self.scaleBase = view[1] / pix[1]
         else:
             self.scaleBase = (view[1] - scrollBarSize) / pix[1]
+        self.setTransform()
         # Update scrollArea
         self.updateGeometry()
         self.zoomSig.emit()
@@ -239,7 +251,6 @@ class Viewer(QWidget):
     def fillWindow(self):
         if self.currImage is None:
             return
-        self.scaleFactor = 1.0
         # Dimensions of viewport
         mode,scrollBarSize,view,pix = self.measureAll()
         # Find smaller ratio
@@ -255,9 +266,7 @@ class Viewer(QWidget):
 
         # Paint the rectangle
         p = QPainter(self.currImage)
-        #p.scale(1/(self.scaleFactor * self.scaleBase), 1/(self.scaleFactor * self.scaleBase))
-        (transform,_) = self.currTransform.inverted()
-        p.setTransform(transform)
+        p.setTransform(self.currInverse)
         p.fillRect(rect, self.backgroundColor)
         p.end()
 
