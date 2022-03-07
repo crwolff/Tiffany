@@ -14,6 +14,7 @@ class Viewer(QWidget):
         self.scrollArea = None  # Set by main window
         self.currListItem = None
         self.currImage = None
+        self.flushEdits()
         self.currTransform = None
         self.currInverse = None
         self.rubberBand = None
@@ -34,12 +35,19 @@ class Viewer(QWidget):
         if self.rubberBand is None:
             self.rubberBand = QRubberBand(QRubberBand.Rectangle,self)
         if event.button() == QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom" or self.leftMode == "Fill":
+            if self.leftMode == "Zoom":
+                self.origin = event.pos()
+                self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
+                self.rubberBand.show()
+                event.accept()
+            elif self.leftMode == "Fill":
+                self.pushImage()
                 self.origin = event.pos()
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
                 self.rubberBand.show()
                 event.accept()
             elif self.leftMode == "Draw" or self.leftMode == "Erase":
+                self.pushImage()
                 self.drawing = True
                 self.origin = event.pos()
                 self.setCursor(QtCore.Qt.CrossCursor)
@@ -96,6 +104,7 @@ class Viewer(QWidget):
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
 
     def imageSelected(self, curr, prev):
+        self.flushEdits()
         if curr is not None:
             self.currListItem = curr
             self.currImage = curr.data(QtCore.Qt.UserRole)
@@ -179,11 +188,66 @@ class Viewer(QWidget):
         self.imageChangedSig.emit()
         self.update()
 
-    def undoEdit(self):
-        pass
+#
+# Undo/Redo stack handlers
+#
+    # Flush edit stack
+    def flushEdits(self):
+        self.undoState = list()
+        self.redoState = list()
 
+    # Save current image before making changes
+    def pushImage(self):
+        if self.currImage is None:
+            return
+
+        # Add current image to beginning of redo stack
+        self.undoState.insert(0, self.currImage.copy())
+        if len(self.undoState) > 5:
+            self.undoState = self.undostack[:5]
+
+        # Clear redo stack
+        self.redoState = list()
+
+    # Roll back one edit
+    def undoEdit(self):
+        if self.currImage is None:
+            return
+
+        if len(self.undoState) > 0:
+            # Add current image to beginning of redo stack
+            self.redoState.insert(0, self.currImage.copy())
+            if len(self.redoState) > 5:
+                self.redoState = self.redostack[:5]
+
+            # Recover image from undo stack
+            self.currImage = self.undoState[0]
+            self.undoState = self.undoState[1:]
+
+            # Update list widget with new image
+            self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+            self.imageChangedSig.emit()
+            self.update()
+
+    # Roll forward one edit
     def redoEdit(self):
-        pass
+        if self.currImage is None:
+            return
+
+        if len(self.redoState) > 0:
+            # Add current image to beginning of undo stack
+            self.undoState.insert(0, self.currImage.copy())
+            if len(self.undoState) > 5:
+                self.undoState = self.undostack[:5]
+
+            # Recover image from redo stack
+            self.currImage = self.redoState[0]
+            self.redoState = self.redoState[1:]
+
+            # Update list widget with new image
+            self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+            self.imageChangedSig.emit()
+            self.update()
 
 #
 # Zoom functions
