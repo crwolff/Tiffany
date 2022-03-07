@@ -76,7 +76,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self.pix4Act.triggered.connect(self.viewer.setBrush)
         self.pix8Act.triggered.connect(self.viewer.setBrush)
         self.pix12Act.triggered.connect(self.viewer.setBrush)
-        # Color button
+        # Button
+        self.undoAct.triggered.connect(self.viewer.undoEdit)
+        self.redoAct.triggered.connect(self.viewer.redoEdit)
         self.colorAct.triggered.connect(self.colorMagic)
         # Help menu
         self.aboutAct.triggered.connect(self.about)
@@ -121,6 +123,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.saveToolButton.setDefaultAction(self.saveAct)
         self.toolBar.addWidget(self.saveToolButton)
 
+        self.toolBar.addAction(self.deleteAct)
+
         self.rotateMenu = QtWidgets.QMenu(self)
         self.rotateMenu.addAction(self.rotateCWAct)
         self.rotateMenu.addAction(self.rotateCCWAct)
@@ -130,7 +134,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.rotateToolButton.setDefaultAction(self.rotateCWAct)
         self.toolBar.addWidget(self.rotateToolButton)
 
-        self.toolBar.addAction(self.deleteAct)
+        self.toolBar.addAction(self.undoAct)
+        self.toolBar.addAction(self.redoAct)
         self.toolBar.addAction(self.zoomOutAct)
         self.toolBar.addAction(self.zoomInAct)
 

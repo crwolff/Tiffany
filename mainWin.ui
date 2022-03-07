@@ -54,6 +54,14 @@
         <set>Qt::AlignCenter</set>
        </property>
        <widget class="Viewer" name="viewer">
+        <property name="geometry">
+         <rect>
+          <x>450</x>
+          <y>402</y>
+          <width>18</width>
+          <height>18</height>
+         </rect>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -436,6 +444,30 @@
    </property>
    <property name="toolTip">
     <string>Color Picker</string>
+   </property>
+  </action>
+  <action name="undoAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/undo.svg</normaloff>:/images/assets/undo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo previous image edit</string>
+   </property>
+  </action>
+  <action name="redoAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/redo.svg</normaloff>:/images/assets/redo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo previous undo</string>
    </property>
   </action>
  </widget>

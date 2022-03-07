@@ -26,6 +26,9 @@ class Viewer(QWidget):
         self.backgroundColor = QtCore.Qt.white
         self.leftMode = "Zoom"
 
+#
+# Event handlers
+#
     def mousePressEvent(self, event):
         # if left mouse button is pressed
         if self.rubberBand is None:
@@ -92,12 +95,6 @@ class Viewer(QWidget):
             p.setTransform(self.currTransform)
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
 
-    def setTransform(self):
-        p = QtGui.QTransform()
-        p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
-        self.currTransform = p
-        (self.currInverse,_) = self.currTransform.inverted()
-
     def imageSelected(self, curr, prev):
         if curr is not None:
             self.currListItem = curr
@@ -107,12 +104,18 @@ class Viewer(QWidget):
             self.currListItem = None
             self.currImage = None
 
+#
+# Re-implement for scrollArea sizing
+#
     def sizeHint(self):
         if self.currImage is not None:
             return self.currImage.size() * self.scaleFactor * self.scaleBase
         else:
             return super().sizeHint()
 
+#
+# Draw functions
+#
     def pointerMode(self):
         self.leftMode = "Zoom"
 
@@ -136,6 +139,55 @@ class Viewer(QWidget):
         else:
             self.brushSize = 12
 
+    def setTransform(self):
+        p = QtGui.QTransform()
+        p.scale(self.scaleFactor * self.scaleBase, self.scaleFactor * self.scaleBase)
+        self.currTransform = p
+        (self.currInverse,_) = self.currTransform.inverted()
+
+    # Draw a line with current color
+    def drawLine(self, start, finish, color):
+        if self.currImage is None:
+            return
+        p = QPainter(self.currImage)
+        p.setTransform(self.currInverse)
+        brush = int(self.brushSize * self.scaleFactor * self.scaleBase)
+        if brush == 0:
+            brush = 1
+        p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        p.drawLine(start, finish)
+        p.end()
+
+        # Update list widget with new image
+        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+        self.imageChangedSig.emit()
+        self.update()
+
+    # fill rectangle with background color
+    def fillArea(self, rect):
+        if self.currImage is None:
+            return
+
+        # Paint the rectangle
+        p = QPainter(self.currImage)
+        p.setTransform(self.currInverse)
+        p.fillRect(rect, self.backgroundColor)
+        p.end()
+
+        # Update list widget with new image
+        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+        self.imageChangedSig.emit()
+        self.update()
+
+    def undoEdit(self):
+        pass
+
+    def redoEdit(self):
+        pass
+
+#
+# Zoom functions
+#
     def updateScrollBars(self):
         # Cheesy way to force qscrollArea to recalculate scrollbars
         self.scrollArea.setWidgetResizable(True)
@@ -179,6 +231,8 @@ class Viewer(QWidget):
         # Size of rectangle
         rectW = rect.width()
         rectH = rect.height()
+        if (rectW == 0) or (rectH == 0):
+            return
 
         # Size of viewport with scrollbars
         scrollBarExtent = self.style().pixelMetric(QtWidgets.QStyle.PM_ScrollBarExtent)
@@ -293,37 +347,3 @@ class Viewer(QWidget):
             self.fitWidth()
         else:
             self.fitHeight()
-
-    # Draw a line with current color
-    def drawLine(self, start, finish, color):
-        if self.currImage is None:
-            return
-        p = QPainter(self.currImage)
-        p.setTransform(self.currInverse)
-        brush = int(self.brushSize * self.scaleFactor * self.scaleBase)
-        if brush == 0:
-            brush = 1
-        p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
-        p.drawLine(start, finish)
-        p.end()
-
-        # Update list widget with new image
-        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
-        self.imageChangedSig.emit()
-        self.update()
-
-    # fill rectangle with background color
-    def fillArea(self, rect):
-        if self.currImage is None:
-            return
-
-        # Paint the rectangle
-        p = QPainter(self.currImage)
-        p.setTransform(self.currInverse)
-        p.fillRect(rect, self.backgroundColor)
-        p.end()
-
-        # Update list widget with new image
-        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
-        self.imageChangedSig.emit()
-        self.update()
