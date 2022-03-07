@@ -20,9 +20,10 @@ class Viewer(QWidget):
         self.origin = None
         self.scaleBase = 1.0
         self.scaleFactor = 1.0
+        self.drawing = False
+        self.brushSize = 1
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
-        self.brushSize = 1
         self.leftMode = "Zoom"
 
     def mousePressEvent(self, event):
@@ -34,12 +35,35 @@ class Viewer(QWidget):
                 self.origin = event.pos()
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
                 self.rubberBand.show()
+                event.accept()
+            elif self.leftMode == "Draw" or self.leftMode == "Erase":
+                self.drawing = True
+                self.origin = event.pos()
+                self.setCursor(QtCore.Qt.CrossCursor)
+                event.accept()
+            else:
+                QWidget.mousePressEvent(self, event)
+        else:
+            QWidget.mousePressEvent(self, event)
 
     # method for tracking mouse activity
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
             if self.leftMode == "Zoom" or self.leftMode == "Fill":
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
+                event.accept()
+            elif self.drawing and self.leftMode == "Draw":
+                self.drawLine(self.origin, event.pos(), self.foregroundColor)
+                self.origin = event.pos()
+                event.accept()
+            elif self.drawing and self.leftMode == "Erase":
+                self.drawLine(self.origin, event.pos(), self.backgroundColor)
+                self.origin = event.pos()
+                event.accept()
+            else:
+                QWidget.mouseMoveEvent(self, event)
+        else:
+            QWidget.mouseMoveEvent(self, event)
 
     # method for mouse left button release
     def mouseReleaseEvent(self, event):
@@ -47,9 +71,20 @@ class Viewer(QWidget):
             if self.leftMode == "Zoom":
                 self.rubberBand.hide()
                 self.zoomArea(self.rubberBand.geometry())
+                event.accept()
             elif self.leftMode == "Fill":
                 self.rubberBand.hide()
                 self.fillArea(self.rubberBand.geometry())
+                event.accept()
+            elif self.leftMode == "Draw" or self.leftMode == "Erase":
+                self.drawing = False
+                self.setCursor(QtCore.Qt.ArrowCursor)
+                self.imageChangedSig.emit()
+                event.accept()
+            else:
+                QWidget.mouseReleaseEvent(self, event)
+        else:
+            QWidget.mouseReleaseEvent(self, event)
 
     def paintEvent(self, event):
         if self.currImage is not None:
@@ -258,6 +293,24 @@ class Viewer(QWidget):
             self.fitWidth()
         else:
             self.fitHeight()
+
+    # Draw a line with current color
+    def drawLine(self, start, finish, color):
+        if self.currImage is None:
+            return
+        p = QPainter(self.currImage)
+        p.setTransform(self.currInverse)
+        brush = int(self.brushSize * self.scaleFactor * self.scaleBase)
+        if brush == 0:
+            brush = 1
+        p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
+        p.drawLine(start, finish)
+        p.end()
+
+        # Update list widget with new image
+        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+        self.imageChangedSig.emit()
+        self.update()
 
     # fill rectangle with background color
     def fillArea(self, rect):
