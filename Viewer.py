@@ -64,7 +64,7 @@ class Viewer(QWidget):
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
                 event.accept()
             elif (self.leftMode == "Draw" or self.leftMode == "Erase") and self.drawing:
-                color = self.foregroundColor if self.leftMode == "Draw" else self.backgroundColor)
+                color = self.foregroundColor if self.leftMode == "Draw" else self.backgroundColor
                 self.drawLine(self.origin, event.pos(), color)
                 self.origin = event.pos()
                 event.accept()
@@ -155,7 +155,7 @@ class Viewer(QWidget):
             return
         p = QPainter(self.currImage)
         p.setTransform(self.currInverse)
-        brush = int(self.brushSize * self.scaleFactor * self.scaleBase)
+        brush = int(self.brushSize * self.scaleFactor * self.scaleBase * 0.90)
         if brush == 0:
             brush = 1
         p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
