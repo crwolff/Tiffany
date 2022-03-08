@@ -189,9 +189,9 @@ class Viewer(QWidget):
         self.update()
 
 #
-# Undo/Redo stack handlers
+# Undo/Redo State handlers
 #
-    # Flush edit stack
+    # Flush edit State
     def flushEdits(self):
         self.undoState = list()
         self.redoState = list()
@@ -201,12 +201,12 @@ class Viewer(QWidget):
         if self.currImage is None:
             return
 
-        # Add current image to beginning of redo stack
+        # Add current image to beginning of redo State
         self.undoState.insert(0, self.currImage.copy())
         if len(self.undoState) > 5:
-            self.undoState = self.undostack[:5]
+            self.undoState = self.undoState[:5]
 
-        # Clear redo stack
+        # Clear redo State
         self.redoState = list()
 
     # Roll back one edit
@@ -215,12 +215,12 @@ class Viewer(QWidget):
             return
 
         if len(self.undoState) > 0:
-            # Add current image to beginning of redo stack
+            # Add current image to beginning of redo State
             self.redoState.insert(0, self.currImage.copy())
             if len(self.redoState) > 5:
-                self.redoState = self.redostack[:5]
+                self.redoState = self.redoState[:5]
 
-            # Recover image from undo stack
+            # Recover image from undo State
             self.currImage = self.undoState[0]
             self.undoState = self.undoState[1:]
 
@@ -235,12 +235,12 @@ class Viewer(QWidget):
             return
 
         if len(self.redoState) > 0:
-            # Add current image to beginning of undo stack
+            # Add current image to beginning of undo State
             self.undoState.insert(0, self.currImage.copy())
             if len(self.undoState) > 5:
-                self.undoState = self.undostack[:5]
+                self.undoState = self.undoState[:5]
 
-            # Recover image from redo stack
+            # Recover image from redo State
             self.currImage = self.redoState[0]
             self.redoState = self.redoState[1:]
 
