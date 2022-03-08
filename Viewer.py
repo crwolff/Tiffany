@@ -25,7 +25,7 @@ class Viewer(QWidget):
         self.brushSize = 1
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
-        self.leftMode = "Zoom"
+        self.leftMode = "Pointer"
 
 #
 # Event handlers
@@ -35,7 +35,7 @@ class Viewer(QWidget):
         if self.rubberBand is None:
             self.rubberBand = QRubberBand(QRubberBand.Rectangle,self)
         if event.button() == QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom":
+            if self.leftMode == "Pointer":
                 self.origin = event.pos()
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
                 self.rubberBand.show()
@@ -60,15 +60,12 @@ class Viewer(QWidget):
     # method for tracking mouse activity
     def mouseMoveEvent(self, event):
         if event.buttons() & QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom" or self.leftMode == "Fill":
+            if self.leftMode == "Pointer" or self.leftMode == "Fill":
                 self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
                 event.accept()
-            elif self.drawing and self.leftMode == "Draw":
-                self.drawLine(self.origin, event.pos(), self.foregroundColor)
-                self.origin = event.pos()
-                event.accept()
-            elif self.drawing and self.leftMode == "Erase":
-                self.drawLine(self.origin, event.pos(), self.backgroundColor)
+            elif (self.leftMode == "Draw" or self.leftMode == "Erase") and self.drawing:
+                color = self.foregroundColor if self.leftMode == "Draw" else self.backgroundColor)
+                self.drawLine(self.origin, event.pos(), color)
                 self.origin = event.pos()
                 event.accept()
             else:
@@ -79,9 +76,7 @@ class Viewer(QWidget):
     # method for mouse left button release
     def mouseReleaseEvent(self, event):
         if event.button() == QtCore.Qt.LeftButton:
-            if self.leftMode == "Zoom":
-                self.rubberBand.hide()
-                self.zoomArea(self.rubberBand.geometry())
+            if self.leftMode == "Pointer":
                 event.accept()
             elif self.leftMode == "Fill":
                 self.rubberBand.hide()
@@ -126,7 +121,7 @@ class Viewer(QWidget):
 # Draw functions
 #
     def pointerMode(self):
-        self.leftMode = "Zoom"
+        self.leftMode = "Pointer"
 
     def pencilMode(self):
         self.leftMode = "Draw"
@@ -284,9 +279,15 @@ class Viewer(QWidget):
         self.setVisible(True)
         self.zoomSig.emit()
 
-    def zoomArea(self, rect):
+    def zoomArea(self):
         if self.currImage is None:
             return
+        if self.rubberBand is None or self.rubberBand.isHidden():
+            return
+        self.rubberBand.hide()
+
+        # Get geometry
+        rect = self.rubberBand.geometry()
 
         # Center of rubberBand in percentage
         centerX = rect.center().x() / self.geometry().width()

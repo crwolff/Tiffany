@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>assets/zoom_selection.svg</file>
     <file>assets/redo.svg</file>
     <file>assets/undo.svg</file>
     <file>assets/fit_height.svg</file>
