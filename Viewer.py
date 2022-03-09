@@ -54,6 +54,11 @@ class Viewer(QWidget):
                 event.accept()
             else:
                 QWidget.mousePressEvent(self, event)
+        elif event.button() == QtCore.Qt.RightButton:
+            self.origin = event.pos()
+            self.rubberBand.setGeometry(QtCore.QRect(self.origin, QtCore.QSize()))
+            self.rubberBand.show()
+            event.accept()
         else:
             QWidget.mousePressEvent(self, event)
 
@@ -70,7 +75,10 @@ class Viewer(QWidget):
                 event.accept()
             else:
                 QWidget.mouseMoveEvent(self, event)
-        else:
+        if event.buttons() & QtCore.Qt.RightButton:
+            self.rubberBand.setGeometry(QtCore.QRect(self.origin, event.pos()).normalized())
+            event.accept()
+        if event.buttons() & (QtCore.Qt.LeftButton | QtCore.Qt.RightButton) == 0:
             QWidget.mouseMoveEvent(self, event)
 
     # method for mouse left button release
@@ -89,6 +97,9 @@ class Viewer(QWidget):
                 event.accept()
             else:
                 QWidget.mouseReleaseEvent(self, event)
+        elif event.button() == QtCore.Qt.RightButton:
+            self.zoomArea()
+            event.accept()
         else:
             QWidget.mouseReleaseEvent(self, event)
 
@@ -155,9 +166,7 @@ class Viewer(QWidget):
             return
         p = QPainter(self.currImage)
         p.setTransform(self.currInverse)
-        brush = int(self.brushSize * self.scaleFactor * self.scaleBase * 0.90)
-        if brush == 0:
-            brush = 1
+        brush = int(self.brushSize * self.scaleFactor * self.scaleBase)
         p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         p.drawLine(start, finish)
         p.end()

@@ -310,15 +310,6 @@
     <string>Zoom &amp;Out</string>
    </property>
   </action>
-  <action name="zoomAreaAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/zoom_selection.svg</normaloff>:/images/assets/zoom_selection.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Zoom Selection</string>
-   </property>
-  </action>
   <action name="fitToWindowAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">

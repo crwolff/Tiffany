@@ -62,7 +62,6 @@ class Window(QMainWindow, Ui_MainWindow):
         # View menu
         self.zoomInAct.triggered.connect(self.viewer.zoomIn)
         self.zoomOutAct.triggered.connect(self.viewer.zoomOut)
-        self.zoomAreaAct.triggered.connect(self.viewer.zoomArea)
         self.fitToWindowAct.triggered.connect(self.viewer.fitToWindow)
         self.fillWindowAct.triggered.connect(self.viewer.fillWindow)
         self.fitWidthAct.triggered.connect(self.viewer.fitWidth)
@@ -97,8 +96,7 @@ class Window(QMainWindow, Ui_MainWindow):
         elif self.colorToolButton.mode == "Background":
             self.viewer.backgroundColor = QColorDialog.getColor()
         elif self.colorToolButton.mode == "Swap":
-            self.viewer.foregroundColor, self.viewer.backgroundColor = 
-                         self.viewer.backgroundColor, self.viewer.foregroundColor
+            self.viewer.foregroundColor, self.viewer.backgroundColor = self.viewer.backgroundColor, self.viewer.foregroundColor
         elif self.colorToolButton.mode == "Reset":
             self.viewer.foregroundColor = QtCore.Qt.black
             self.viewer.backgroundColor = QtCore.Qt.white
@@ -138,7 +136,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.toolBar.addAction(self.redoAct)
         self.toolBar.addAction(self.zoomOutAct)
         self.toolBar.addAction(self.zoomInAct)
-        self.toolBar.addAction(self.zoomAreaAct)
 
         self.toolsMenu = QtWidgets.QMenu(self)
         self.toolsMenu.addAction(self.pointerAct)
