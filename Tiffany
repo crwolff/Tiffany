@@ -97,9 +97,8 @@ class Window(QMainWindow, Ui_MainWindow):
         elif self.colorToolButton.mode == "Background":
             self.viewer.backgroundColor = QColorDialog.getColor()
         elif self.colorToolButton.mode == "Swap":
-            tmp = self.viewer.foregroundColor
-            self.viewer.foregroundColor = self.viewer.backgroundColor
-            self.viewer.backgroundColor = tmp
+            self.viewer.foregroundColor, self.viewer.backgroundColor = 
+                         self.viewer.backgroundColor, self.viewer.foregroundColor
         elif self.colorToolButton.mode == "Reset":
             self.viewer.foregroundColor = QtCore.Qt.black
             self.viewer.backgroundColor = QtCore.Qt.white
