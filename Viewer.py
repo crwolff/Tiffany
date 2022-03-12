@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox
-from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter
+from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox, QDialog
+from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor
+from SliderDlg import SliderDlg
 
 class Viewer(QWidget):
     progressSig = QtCore.pyqtSignal(str, int)
@@ -11,6 +12,7 @@ class Viewer(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.dlg = SliderDlg()
         self.scrollArea = None  # Set by main window
         self.currListItem = None
         self.currImage = None
@@ -26,6 +28,10 @@ class Viewer(QWidget):
         self.foregroundColor = QtCore.Qt.black
         self.backgroundColor = QtCore.Qt.white
         self.leftMode = "Pointer"
+
+        # Connect signals
+        self.dlg.changed.connect(self.removeMarkup)
+        self.dlg.finished['int'].connect(self.removeMarkupEnd)
 
 #
 # Event handlers
@@ -191,6 +197,51 @@ class Viewer(QWidget):
         self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
         self.imageChangedSig.emit()
         self.update()
+
+    # Remove colored pixels from region
+    def removeMarkup(self):
+        if self.currImage is None:
+            return
+        if self.rubberBand is None or self.rubberBand.isHidden():
+            QMessageBox.information(self, "Remove Markups", "Area must be selected")
+            return
+
+        # First entry
+        if not self.dlg.isVisible():
+            self.pushImage()
+            self.dlg.show()
+
+        # Get region to edit
+        rect = self.rubberBand.geometry()
+        invScale = 1.0 / (self.scaleFactor * self.scaleBase)
+        x1 = round(rect.x() * invScale)
+        y1 = round(rect.y() * invScale)
+        x2 = round((rect.x() + rect.width()) * invScale)
+        y2 = round((rect.y() + rect.height()) * invScale)
+
+        # Sweep region, removing colored pixels
+        tol = self.dlg.getValue()
+        for y in range(y1,y2):
+            for x in range(x1,x2):
+                pixel = self.undoState[0].pixel(x,y)
+                b = pixel & 0xFF
+                g = (pixel>>8) & 0xFF
+                r = (pixel>>16) & 0xFF
+                if (max(r, b, g) - min(r, b, g)) > tol:
+                    self.currImage.setPixel(x, y, 0xFFFFFFFF)
+                else:
+                    self.currImage.setPixel(x, y, pixel)
+        self.update()
+
+    # Cleanup after removing markups
+    def removeMarkupEnd(self, val):
+        self.rubberBand.hide()
+        if val == 0:
+            self.undoEdit()
+        else:
+            # Update list widget with new image
+            self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+            self.imageChangedSig.emit()
 
 #
 # Undo/Redo State handlers

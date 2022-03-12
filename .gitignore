@@ -1,4 +1,5 @@
 /__pycache__/*
 /samples/*
 mainWin.py
+Slider.py
 rsrc_rc.py
