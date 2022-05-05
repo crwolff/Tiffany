@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>assets/draw_line.svg</file>
     <file>assets/zoom_selection.svg</file>
     <file>assets/redo.svg</file>
     <file>assets/undo.svg</file>

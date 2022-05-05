@@ -473,7 +473,7 @@
   <action name="stuffAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/zoom_selection.svg</normaloff>:/images/assets/zoom_selection.svg</iconset>
+     <normaloff>:/images/assets/draw_line.svg</normaloff>:/images/assets/draw_line.svg</iconset>
    </property>
    <property name="text">
     <string>Stuff</string>

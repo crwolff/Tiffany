@@ -16,6 +16,8 @@ class Viewer(QWidget):
         self.scrollArea = None  # Set by main window
         self.currListItem = None
         self.currImage = None
+        self.subImage = None
+        self.subImageLocation = QtCore.QPoint(0,0)
         self.flushEdits()
         self.currTransform = None
         self.currInverse = None
@@ -114,6 +116,8 @@ class Viewer(QWidget):
             p = QPainter(self)
             p.setTransform(self.currTransform)
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
+            if self.subImage is not None:
+                p.drawImage(self.subImageLocation, self.subImage)
 
     def imageSelected(self, curr, prev):
         self.flushEdits()
@@ -218,19 +222,25 @@ class Viewer(QWidget):
         y1 = round(rect.y() * invScale)
         x2 = round((rect.x() + rect.width()) * invScale)
         y2 = round((rect.y() + rect.height()) * invScale)
+        box = QtCore.QRect( QtCore.QPoint(x1, y1), QtCore.QPoint(x2, y2) )
 
-        # Sweep region, removing colored pixels
+        # Make a copy of the region into a new image
+        self.subImageLocation = QtCore.QPoint(x1, y1)
+        self.subImage = self.currImage.copy( box )
+
+        # Remove colored pixels from subImage and convert to greyscale
         tol = self.dlg.getValue()
-        for y in range(y1,y2):
-            for x in range(x1,x2):
-                pixel = self.undoState[0].pixel(x,y)
+        for y in range(self.subImage.rect().height()):
+            for x in range(self.subImage.rect().width()):
+                pixel = self.subImage.pixel(x, y)
                 b = pixel & 0xFF
                 g = (pixel>>8) & 0xFF
                 r = (pixel>>16) & 0xFF
                 if (max(r, b, g) - min(r, b, g)) > tol:
-                    self.currImage.setPixel(x, y, 0xFFFFFFFF)
+                    self.subImage.setPixel(x, y, 0xFFFFFFFF)
                 else:
-                    self.currImage.setPixel(x, y, pixel)
+                    self.subImage.setPixel(x, y, pixel)
+        self.subImage = self.subImage.convertToFormat(QImage.Format_Mono, QtCore.Qt.ThresholdDither)
         self.update()
 
     # Cleanup after removing markups
@@ -240,6 +250,7 @@ class Viewer(QWidget):
             self.undoEdit()
         else:
             # Update list widget with new image
+            self.subImage = None
             self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
             self.imageChangedSig.emit()
 
