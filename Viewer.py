@@ -240,6 +240,7 @@ class Viewer(QWidget):
                     self.subImage.setPixel(x, y, 0xFFFFFFFF)
                 else:
                     self.subImage.setPixel(x, y, pixel)
+        # DiffuseDither/OrderedDither/ThresholdDither, PreferDither/AvoidDither/AutoDither
         self.subImage = self.subImage.convertToFormat(QImage.Format_Mono, QtCore.Qt.ThresholdDither)
         self.update()
 
@@ -249,6 +250,11 @@ class Viewer(QWidget):
         if val == 0:
             self.undoEdit()
         else:
+            # Copy marked up image to master
+            p = QPainter(self.currImage)
+            p.drawImage(self.subImageLocation, self.subImage)
+            p.end()
+
             # Update list widget with new image
             self.subImage = None
             self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
