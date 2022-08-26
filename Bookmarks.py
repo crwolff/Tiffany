@@ -3,6 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidget, QListWidgetItem
 from PyQt5.QtGui import QImage, QPixmap, QTransform, QPainter, QPainterPath
+import Defines
 
 class Bookmarks(QListWidget):
     progressSig = QtCore.pyqtSignal(str, int)
@@ -56,14 +57,18 @@ class Bookmarks(QListWidget):
                 if whom == 'openAct' or whom == 'insertAct':
                     newItem = QListWidgetItem();
                     newItem.setToolTip(fname)
-                    newItem.setData(QtCore.Qt.UserRole, image)
-                    newItem.setIcon(self.makeIcon(image))
+                    newItem.setData(Defines.roleImage, image)
+                    newItem.setData(Defines.roleRotation, 0.0)
+                    newItem.setData(Defines.roleChanges, 0)
+                    newItem.setIcon(self.makeIcon(image, False))
                     self.insertItem(rows[0], newItem)
                     rows[0] = rows[0] + 1
                 else:
                     self.item(rows[0]).setToolTip(fname)
-                    self.item(rows[0]).setData(QtCore.Qt.UserRole, image)
-                    self.item(rows[0]).setIcon(self.makeIcon(image))
+                    self.item(rows[0]).setData(Defines.roleImage, image)
+                    self.item(rows[0]).setData(Defines.roleRotation, 0.0)
+                    self.item(rows[0]).setData(Defines.roleChanges, 0)
+                    self.item(rows[0]).setIcon(self.makeIcon(image, False))
                     if len(rows) > 1:
                         rows = rows[1:]
                     else:
@@ -116,10 +121,13 @@ class Bookmarks(QListWidget):
         # Determine button pressed
         whom = self.sender().objectName()
         if whom == "rotateCWAct":
+            rot = 1
             tmat = QTransform().rotate(90.0)
         elif whom == "rotateCCWAct":
+            rot = 3
             tmat = QTransform().rotate(270.0)
         else:
+            rot = 2
             tmat = QTransform().rotate(180.0)
 
         # Make a list of all selected items
@@ -135,12 +143,19 @@ class Bookmarks(QListWidget):
         progress = 0
         if len(rows) > 0:
             for idx in rows:
-                oldImage = self.item(idx).data(QtCore.Qt.UserRole)
+                oldImage = self.item(idx).data(Defines.roleImage)
                 rotImage = oldImage.transformed(tmat, QtCore.Qt.SmoothTransformation)
+                rotation = rot + self.item(idx).data(Defines.roleRotation)
+                changes = self.item(idx).data(Defines.roleChanges)
+                if rotation > 3:
+                    rotation = rotation - 4
 
                 # Update item
-                self.item(idx).setData(QtCore.Qt.UserRole, rotImage)
-                self.item(idx).setIcon(self.makeIcon(rotImage,changed=True))
+                self.item(idx).setData(Defines.roleImage, rotImage)
+                self.item(idx).setData(Defines.roleRotation, rotation)
+                flag = (rotation != 0) or (changes != 0)
+                icon = self.makeIcon(rotImage, flag)
+                self.item(idx).setIcon(icon)
 
                 # Update progress bar
                 self.progressSig.emit("", progress)
@@ -155,8 +170,9 @@ class Bookmarks(QListWidget):
 
     def updateIcon(self):
         item = self.currentItem()
-        image = item.data(QtCore.Qt.UserRole)
-        item.setIcon(self.makeIcon(image,changed=True))
+        image = item.data(Defines.roleImage)
+        flag = (item.data(Defines.roleRotation) != 0) or (item.data(Defines.roleChanges) != 0)
+        item.setIcon(self.makeIcon(image, flag))
 
     def moveMode(self):
         pass
@@ -197,7 +213,7 @@ class Bookmarks(QListWidget):
         for idx in range(self.count()):
             self.item(idx).setSelected(idx&1==0)
 
-    def makeIcon(self,image,changed=False):
+    def makeIcon(self, image, changed):
         # Fill background
         qimg = QImage(100, 100, QImage.Format_RGB32)
         qimg.fill(QtGui.QColor(240, 240, 240))

@@ -3,6 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QWidget, QRubberBand, QMessageBox, QDialog
 from PyQt5.QtGui import QImage, QPixmap, QPalette, QPainter, QColor
+import Defines
 
 class Viewer(QWidget):
     progressSig = QtCore.pyqtSignal(str, int)
@@ -89,13 +90,15 @@ class Viewer(QWidget):
             elif self.leftMode == "Fill":
                 self.rubberBand.hide()
                 self.fillArea(self.rubberBand.geometry())
-                self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+                self.currListItem.setData(Defines.roleImage, self.currImage)
+                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
                 self.imageChangedSig.emit()
                 event.accept()
             elif self.leftMode == "Draw" or self.leftMode == "Erase":
                 self.drawing = False
                 self.setCursor(QtCore.Qt.ArrowCursor)
-                self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+                self.currListItem.setData(Defines.roleImage, self.currImage)
+                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
                 self.imageChangedSig.emit()
                 event.accept()
             else:
@@ -116,7 +119,7 @@ class Viewer(QWidget):
         self.flushEdits()
         if curr is not None:
             self.currListItem = curr
-            self.currImage = curr.data(QtCore.Qt.UserRole)
+            self.currImage = curr.data(Defines.roleImage)
             self.fitToWindow()
         else:
             self.currListItem = None
@@ -224,7 +227,8 @@ class Viewer(QWidget):
             self.undoState = self.undoState[1:]
 
             # Update list widget with new image
-            self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+            self.currListItem.setData(Defines.roleImage, self.currImage)
+            self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) - 1)
             self.imageChangedSig.emit()
             self.update()
 
@@ -244,7 +248,8 @@ class Viewer(QWidget):
             self.redoState = self.redoState[1:]
 
             # Update list widget with new image
-            self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+            self.currListItem.setData(Defines.roleImage, self.currImage)
+            self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
             self.imageChangedSig.emit()
             self.update()
 
