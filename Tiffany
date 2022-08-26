@@ -45,9 +45,9 @@ class Window(QMainWindow, Ui_MainWindow):
         self.openAct.triggered.connect(self.bookmarks.readFiles)
         self.insertAct.triggered.connect(self.bookmarks.readFiles)
         self.replaceAct.triggered.connect(self.bookmarks.readFiles)
-        self.saveAct.triggered.connect(self.bookmarks.writeFiles)
-        self.saveAsAct.triggered.connect(self.bookmarks.writeFiles)
-        self.createTIFFAct.triggered.connect(self.bookmarks.writeFiles)
+        self.saveFilesAct.triggered.connect(self.bookmarks.saveFiles)
+        self.saveAsAct.triggered.connect(self.bookmarks.saveAs)
+        self.createTIFFAct.triggered.connect(self.bookmarks.createTIFF)
         self.exitAct.triggered.connect(self.close)
         # Edit menu
         self.selectAllAct.triggered.connect(self.bookmarks.selectAll)
@@ -112,12 +112,12 @@ class Window(QMainWindow, Ui_MainWindow):
         self.toolBar.addWidget(self.openToolButton)
 
         self.saveMenu = QtWidgets.QMenu(self)
-        self.saveMenu.addAction(self.saveAct)
+        self.saveMenu.addAction(self.saveFilesAct)
         self.saveMenu.addAction(self.saveAsAct)
         self.saveMenu.addAction(self.createTIFFAct)
         self.saveToolButton = PopupQToolButton()
         self.saveToolButton.setMenu(self.saveMenu)
-        self.saveToolButton.setDefaultAction(self.saveAct)
+        self.saveToolButton.setDefaultAction(self.saveFilesAct)
         self.toolBar.addWidget(self.saveToolButton)
 
         self.toolBar.addAction(self.deleteAct)

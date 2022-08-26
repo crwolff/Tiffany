@@ -91,16 +91,26 @@ class Bookmarks(QListWidget):
         # Signal redraw
         self.currentItemChanged.emit(self.currentItem(), None)
 
-    def writeFiles(self):
-        # Determine button pressed
-        whom = self.sender().objectName()
-        if whom == "saveAct":
-            txt = 'Save Files'
-        elif whom == "saveAsAct":
-            txt = 'Save As Files'
-        else:
-            txt = 'Create TIFF'
-        print(txt + " not implemented")
+    # Save selected files
+    def saveFiles(self):
+        # Make a list of all selected items
+        rows = []
+        for x in self.selectedItems():
+            rows.append(int(x.text()) - 1)
+
+        # Add progress to status bar
+        if len(rows) > 0:
+            self.progressSig.emit("Saving...", len(rows))
+
+        # Cleanup status bar
+        if len(rows) > 0:
+            self.progressSig.emit("", -1)
+
+    def saveAs(self):
+        print("Save As")
+
+    def createTIFF(self):
+        print("Create TIFF")
 
     def rotateSelection(self):
         # Determine button pressed
