@@ -14,8 +14,6 @@ class Viewer(QWidget):
         self.scrollArea = None  # Set by main window
         self.currListItem = None
         self.currImage = None
-        self.subImage = None
-        self.subImageLocation = QtCore.QPoint(0,0)
         self.flushEdits()
         self.currTransform = None
         self.currInverse = None
@@ -113,8 +111,6 @@ class Viewer(QWidget):
             p = QPainter(self)
             p.setTransform(self.currTransform)
             p.drawImage(self.currImage.rect().topLeft(), self.currImage)
-            if self.subImage is not None:
-                p.drawImage(self.subImageLocation, self.subImage)
 
     def imageSelected(self, curr, prev):
         self.flushEdits()
