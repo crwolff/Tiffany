@@ -79,7 +79,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.undoAct.triggered.connect(self.viewer.undoEdit)
         self.redoAct.triggered.connect(self.viewer.redoEdit)
         self.colorAct.triggered.connect(self.colorMagic)
-        self.stuffAct.triggered.connect(self.viewer.removeMarkup)
         # Help menu
         self.aboutAct.triggered.connect(self.about)
         self.aboutQtAct.triggered.connect(qApp.aboutQt)
@@ -161,8 +160,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.colorToolButton.setDefaultAction(self.colorAct)
         self.colorToolButton.setIcon(self.viewer.foregroundColor, self.viewer.backgroundColor)
         self.toolBar.addWidget(self.colorToolButton)
-
-        self.toolBar.addAction(self.stuffAct)
 
     def updateProgress(self, txt, val):
         if txt != "":

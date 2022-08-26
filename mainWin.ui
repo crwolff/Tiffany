@@ -470,15 +470,6 @@
     <string>Undo previous undo</string>
    </property>
   </action>
-  <action name="stuffAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/draw_line.svg</normaloff>:/images/assets/draw_line.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Stuff</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
