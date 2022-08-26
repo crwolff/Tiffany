@@ -91,10 +91,13 @@ class Viewer(QWidget):
             elif self.leftMode == "Fill":
                 self.rubberBand.hide()
                 self.fillArea(self.rubberBand.geometry())
+                self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
+                self.imageChangedSig.emit()
                 event.accept()
             elif self.leftMode == "Draw" or self.leftMode == "Erase":
                 self.drawing = False
                 self.setCursor(QtCore.Qt.ArrowCursor)
+                self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
                 self.imageChangedSig.emit()
                 event.accept()
             else:
@@ -174,10 +177,6 @@ class Viewer(QWidget):
         p.setPen(QtGui.QPen(color, brush, QtCore.Qt.SolidLine, QtCore.Qt.RoundCap, QtCore.Qt.RoundJoin))
         p.drawLine(start, finish)
         p.end()
-
-        # Update list widget with new image
-        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
-        self.imageChangedSig.emit()
         self.update()
 
     # fill rectangle with background color
@@ -190,10 +189,6 @@ class Viewer(QWidget):
         p.setTransform(self.currInverse)
         p.fillRect(rect, self.backgroundColor)
         p.end()
-
-        # Update list widget with new image
-        self.currListItem.setData(QtCore.Qt.UserRole, self.currImage)
-        self.imageChangedSig.emit()
         self.update()
 
 #
