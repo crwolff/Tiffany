@@ -2,7 +2,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QListWidget, QListWidgetItem
-from PyQt5.QtGui import QImage, QPixmap, QTransform, QPainter
+from PyQt5.QtGui import QImage, QPixmap, QTransform, QPainter, QPainterPath
 
 class Bookmarks(QListWidget):
     progressSig = QtCore.pyqtSignal(str, int)
@@ -140,7 +140,7 @@ class Bookmarks(QListWidget):
 
                 # Update item
                 self.item(idx).setData(QtCore.Qt.UserRole, rotImage)
-                self.item(idx).setIcon(self.makeIcon(rotImage))
+                self.item(idx).setIcon(self.makeIcon(rotImage,changed=True))
 
                 # Update progress bar
                 self.progressSig.emit("", progress)
@@ -156,7 +156,7 @@ class Bookmarks(QListWidget):
     def updateIcon(self):
         item = self.currentItem()
         image = item.data(QtCore.Qt.UserRole)
-        item.setIcon(self.makeIcon(image))
+        item.setIcon(self.makeIcon(image,changed=True))
 
     def moveMode(self):
         pass
@@ -197,7 +197,7 @@ class Bookmarks(QListWidget):
         for idx in range(self.count()):
             self.item(idx).setSelected(idx&1==0)
 
-    def makeIcon(self,image):
+    def makeIcon(self,image,changed=False):
         # Fill background
         qimg = QImage(100, 100, QImage.Format_RGB32)
         qimg.fill(QtGui.QColor(240, 240, 240))
@@ -211,6 +211,14 @@ class Bookmarks(QListWidget):
         else:
             m = (100 - scaledImage.width()) / 2
             painter.drawImage(QtCore.QPoint(m,0), scaledImage)
+
+        # Mark if changed
+        if changed:
+            path = QPainterPath()
+            path.addRect(QtCore.QRectF(2, 2, 10, 10))
+            painter.fillPath(path, QtCore.Qt.red)
+            painter.drawPath(path)
+
         painter.end()
 
         # Convert to icon
