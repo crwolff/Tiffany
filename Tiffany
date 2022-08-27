@@ -54,7 +54,6 @@ class Window(QMainWindow, Ui_MainWindow):
         self.selectEvenAct.triggered.connect(self.bookmarks.selectEven)
         self.selectOddAct.triggered.connect(self.bookmarks.selectOdd)
         self.deleteAct.triggered.connect(self.bookmarks.deleteSelection)
-        self.moveAct.triggered.connect(self.bookmarks.moveMode)
         self.rotateCWAct.triggered.connect(self.bookmarks.rotateSelection)
         self.rotateCCWAct.triggered.connect(self.bookmarks.rotateSelection)
         self.rotate180Act.triggered.connect(self.bookmarks.rotateSelection)

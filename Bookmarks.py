@@ -174,9 +174,6 @@ class Bookmarks(QListWidget):
         flag = (item.data(Defines.roleRotation) != 0) or (item.data(Defines.roleChanges) != 0)
         item.setIcon(self.makeIcon(image, flag))
 
-    def moveMode(self):
-        pass
-
     def deleteSelection(self):
         # Make a list of all selected items
         rows = []

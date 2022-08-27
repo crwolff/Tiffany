@@ -107,7 +107,6 @@
     <addaction name="selectEvenAct"/>
     <addaction name="separator"/>
     <addaction name="deleteAct"/>
-    <addaction name="moveAct"/>
     <addaction name="separator"/>
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
@@ -255,11 +254,6 @@
    </property>
    <property name="text">
     <string>&amp;Delete</string>
-   </property>
-  </action>
-  <action name="moveAct">
-   <property name="text">
-    <string>&amp;Move</string>
    </property>
   </action>
   <action name="rotateCWAct">
