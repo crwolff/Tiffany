@@ -124,6 +124,7 @@ class Viewer(QWidget):
         else:
             self.currListItem = None
             self.currImage = None
+        self.update()
 
 #
 # Re-implement for scrollArea sizing
