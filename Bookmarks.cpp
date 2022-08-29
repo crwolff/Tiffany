@@ -72,33 +72,33 @@ void Bookmarks::readFiles()
             if (image.format() == QImage::Format_Indexed8)
                 image = image.convertToFormat(QImage::Format_Grayscale8);
 
+            // Remove the next item to be replaced
+            if (whom == "replaceAct")
+                delete this->takeItem(rows[0]);
+
             // Build list item and insert
-            if ((whom == "openAct") || (whom == "insertAct"))
+            QListWidgetItem *newItem = new QListWidgetItem();
+            newItem->setToolTip(filenames.at(idx));
+            newItem->setData(Qt::UserRole, image);
+            newItem->setData(Qt::UserRole+1, 0);
+            newItem->setData(Qt::UserRole+2, 0);
+            newItem->setIcon(makeIcon(image, false));
+            this->insertItem(rows[0], newItem);
+ 
+            // Update row for next item
+            if (whom == "replaceAct")
             {
-                QListWidgetItem *newItem = new QListWidgetItem();
-                newItem->setToolTip(filenames.at(idx));
-                newItem->setData(Qt::UserRole, image);
-                newItem->setData(Qt::UserRole+1, 0);
-                newItem->setData(Qt::UserRole+2, 0);
-                newItem->setIcon(makeIcon(image, false));
-                this->insertItem(rows[0], newItem);
-                rows[0] = rows[0] + 1;
-            }
-            else // Replace existing list item
-            {
-                this->item(rows[0])->setToolTip(filenames.at(idx));
-                this->item(rows[0])->setData(Qt::UserRole, image);
-                this->item(rows[0])->setData(Qt::UserRole+1, 0);
-                this->item(rows[0])->setData(Qt::UserRole+2, 0);
-                this->item(rows[0])->setIcon(makeIcon(image, false));
                 if (rows.count() > 1)
                     rows.remove(0);
                 else
-                {
+                    // Out of replacement items, switch to insert
                     whom = "insertAct";
-                    rows[0] = rows[0] + 1;
-                }
             }
+
+            // Next item goes after current one
+            if ((whom == "openAct") || (whom == "insertAct"))
+                rows[0] = rows[0] + 1;
+
             // TODO
             // if (this->count() == 1)
             //     self.setCurrentItem(self.item(0))
