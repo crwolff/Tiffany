@@ -23,6 +23,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
+    void buildToolBar();
 
     QLabel *statusLabel;
     QProgressBar *progressBar;

@@ -30,7 +30,7 @@ UI_DIR = ./.build
 QT += widgets gui
 
 # Input
-HEADERS += Bookmarks.h mainwindow.h Viewer.h
+HEADERS += mainwindow.h Bookmarks.h Viewer.h PopupQToolButton.h
 FORMS += mainWin.ui
-SOURCES += Bookmarks.cpp main.cpp mainwindow.cpp Viewer.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp PopupQToolButton.cpp
 RESOURCES += rsrc.qrc
