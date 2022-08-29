@@ -469,12 +469,12 @@
   <customwidget>
    <class>Bookmarks</class>
    <extends>QListWidget</extends>
-   <header>Bookmarks</header>
+   <header>Bookmarks.h</header>
   </customwidget>
   <customwidget>
    <class>Viewer</class>
    <extends>QWidget</extends>
-   <header>Viewer</header>
+   <header>Viewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
