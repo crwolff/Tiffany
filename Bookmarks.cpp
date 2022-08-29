@@ -84,7 +84,7 @@ void Bookmarks::readFiles()
             newItem->setData(Qt::UserRole+2, 0);
             newItem->setIcon(makeIcon(image, false));
             this->insertItem(rows[0], newItem);
- 
+
             // Update row for next item
             if (whom == "replaceAct")
             {
@@ -168,7 +168,7 @@ QIcon Bookmarks::makeIcon(QImage image, bool flag)
         painter.drawPath(path);
     }
     painter.end();
-   
+
     // Convert to icon
     QIcon icon = QIcon(QPixmap::fromImage(qimg));
     return icon;
