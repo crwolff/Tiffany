@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
+#include <QProgressBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,5 +23,8 @@ public slots:
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
+
+    QLabel *statusLabel;
+    QProgressBar *progressBar;
 };
 #endif // MAINWINDOW_H

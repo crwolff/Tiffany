@@ -8,6 +8,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connectSignalSlots();
+
+    // Initialize status bar
+    statusLabel = new QLabel("Ready");
+    ui->statusbar->addWidget(statusLabel);
+    progressBar = new QProgressBar();
+    progressBar->setMaximumHeight(17);
 }
 
 MainWindow::~MainWindow()
@@ -32,5 +38,20 @@ void MainWindow::connectSignalSlots()
 
 void MainWindow::updateProgress(QString descr, int val)
 {
-    qInfo() << descr << val;
+    if (val < 0)
+    {
+        ui->statusbar->removeWidget(progressBar);
+        statusLabel->setText("Ready");
+    }
+    else if (descr != "")
+    {
+        statusLabel->setText(descr);
+        progressBar->setRange(0, val);
+        progressBar->setValue(0);
+        ui->statusbar->addWidget(progressBar);
+    }
+    else
+    {
+        progressBar->setValue(val);
+    }
 }
