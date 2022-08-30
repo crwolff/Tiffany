@@ -19,11 +19,14 @@ public:
 
 public slots:
     void updateProgress(QString descr, int val);
+    void updateActions();
+    void about();
 
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
     void buildToolBar();
+    void colorMagic();
 
     QLabel *statusLabel;
     QProgressBar *progressBar;

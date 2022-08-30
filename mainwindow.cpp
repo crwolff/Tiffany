@@ -4,6 +4,9 @@
 #include "ColorQToolButton.h"
 #include <QDebug>
 
+//
+// Constructor
+//
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -12,14 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     connectSignalSlots();
     buildToolBar();
 
-    // Adjuset text for better layout
-    ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
-    ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
-    ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));
-    ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
-    ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
-    ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
-
     // Initialize status bar
     statusLabel = new QLabel("Ready");
     ui->statusbar->addWidget(statusLabel);
@@ -27,11 +22,17 @@ MainWindow::MainWindow(QWidget *parent)
     progressBar->setMaximumHeight(17);
 }
 
+//
+// Destructor
+//
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+//
+// Connect signals to slots
+//
 void MainWindow::connectSignalSlots()
 {
     // File menu
@@ -57,6 +58,14 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
 }
 
+// TODO
+void MainWindow::colorMagic()
+{
+}
+
+//
+// Populate the toolbar with buttons
+//
 void MainWindow::buildToolBar()
 {
     // Open button
@@ -126,8 +135,19 @@ void MainWindow::buildToolBar()
     colorToolButton->setDefaultAction(ui->colorAct);
     colorToolButton->setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
     ui->toolBar->addWidget(colorToolButton);
+
+    // Adjust text for better toolbar layout
+    ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
+    ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
+    ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));
+    ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
+    ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
+    ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
 }
 
+//
+// Show progress of long operation on status bar
+//
 void MainWindow::updateProgress(QString descr, int val)
 {
     if (val < 0)
@@ -147,3 +167,14 @@ void MainWindow::updateProgress(QString descr, int val)
         progressBar->setValue(val);
     }
 }
+
+// TODO
+void MainWindow::updateActions()
+{
+}
+
+// TODO
+void MainWindow::about()
+{
+}
+
