@@ -12,6 +12,14 @@ MainWindow::MainWindow(QWidget *parent)
     connectSignalSlots();
     buildToolBar();
 
+    // Adjuset text for better layout
+    ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
+    ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
+    ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));
+    ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
+    ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
+    ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
+
     // Initialize status bar
     statusLabel = new QLabel("Ready");
     ui->statusbar->addWidget(statusLabel);
@@ -46,6 +54,7 @@ void MainWindow::connectSignalSlots()
 
     // Interconnects
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
+    //QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
 }
 
 void MainWindow::buildToolBar()
@@ -88,6 +97,7 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->redoAct);
     ui->toolBar->addAction(ui->zoomOutAct);
     ui->toolBar->addAction(ui->zoomInAct);
+    ui->toolBar->addAction(ui->fitToWindowAct);
 
     // Tool button
     QMenu *toolsMenu = new QMenu();
