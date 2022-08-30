@@ -53,9 +53,18 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateSelection );
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateSelection );
 
+    // View menu
+    QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
+    QObject::connect( ui->zoomOutAct, &QAction::triggered, ui->viewer, &Viewer::zoomOut );
+    QObject::connect( ui->fitToWindowAct, &QAction::triggered, ui->viewer, &Viewer::fitToWindow );
+    QObject::connect( ui->fillWindowAct, &QAction::triggered, ui->viewer, &Viewer::fillWindow );
+    QObject::connect( ui->fitWidthAct, &QAction::triggered, ui->viewer, &Viewer::fitWidth );
+    QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
+
     // Interconnects
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
+    QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
 }
 
 // TODO
@@ -168,9 +177,13 @@ void MainWindow::updateProgress(QString descr, int val)
     }
 }
 
-// TODO
+//
+// Enable zoom icons if scale factor in range
+//
 void MainWindow::updateActions()
 {
+    ui->zoomInAct->setEnabled(ui->viewer->scaleFactor < 10.0);
+    ui->zoomOutAct->setEnabled(ui->viewer->scaleFactor > 0.1);
 }
 
 // TODO

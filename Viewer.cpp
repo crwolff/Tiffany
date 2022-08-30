@@ -138,24 +138,56 @@ void Viewer::redoEdit()
 {
 }
 
-// TODO
+//
+// Force QScrollArea to recalculate scrollbars
+//
 void Viewer::updateScrollBars()
 {
+    scrollArea->setWidgetResizable(true);
 }
 
-// TODO
+//
+// Recenter view after scaling change
+//
 void Viewer::adjustScrollBars(float factor)
 {
+    scrollArea->horizontalScrollBar()->setValue(int(
+                factor * scrollArea->horizontalScrollBar()->value() +
+                ((factor - 1) * scrollArea->horizontalScrollBar()->pageStep() / 2)));
+    scrollArea->verticalScrollBar()->setValue(int(
+                factor * scrollArea->verticalScrollBar()->value() +
+                ((factor - 1) * scrollArea->verticalScrollBar()->pageStep() / 2)));
 }
 
-// TODO
+//
+// Draw image 25% larger
+//
 void Viewer::zoomIn()
 {
+    if (currImage.isNull())
+        return;
+    setVisible(false);
+    scaleFactor = scaleFactor * 1.25;
+    setTransform();
+    updateGeometry();
+    adjustScrollBars(1.25);
+    setVisible(true);
+    emit zoomSig();
 }
 
-// TODO
+//
+// Draw image 20% smaller
 void Viewer::zoomOut()
 {
+    if (currImage.isNull())
+        return;
+    setVisible(false);
+    scaleFactor = scaleFactor * 0.8;
+    setTransform();
+    updateGeometry();
+    adjustScrollBars(0.8);
+    setVisible(true);
+    emit zoomSig();
 }
 
 // TODO
