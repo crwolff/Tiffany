@@ -3,8 +3,8 @@
 
 PopupQToolButton::PopupQToolButton(QWidget * parent) : QToolButton(parent)
 {
-    this->setPopupMode(QToolButton::MenuButtonPopup);
-    this->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    setPopupMode(QToolButton::MenuButtonPopup);
+    setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     QObject::connect(this, &QToolButton::triggered, this, &QToolButton::setDefaultAction);
 }
 

@@ -41,7 +41,7 @@ void Bookmarks::readFiles()
     QVector<int> rows;
     if ((whom == "insertAct") || (whom == "replaceAct"))
     {
-        QList<QListWidgetItem*> items = this->selectedItems();
+        QList<QListWidgetItem*> items = selectedItems();
         foreach(QListWidgetItem* item, items)
             rows.append(item->text().toInt() - 1);
         if (rows.count() == 0)
@@ -52,7 +52,7 @@ void Bookmarks::readFiles()
         std::sort(rows.begin(), rows.end());
     }
     else // openAct
-        rows.append(this->count());
+        rows.append(count());
 
     // Add progress to status bar
     emit progressSig("Reading...", filenames.count());
@@ -74,7 +74,7 @@ void Bookmarks::readFiles()
 
             // Remove the next item to be replaced
             if (whom == "replaceAct")
-                delete this->takeItem(rows[0]);
+                delete takeItem(rows[0]);
 
             // Build list item and insert
             QListWidgetItem *newItem = new QListWidgetItem();
@@ -83,7 +83,7 @@ void Bookmarks::readFiles()
             newItem->setData(Qt::UserRole+1, 0);
             newItem->setData(Qt::UserRole+2, 0);
             newItem->setIcon(makeIcon(image, false));
-            this->insertItem(rows[0], newItem);
+            insertItem(rows[0], newItem);
 
             // Update row for next item
             if (whom == "replaceAct")
@@ -100,7 +100,7 @@ void Bookmarks::readFiles()
                 rows[0] = rows[0] + 1;
 
             // TODO
-            // if (this->count() == 1)
+            // if (count() == 1)
             //     self.setCurrentItem(self.item(0))
 
         }
@@ -112,14 +112,14 @@ void Bookmarks::readFiles()
     // Remove any remaining selections
     if (whom == "replaceAct")
         for(int idx=rows.count()-1;idx >= 0; idx--)
-            delete this->takeItem(rows[idx]);
+            delete takeItem(rows[idx]);
 
     // Cleanup status bar
     emit progressSig("", -1);
 
     // (Re)number all the loaded pages
-    for(int idx = 0; idx < this->count(); idx++)
-        this->item(idx)->setText(QString::number(idx+1));
+    for(int idx = 0; idx < count(); idx++)
+        item(idx)->setText(QString::number(idx+1));
 
     // TODO
     // Signal redraw
