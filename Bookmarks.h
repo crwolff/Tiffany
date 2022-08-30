@@ -17,12 +17,17 @@ public slots:
     void saveFiles();
     void saveAsFiles();
     void createTIFF();
+    void selectEven();
+    void selectOdd();
+    void deleteSelection();
+    void rotateSelection();
+    void updateIcon();
 
 signals:
     void progressSig(QString descr, int val);
 
 private:
-    QIcon makeIcon(QImage image, bool flag);
+    QIcon makeIcon(QImage *image, bool flag);
 };
 
 #endif
