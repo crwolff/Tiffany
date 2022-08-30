@@ -54,7 +54,7 @@ void MainWindow::connectSignalSlots()
 
     // Interconnects
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
-    //QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
+    QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
 }
 
 void MainWindow::buildToolBar()
