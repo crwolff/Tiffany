@@ -61,6 +61,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         currListItem = NULL;
         currImage = QImage();
     }
+    update();
 }
 
 //
@@ -166,12 +167,10 @@ void Viewer::zoomIn()
 {
     if (currImage.isNull())
         return;
-    setVisible(false);
     scaleFactor = scaleFactor * 1.25;
     setTransform();
     updateGeometry();
     adjustScrollBars(1.25);
-    setVisible(true);
     emit zoomSig();
 }
 
@@ -181,12 +180,10 @@ void Viewer::zoomOut()
 {
     if (currImage.isNull())
         return;
-    setVisible(false);
     scaleFactor = scaleFactor * 0.8;
     setTransform();
     updateGeometry();
     adjustScrollBars(0.8);
-    setVisible(true);
     emit zoomSig();
 }
 
