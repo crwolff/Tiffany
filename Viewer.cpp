@@ -1,4 +1,7 @@
 #include "Viewer.h"
+#include <QDebug>
+#include <QPainter>
+#include <QScrollBar>
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
@@ -26,21 +29,48 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
 }
 
-// TODO
-void Viewer::paintEvent(QPaintEvent *event)
+//
+// Replace paintEvent to get proper scaling of image
+//
+void Viewer::paintEvent(QPaintEvent *)
 {
-    QWidget::paintEvent(event);
+    if (currImage.isNull() == false)
+    {
+        QPainter p(this);
+        p.setTransform(currTransform);
+        p.drawImage(currImage.rect().topLeft(), currImage);
+        p.end();
+    }
 }
 
 // TODO
+//
+// Update viewer image from bookmarks
+//
 void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 {
+    flushEdits();
+    if (curr != NULL)
+    {
+        currListItem = curr;
+        currImage = curr->data(Qt::UserRole).value<QImage>();
+        fitToWindow();
+    }
+    else
+    {
+        currListItem = NULL;
+        currImage = QImage();
+    }
 }
 
-// TODO
+//
+// Always honor aspect ratio when resizing
+//
 QSize Viewer::sizeHint() const
 {
-    return QWidget::sizeHint();
+    if (currImage.isNull())
+        return QWidget::sizeHint();
+    return currImage.size() * scaleFactor * scaleBase;
 }
 
 // TODO
@@ -68,9 +98,14 @@ void Viewer::setBrush()
 {
 }
 
-// TODO
+//
+// Pre-compute the scaling transformation matrix
+//
 void Viewer::setTransform()
 {
+    currTransform = QTransform();
+    currTransform.scale(scaleFactor * scaleBase, scaleFactor * scaleBase);
+    currInverse = currTransform.inverted();
 }
 
 // TODO
@@ -128,15 +163,58 @@ void Viewer::zoomArea()
 {
 }
 
-// TODO
-bool Viewer::measureAll()
+//
+// Helper function for window fit functions
+//
+bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
 {
+    // Get handle to parent's scrollbars
+    if (scrollArea == NULL)
+        scrollArea = (QScrollArea *)(parentWidget()->parentWidget());
+
+    // Get thickness of scrollbars
+    scrollBarSize = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    // Size of viewport not including scrollbars
+    viewW = parentWidget()->width();
+    if (scrollArea->verticalScrollBar()->isVisible())
+        viewW += scrollBarSize;
+    viewH = parentWidget()->height();
+    if (scrollArea->horizontalScrollBar()->isVisible())
+        viewH += scrollBarSize;
+
+    // Size of image
+    imageW = currImage.size().width();
+    imageH = currImage.size().height();
+
+    // Scale to horizontal if it is larger
+    if (viewW * imageH > viewH * imageW)
+        return true;
     return false;
 }
 
-// TODO
+//
+// Fit image to window without scrollbars
+//
 void Viewer::fitToWindow()
 {
+    int scrollBarSize, viewW, viewH, imageW, imageH;
+
+    scaleBase = 1.0;
+    scaleFactor = 1.0;
+    if (currImage.isNull())
+        return;
+
+    // Scale to larger dimension
+    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+        scaleBase = (float)viewH / imageH;
+    else
+        scaleBase = (float)viewW / imageW;
+    setTransform();
+
+    // Update scrollarea
+    updateGeometry();
+    emit zoomSig();
 }
 
 // TODO

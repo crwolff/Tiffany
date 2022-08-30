@@ -3,7 +3,9 @@
 
 #include <QWidget>
 #include <QColor>
+#include <QImage>
 #include <QListWidget>
+#include <QScrollArea>
 
 class Viewer : public QWidget
 {
@@ -15,6 +17,8 @@ public:
 
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
+    float scaleBase = 1.0;
+    float scaleFactor = 1.0;
 
 public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
@@ -34,6 +38,7 @@ public slots:
     void fillWindow();
 
 signals:
+    void zoomSig();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -50,7 +55,12 @@ private:
     void pushImage();
     void updateScrollBars();
     void adjustScrollBars(float factor);
-    bool measureAll();
+    bool measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+
+    QListWidgetItem *currListItem = NULL;
+    QImage currImage;
+    QScrollArea *scrollArea = NULL;
+    QTransform currTransform, currInverse;
 };
 
 #endif
