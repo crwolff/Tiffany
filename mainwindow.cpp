@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainWin.h"
 #include "PopupQToolButton.h"
+#include "ColorQToolButton.h"
 #include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -101,12 +102,11 @@ void MainWindow::buildToolBar()
     toolSizeToolButton->setDefaultAction(ui->pix1Act);
     ui->toolBar->addWidget(toolSizeToolButton);
 
-    // TODO
     // Color button
-    //ColorQToolButton *colorToolButton = new ColorQToolButton();
-    //colorToolButton->setDefaultAction(ui->colorAct);
-    //colorToolButton->setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
-    //ui->toolBar->addWidget(colorToolButton);
+    ColorQToolButton *colorToolButton = new ColorQToolButton();
+    colorToolButton->setDefaultAction(ui->colorAct);
+    colorToolButton->setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
+    ui->toolBar->addWidget(colorToolButton);
 }
 
 void MainWindow::updateProgress(QString descr, int val)

@@ -2,6 +2,7 @@
 #define VIEWER_H
 
 #include <QWidget>
+#include <QColor>
 
 class Viewer : public QWidget
 {
@@ -11,9 +12,11 @@ public:
     Viewer(QWidget * parent = NULL);
     ~Viewer();
 
-protected:
-    void paintEvent(QPaintEvent * event);
+    QColor foregroundColor = Qt::black;
+    QColor backgroundColor = Qt::white;
 
+protected:
+    void paintEvent(QPaintEvent * event) override;
 };
 
 #endif
