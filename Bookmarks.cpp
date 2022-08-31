@@ -227,8 +227,8 @@ void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
     QImage image = item->data(Qt::UserRole).value<QImage>();
-    bool flag = (item->data(Qt::UserRole+1).value<int>() == 0) &&
-                (item->data(Qt::UserRole+2).value<int>() == 0);
+    bool flag = (item->data(Qt::UserRole+1).value<int>() != 0) ||
+                (item->data(Qt::UserRole+2).value<int>() != 0);
     item->setIcon(makeIcon(image, flag));
 }
 
