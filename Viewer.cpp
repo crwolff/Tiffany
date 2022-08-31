@@ -109,17 +109,17 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry());
-//                self.currListItem.setData(Defines.roleImage, self.currImage)
-//                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
-//                self.imageChangedSig.emit()
+            currListItem->setData(Qt::UserRole, currImage);
+            currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() + 1);
+            emit imageChangedSig();
         }
         else if (drawing)
         {
             drawing = false;
             setCursor(Qt::ArrowCursor);
-//                self.currListItem.setData(Defines.roleImage, self.currImage)
-//                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
-//                self.imageChangedSig.emit()
+            currListItem->setData(Qt::UserRole, currImage);
+            currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() + 1);
+            emit imageChangedSig();
         }
         flag = true;
     }
@@ -256,16 +256,34 @@ void Viewer::setTransform()
     currInverse = currTransform.inverted();
 }
 
-// TODO
+//
+// Draw/Erase a line in the foreground/background color
+//
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 {
-    qInfo() << "drawLine" << start << finish << color;
+    if (currImage.isNull())
+        return;
+    QPainter p(&currImage);
+    p.setTransform(currInverse);
+    qreal brush = int(brushSize * scaleFactor * scaleBase);
+    p.setPen(QPen(color, brush, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.drawLine(start, finish);
+    p.end();
+    update();
 }
 
-// TODO
+//
+// Fill area with background color
+//
 void Viewer::fillArea(QRect rect)
 {
-    qInfo() << "fillArea" << rect;
+    if (currImage.isNull())
+        return;
+    QPainter p(&currImage);
+    p.setTransform(currInverse);
+    p.fillRect(rect, backgroundColor);
+    p.end();
+    update();
 }
 
 // TODO
