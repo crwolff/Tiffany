@@ -1,5 +1,6 @@
 #include "Viewer.h"
 #include <QDebug>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
 
@@ -11,22 +12,130 @@ Viewer::~Viewer()
 {
 }
 
-// TODO
+//
+// Handle mouse button down
+//
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
-    QWidget::mousePressEvent(event);
+    bool flag = false;
+
+    // Create rubberBand
+    if (rubberBand == NULL)
+        rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+
+    // If left mouse button is pressed
+    if (event->button() == Qt::LeftButton)
+    {
+        origin = event->pos();
+        if ((leftMode == "Draw") || (leftMode == "Erase"))
+        {
+            pushImage();
+            drawing = true;
+            setCursor(Qt::CrossCursor);
+        }
+        else // Pointer or Fill
+        {
+            rubberBand->setGeometry(QRect(origin, QSize()));
+            rubberBand->show();
+        }
+        flag = true;
+    }
+
+    // If right mouse button pressed
+    if (event->button() == Qt::RightButton)
+    {
+        origin = event->pos();
+        rubberBand->setGeometry(QRect(origin, QSize()));
+        rubberBand->show();
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::mousePressEvent(event);
 }
 
-// TODO
+//
+// Handle mouse motion
+//
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
-    QWidget::mouseMoveEvent(event);
+    bool flag = false;
+
+    // If left mouse button is pressed
+    if (event->buttons() & Qt::LeftButton)
+    {
+        if ((leftMode == "Pointer") || (leftMode == "Fill"))
+        {
+            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+            flag = true;
+        }
+        else if (drawing)
+        {
+            QColor color = (leftMode == "Draw") ? foregroundColor : backgroundColor;
+            drawLine(origin, event->pos(), color);
+            origin = event->pos();
+            flag = true;
+        }
+    }
+
+    // If right mouse button pressed
+    if (event->buttons() & Qt::RightButton)
+    {
+        rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::mouseMoveEvent(event);
 }
 
-// TODO
+//
+// Cleanup after mouse action
+//
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
-    QWidget::mouseReleaseEvent(event);
+    bool flag = false;
+
+    // If left mouse button was released
+    if (event->button() == Qt::LeftButton)
+    {
+        if (leftMode == "Fill")
+        {
+            rubberBand->hide();
+            fillArea(rubberBand->geometry());
+//                self.currListItem.setData(Defines.roleImage, self.currImage)
+//                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
+//                self.imageChangedSig.emit()
+        }
+        else if (drawing)
+        {
+            drawing = false;
+            setCursor(Qt::ArrowCursor);
+//                self.currListItem.setData(Defines.roleImage, self.currImage)
+//                self.currListItem.setData(Defines.roleChanges, self.currListItem.data(Defines.roleChanges) + 1)
+//                self.imageChangedSig.emit()
+        }
+        flag = true;
+    }
+
+    // If right mouse button was released
+    if (event->button() == Qt::RightButton)
+    {
+        zoomArea();
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::mouseReleaseEvent(event);
 }
 
 //
@@ -148,13 +257,15 @@ void Viewer::setTransform()
 }
 
 // TODO
-void Viewer::drawLine(QPoint *start, QPoint *finish, QColor color)
+void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 {
+    qInfo() << "drawLine" << start << finish << color;
 }
 
 // TODO
-void Viewer::fillArea(QRect *rect)
+void Viewer::fillArea(QRect rect)
 {
+    qInfo() << "fillArea" << rect;
 }
 
 // TODO

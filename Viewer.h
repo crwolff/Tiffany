@@ -53,8 +53,8 @@ protected:
 
 private:
     void setTransform();
-    void drawLine(QPoint *start, QPoint *finish, QColor color);
-    void fillArea(QRect *rect);
+    void drawLine(QPoint start, QPoint finish, QColor color);
+    void fillArea(QRect rect);
     void flushEdits();
     void pushImage();
     void updateScrollBars();
@@ -67,6 +67,9 @@ private:
     QTransform currTransform, currInverse;
     QString leftMode = "Pointer";
     qreal brushSize = 1.0;
+    QRubberBand *rubberBand = NULL;
+    QPoint origin;
+    bool drawing = false;
 };
 
 #endif
