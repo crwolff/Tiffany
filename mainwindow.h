@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QProgressBar>
+#include "ColorQToolButton.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,6 +17,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    ColorQToolButton colorToolButton;
 
 public slots:
     void updateProgress(QString descr, int val);

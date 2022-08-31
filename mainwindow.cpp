@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainWin.h"
 #include "PopupQToolButton.h"
-#include "ColorQToolButton.h"
+#include <QColorDialog>
 #include <QDebug>
 #include <QMessageBox>
 
@@ -88,11 +88,6 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
 }
 
-// TODO
-void MainWindow::colorMagic()
-{
-}
-
 //
 // Populate the toolbar with buttons
 //
@@ -161,10 +156,9 @@ void MainWindow::buildToolBar()
     ui->toolBar->addWidget(toolSizeToolButton);
 
     // Color button
-    ColorQToolButton *colorToolButton = new ColorQToolButton();
-    colorToolButton->setDefaultAction(ui->colorAct);
-    colorToolButton->setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
-    ui->toolBar->addWidget(colorToolButton);
+    colorToolButton.setDefaultAction(ui->colorAct);
+    colorToolButton.setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
+    ui->toolBar->addWidget(&colorToolButton);
 
     // Adjust text for better toolbar layout
     ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
@@ -173,6 +167,30 @@ void MainWindow::buildToolBar()
     ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
     ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
     ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
+}
+
+//
+// Manipulate drawing colors
+//
+void MainWindow::colorMagic()
+{
+    if (colorToolButton.mode == "Foreground")
+        ui->viewer->foregroundColor = QColorDialog::getColor();
+    else if (colorToolButton.mode == "Background")
+        ui->viewer->backgroundColor = QColorDialog::getColor();
+    else if (colorToolButton.mode == "Swap")
+    {
+        QColor tmp;
+        tmp = ui->viewer->foregroundColor;
+        ui->viewer->foregroundColor = ui->viewer->backgroundColor;
+        ui->viewer->backgroundColor = tmp;
+    }
+    else if (colorToolButton.mode == "Reset")
+    {
+        ui->viewer->foregroundColor = Qt::black;
+        ui->viewer->backgroundColor = Qt::white;
+    }
+    colorToolButton.setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
 }
 
 //
