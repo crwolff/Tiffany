@@ -27,7 +27,7 @@ signals:
     void progressSig(QString descr, int val);
 
 private:
-    QIcon makeIcon(QImage *image, bool flag);
+    QIcon makeIcon(QImage &image, bool flag);
 };
 
 #endif

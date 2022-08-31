@@ -82,7 +82,7 @@ void Bookmarks::readFiles()
             newItem->setData(Qt::UserRole, image);
             newItem->setData(Qt::UserRole+1, 0);
             newItem->setData(Qt::UserRole+2, 0);
-            newItem->setIcon(makeIcon(&image, false));
+            newItem->setIcon(makeIcon(image, false));
             insertItem(rows[0], newItem);
 
             // Update row for next item
@@ -174,7 +174,7 @@ void Bookmarks::rotateSelection()
 void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
-    QImage *image = item->data(Qt::UserRole).value<QImage*>();
+    QImage image = item->data(Qt::UserRole).value<QImage>();
     bool flag = (item->data(Qt::UserRole+1).value<int>() == 0) && 
                 (item->data(Qt::UserRole+2).value<int>() == 0);
     item->setIcon(makeIcon(image, flag));
@@ -183,7 +183,7 @@ void Bookmarks::updateIcon()
 //
 // Make an icon from the image and add a marker if it has changed
 //
-QIcon Bookmarks::makeIcon(QImage *image, bool flag)
+QIcon Bookmarks::makeIcon(QImage &image, bool flag)
 {
     // Fill background
     QImage qimg(100, 100, QImage::Format_RGB32);
@@ -191,7 +191,7 @@ QIcon Bookmarks::makeIcon(QImage *image, bool flag)
 
     // Draw image
     QPainter painter(&qimg);
-    QImage scaledImage = image->scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QImage scaledImage = image.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     if (scaledImage.width() > scaledImage.height())
     {
         float m = (100 - scaledImage.height()) / 2.0;
