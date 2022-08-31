@@ -19,6 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize status bar
     statusLabel = new QLabel("Ready");
     ui->statusbar->addWidget(statusLabel);
+    progressBar = new QProgressBar(this);
+    progressBar->setMaximumHeight(17);
+    progressBar->hide();
+    ui->statusbar->addWidget(progressBar);
 }
 
 //
@@ -200,17 +204,15 @@ void MainWindow::updateProgress(QString descr, int val)
 {
     if (val < 0)
     {
-        ui->statusbar->removeWidget(progressBar);
+        progressBar->hide();
         statusLabel->setText("Ready");
     }
     else if (descr != "")
     {
         statusLabel->setText(descr);
-        progressBar = new QProgressBar(this);
-        progressBar->setMaximumHeight(17);
         progressBar->setRange(0, val);
         progressBar->setValue(0);
-        ui->statusbar->addWidget(progressBar);
+        progressBar->show();
     }
     else
     {
