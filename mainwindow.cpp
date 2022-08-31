@@ -201,13 +201,12 @@ void MainWindow::updateProgress(QString descr, int val)
     if (val < 0)
     {
         ui->statusbar->removeWidget(progressBar);
-        delete progressBar;
         statusLabel->setText("Ready");
     }
     else if (descr != "")
     {
         statusLabel->setText(descr);
-        progressBar = new QProgressBar();
+        progressBar = new QProgressBar(this);
         progressBar->setMaximumHeight(17);
         progressBar->setRange(0, val);
         progressBar->setValue(0);
