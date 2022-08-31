@@ -3,6 +3,7 @@
 #include "PopupQToolButton.h"
 #include "ColorQToolButton.h"
 #include <QDebug>
+#include <QMessageBox>
 
 //
 // Constructor
@@ -18,8 +19,6 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize status bar
     statusLabel = new QLabel("Ready");
     ui->statusbar->addWidget(statusLabel);
-    progressBar = new QProgressBar();
-    progressBar->setMaximumHeight(17);
 }
 
 //
@@ -73,10 +72,20 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->pix8Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_8 );
     QObject::connect( ui->pix12Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_12 );
 
+    // Toolbar
+    QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
+    QObject::connect( ui->redoAct, &QAction::triggered, ui->viewer, &Viewer::redoEdit );
+    QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
+
+    // Help menu
+    QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
+    QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
+
     // Interconnects
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
+    QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
 }
 
 // TODO
@@ -174,11 +183,14 @@ void MainWindow::updateProgress(QString descr, int val)
     if (val < 0)
     {
         ui->statusbar->removeWidget(progressBar);
+        delete progressBar;
         statusLabel->setText("Ready");
     }
     else if (descr != "")
     {
         statusLabel->setText(descr);
+        progressBar = new QProgressBar();
+        progressBar->setMaximumHeight(17);
         progressBar->setRange(0, val);
         progressBar->setValue(0);
         ui->statusbar->addWidget(progressBar);
@@ -198,8 +210,11 @@ void MainWindow::updateActions()
     ui->zoomOutAct->setEnabled(ui->viewer->scaleFactor > 0.1);
 }
 
-// TODO
+//
 void MainWindow::about()
 {
+    QMessageBox::about( this, "About Tiffany",
+            "<p><b>Tiffany</b> is an image editor tuned for cleaning"
+            "up scanned images</p>" );
 }
 
