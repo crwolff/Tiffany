@@ -26,7 +26,10 @@ public slots:
     void pencilMode();
     void eraserMode();
     void areaFillMode();
-    void setBrush();
+    void setBrush_1();
+    void setBrush_4();
+    void setBrush_8();
+    void setBrush_12();
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -61,6 +64,8 @@ private:
     QImage currImage;
     QScrollArea *scrollArea = NULL;
     QTransform currTransform, currInverse;
+    QString leftMode = "Pointer";
+    qreal brushSize = 1.0;
 };
 
 #endif

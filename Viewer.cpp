@@ -43,7 +43,6 @@ void Viewer::paintEvent(QPaintEvent *)
     }
 }
 
-// TODO
 //
 // Update viewer image from bookmarks
 //
@@ -74,29 +73,68 @@ QSize Viewer::sizeHint() const
     return currImage.size() * scaleFactor * scaleBase;
 }
 
-// TODO
+//
+// Select pointer tool
+//
 void Viewer::pointerMode()
 {
+    leftMode = "Pointer";
 }
 
-// TODO
+//
+// Select draw line tool
+//
 void Viewer::pencilMode()
 {
+    leftMode = "Draw";
 }
 
-// TODO
+//
+// Select erase line tool
+//
 void Viewer::eraserMode()
 {
+    leftMode = "Erase";
 }
 
-// TODO
+//
+// Select erase/fill area tool
+//
 void Viewer::areaFillMode()
 {
+    leftMode = "Fill";
 }
 
-// TODO
-void Viewer::setBrush()
+//
+// Select narrow brush
+//
+void Viewer::setBrush_1()
 {
+    brushSize = 1;
+}
+
+//
+// Select medium brush
+//
+void Viewer::setBrush_4()
+{
+    brushSize = 4;
+}
+
+//
+// Select wide brush
+//
+void Viewer::setBrush_8()
+{
+    brushSize = 8;
+}
+
+//
+// Select extra-wide brush
+//
+void Viewer::setBrush_12()
+{
+    brushSize = 12;
 }
 
 //
@@ -194,6 +232,7 @@ void Viewer::zoomArea()
 
 //
 // Helper function for window fit functions
+//     returns true if horizontal dimension is larger
 //
 bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
 {
@@ -246,17 +285,69 @@ void Viewer::fitToWindow()
     emit zoomSig();
 }
 
-// TODO
+//
+// Fit image to window with only a vertical scrollbar
+//
 void Viewer::fitWidth()
 {
+    int scrollBarSize, viewW, viewH, imageW, imageH;
+
+    scaleBase = 1.0;
+    scaleFactor = 1.0;
+    if (currImage.isNull())
+        return;
+
+    // If height is larger dimension, leave space for vertical scroll bar
+    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+        scaleBase = (float)(viewW - scrollBarSize) / imageW;
+    else
+        scaleBase = (float)viewW / imageW;
+    setTransform();
+
+    // Update scrollarea
+    updateGeometry();
+    emit zoomSig();
 }
 
-// TODO
+//
+// Fit image to window with only a horizontal scrollbar
+//
 void Viewer::fitHeight()
 {
+    int scrollBarSize, viewW, viewH, imageW, imageH;
+
+    scaleBase = 1.0;
+    scaleFactor = 1.0;
+    if (currImage.isNull())
+        return;
+
+    // If width is larger dimension, leave space for horizontal scroll bar
+    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+        scaleBase = (float)(viewH - scrollBarSize) / imageH;
+    else
+        scaleBase = (float)viewH / imageH;
+    setTransform();
+
+    // Update scrollarea
+    updateGeometry();
+    emit zoomSig();
 }
 
-// TODO
+//
+// Fit image to window with a maximum of one scrollbar
+//
 void Viewer::fillWindow()
 {
+    int scrollBarSize, viewW, viewH, imageW, imageH;
+
+    scaleBase = 1.0;
+    scaleFactor = 1.0;
+    if (currImage.isNull())
+        return;
+
+    // Scale to smaller dimension
+    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+        fitWidth();
+    else
+        fitHeight();
 }
