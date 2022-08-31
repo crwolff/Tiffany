@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QMessageBox>
 #include <QPainter>
+#include <QTransform>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)
 {
@@ -98,11 +99,6 @@ void Bookmarks::readFiles()
             // Next item goes after current one
             if ((whom == "openAct") || (whom == "insertAct"))
                 rows[0] = rows[0] + 1;
-
-            // TODO
-            // if (count() == 1)
-            //     self.setCurrentItem(self.item(0))
-
         }
         // Update progress bar
         emit progressSig("", progress);
@@ -121,9 +117,8 @@ void Bookmarks::readFiles()
     for(int idx = 0; idx < count(); idx++)
         item(idx)->setText(QString::number(idx+1));
 
-    // TODO
     // Signal redraw
-    // self.currentItemChanged.emit(self.currentItem(), None)
+    emit currentItemChanged(currentItem(), NULL);
 }
 
 // TODO
@@ -144,28 +139,85 @@ void Bookmarks::createTIFF()
     qInfo() << QObject::sender()->objectName();
 }
 
-// TODO
+//
+// Select all even numbered items
+//
 void Bookmarks::selectEven()
 {
-    qInfo() << QObject::sender()->objectName();
+    for(int idx=0; idx < count(); idx++)
+        item(idx)->setSelected( (idx&1) == 1 );
 }
 
-// TODO
+//
+// Select all odd numbered items
+//
 void Bookmarks::selectOdd()
 {
-    qInfo() << QObject::sender()->objectName();
+    for(int idx=0; idx < count(); idx++)
+        item(idx)->setSelected( (idx&1) == 0 );
 }
 
-// TODO
+//
+// Delete all selected items
+//
 void Bookmarks::deleteSelection()
 {
-    qInfo() << QObject::sender()->objectName();
+    QList<QListWidgetItem*> items = selectedItems();
+    foreach(QListWidgetItem* item, items)
+        delete item;
 }
 
-// TODO
+//
+// Rotate selected items
+//
 void Bookmarks::rotateSelection()
 {
-    qInfo() << QObject::sender()->objectName();
+    QString whom = QObject::sender()->objectName();
+    int rot;
+
+    if (whom == "rotateCWAct")
+        rot = 1;
+    else if (whom == "rotate180ACT")
+        rot = 2;
+    else
+        rot = 3;
+    QTransform tmat = QTransform().rotate(rot * 90.0);
+
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Rotating...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            // Rotate old image and update rotation flag
+            QImage oldImage = item->data(Qt::UserRole).value<QImage>();
+            QImage rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
+            int rotation = rot + item->data(Qt::UserRole+1).value<int>();
+            int changes = item->data(Qt::UserRole+2).value<int>();
+            if (rotation > 3)
+                rotation = rotation - 4;
+            bool flag = (rotation != 0) || (changes != 0);
+
+            // Update item
+            item->setData(Qt::UserRole, rotImage);
+            item->setData(Qt::UserRole+1, rotation);
+            item->setIcon(makeIcon(rotImage, flag));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
+
+    // Signal redraw
+    emit currentItemChanged(currentItem(), NULL);
 }
 
 //
@@ -175,7 +227,7 @@ void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
     QImage image = item->data(Qt::UserRole).value<QImage>();
-    bool flag = (item->data(Qt::UserRole+1).value<int>() == 0) && 
+    bool flag = (item->data(Qt::UserRole+1).value<int>() == 0) &&
                 (item->data(Qt::UserRole+2).value<int>() == 0);
     item->setIcon(makeIcon(image, flag));
 }
