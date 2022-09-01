@@ -337,6 +337,7 @@ void Viewer::zoomIn()
     scaleFactor = scaleFactor * 1.25;
     setTransform();
     updateGeometry();
+    updateScrollBars();
     adjustScrollBars(1.25);
     emit zoomSig();
 }
@@ -350,6 +351,7 @@ void Viewer::zoomOut()
     scaleFactor = scaleFactor * 0.8;
     setTransform();
     updateGeometry();
+    updateScrollBars();
     adjustScrollBars(0.8);
     emit zoomSig();
 }
