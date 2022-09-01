@@ -422,9 +422,9 @@ void Viewer::zoomArea(QRect rect)
     if ((rectW < 5) || (rectH < 5))
         return;
     if ((rectW * viewH) > (rectH * viewW))
-        scaleFactor *= viewW / rectW;
+        scaleFactor *= (float)viewW / rectW;
     else
-        scaleFactor *= viewH / rectH;
+        scaleFactor *= (float)viewH / rectH;
     setTransform();
     updateGeometry();
     updateScrollBars();
