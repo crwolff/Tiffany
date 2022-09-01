@@ -34,7 +34,6 @@ public slots:
     void redoEdit();
     void zoomIn();
     void zoomOut();
-    void zoomArea();
     void fitToWindow();
     void fitWidth();
     void fitHeight();
@@ -55,6 +54,7 @@ private:
     void setTransform();
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect);
+    void zoomArea(QRect rect);
     void flushEdits();
     void pushImage();
     void updateScrollBars();

@@ -127,7 +127,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
     {
-        zoomArea();
+        rubberBand->hide();
+        zoomArea(rubberBand->geometry());
         flag = true;
     }
 
@@ -359,27 +360,17 @@ void Viewer::zoomOut()
 //
 // Zoom to rubberband rectangle
 //
-void Viewer::zoomArea()
+void Viewer::zoomArea(QRect rect)
 {
     if (currImage.isNull())
         return;
-    if ((rubberBand == NULL) || rubberBand->isHidden())
-        return;
-    rubberBand->hide();
 
-    // Size of rectangle
-    QRect rect = rubberBand->geometry();
-    int rectW = rect.width();
-    int rectH = rect.height();
-
-    // Center of rubberBand in percentage of window
+    // Get center of zoom rectangle
     float centerX = (float)rect.center().x() / geometry().width();
     float centerY = (float)rect.center().y() / geometry().height();
 
-    // Get thickness of scrollbars
-    int scrollBarSize = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
-
     // Size of viewport with scrollbars on
+    int scrollBarSize = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
     int viewW = parentWidget()->width();
     if (!scrollArea->verticalScrollBar()->isVisible())
         viewW -= scrollBarSize;
@@ -388,6 +379,8 @@ void Viewer::zoomArea()
         viewH -= scrollBarSize;
 
     // Scale to larger dimension
+    int rectW = rect.width();
+    int rectH = rect.height();
     if ((rectW * viewH) > (rectH * viewW))
         scaleFactor *= viewW / rectW;
     else
