@@ -27,13 +27,17 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         origin = event->pos();
-        if ((leftMode == "Draw") || (leftMode == "Erase"))
+        if (leftMode == "Pointer")
+        {
+            setCursor(Qt::OpenHandCursor);
+        }
+        else if ((leftMode == "Draw") || (leftMode == "Erase"))
         {
             pushImage();
             drawing = true;
             setCursor(Qt::CrossCursor);
         }
-        else // Pointer or Fill
+        else // Fill
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
@@ -67,7 +71,15 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // If left mouse button is pressed
     if (event->buttons() & Qt::LeftButton)
     {
-        if ((leftMode == "Pointer") || (leftMode == "Fill"))
+        if (leftMode == "Pointer")
+        {
+            QPoint delta = event->pos() - origin;
+            scrollArea->horizontalScrollBar()->setValue(
+                scrollArea->horizontalScrollBar()->value() - delta.x());
+            scrollArea->verticalScrollBar()->setValue(
+                scrollArea->verticalScrollBar()->value() - delta.y());
+        }
+        else if (leftMode == "Fill")
         {
             rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
             flag = true;
@@ -107,7 +119,11 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If left mouse button was released
     if (event->button() == Qt::LeftButton)
     {
-        if (leftMode == "Fill")
+        if (leftMode == "Pointer")
+        {
+            setCursor(Qt::ArrowCursor);
+        }
+        else if (leftMode == "Fill")
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry(), shift);
