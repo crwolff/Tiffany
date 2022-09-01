@@ -100,6 +100,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 //
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     // If left mouse button was released
@@ -108,7 +110,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         if (leftMode == "Fill")
         {
             rubberBand->hide();
-            fillArea(rubberBand->geometry());
+            fillArea(rubberBand->geometry(), shift);
             currListItem->setData(Qt::UserRole, currImage);
             currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() + 1);
             emit imageChangedSig();
@@ -127,8 +129,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
     {
+
         rubberBand->hide();
-        zoomArea(rubberBand->geometry());
+        zoomArea(rubberBand->geometry(), shift);
         flag = true;
     }
 
@@ -276,13 +279,27 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 //
 // Fill area with background color
 //
-void Viewer::fillArea(QRect rect)
+void Viewer::fillArea(QRect rect, bool shift)
 {
     if (currImage.isNull())
         return;
     QPainter p(&currImage);
-    p.setTransform(currInverse);
-    p.fillRect(rect, backgroundColor);
+    if (shift)
+    {
+        QRect box = currInverse.mapRect(rect);
+        int imgW = currImage.size().width();
+        int imgH = currImage.size().height();
+
+        p.fillRect(0, 0, imgW, box.top(), backgroundColor);
+        p.fillRect(0, 0, box.left(), imgH, backgroundColor);
+        p.fillRect(box.right(), 0, imgW, imgH, backgroundColor);
+        p.fillRect(0, box.bottom(), imgW, imgH, backgroundColor);
+    }
+    else
+    {
+        p.setTransform(currInverse);
+        p.fillRect(rect, backgroundColor);
+    }
     p.end();
     update();
 }
@@ -360,7 +377,7 @@ void Viewer::zoomOut()
 //
 // Zoom to rubberband rectangle
 //
-void Viewer::zoomArea(QRect rect)
+void Viewer::zoomArea(QRect rect, bool shift)
 {
     if (currImage.isNull())
         return;

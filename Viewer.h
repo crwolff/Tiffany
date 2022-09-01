@@ -53,8 +53,8 @@ protected:
 private:
     void setTransform();
     void drawLine(QPoint start, QPoint finish, QColor color);
-    void fillArea(QRect rect);
-    void zoomArea(QRect rect);
+    void fillArea(QRect rect, bool shift);
+    void zoomArea(QRect rect, bool shift);
     void flushEdits();
     void pushImage();
     void updateScrollBars();
