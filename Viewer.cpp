@@ -131,7 +131,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
 
         rubberBand->hide();
-        zoomArea(rubberBand->geometry(), shift);
+        zoomArea(rubberBand->geometry());
         flag = true;
     }
 
@@ -377,7 +377,7 @@ void Viewer::zoomOut()
 //
 // Zoom to rubberband rectangle
 //
-void Viewer::zoomArea(QRect rect, bool shift)
+void Viewer::zoomArea(QRect rect)
 {
     if (currImage.isNull())
         return;
