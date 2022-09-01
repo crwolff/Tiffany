@@ -354,9 +354,54 @@ void Viewer::zoomOut()
     emit zoomSig();
 }
 
-// TODO
+//
+// Zoom to rubberband rectangle
+//
 void Viewer::zoomArea()
 {
+    if (currImage.isNull())
+        return;
+    if ((rubberBand == NULL) || rubberBand->isHidden())
+        return;
+    rubberBand->hide();
+
+    // Size of rectangle
+    QRect rect = rubberBand->geometry();
+    int rectW = rect.width();
+    int rectH = rect.height();
+
+    // Center of rubberBand in percentage of window
+    float centerX = (float)rect.center().x() / geometry().width();
+    float centerY = (float)rect.center().y() / geometry().height();
+
+    // Get thickness of scrollbars
+    int scrollBarSize = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    // Size of viewport with scrollbars on
+    int viewW = parentWidget()->width();
+    if (!scrollArea->verticalScrollBar()->isVisible())
+        viewW -= scrollBarSize;
+    int viewH = parentWidget()->height();
+    if (!scrollArea->horizontalScrollBar()->isVisible())
+        viewH -= scrollBarSize;
+
+    // Scale to larger dimension
+    if ((rectW * viewH) > (rectH * viewW))
+        scaleFactor *= viewW / rectW;
+    else
+        scaleFactor *= viewH / rectH;
+    setTransform();
+    updateGeometry();
+    updateScrollBars();
+
+    // Adjust scrollbars so center of rect is center of viewport
+    scrollArea->horizontalScrollBar()->setValue(int(
+                centerX * scrollArea->horizontalScrollBar()->maximum() +
+                ((centerX - 0.5) * scrollArea->horizontalScrollBar()->pageStep())));
+    scrollArea->verticalScrollBar()->setValue(int(
+                centerY * scrollArea->verticalScrollBar()->maximum() +
+                ((centerY - 0.5) * scrollArea->verticalScrollBar()->pageStep())));
+    emit zoomSig();
 }
 
 //
@@ -372,7 +417,7 @@ bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW,
     // Get thickness of scrollbars
     scrollBarSize = style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
-    // Size of viewport not including scrollbars
+    // Size of viewport with scrollbars off
     viewW = parentWidget()->width();
     if (scrollArea->verticalScrollBar()->isVisible())
         viewW += scrollBarSize;
