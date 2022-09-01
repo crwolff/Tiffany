@@ -271,6 +271,11 @@ void Viewer::setBrush_12()
 //
 void Viewer::setTransform()
 {
+    // Avoid overflow
+    if (scaleFactor > 10000)
+        scaleFactor = 10000;
+
+    // Make transforms from screen to image
     currTransform = QTransform();
     currTransform.scale(scaleFactor * scaleBase, scaleFactor * scaleBase);
     currInverse = currTransform.inverted();
@@ -414,6 +419,8 @@ void Viewer::zoomArea(QRect rect)
     // Scale to larger dimension
     int rectW = rect.width();
     int rectH = rect.height();
+    if ((rectW < 5) || (rectH < 5))
+        return;
     if ((rectW * viewH) > (rectH * viewW))
         scaleFactor *= viewW / rectW;
     else
