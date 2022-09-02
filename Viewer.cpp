@@ -39,6 +39,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         }
         else // Fill
         {
+            pushImage();
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
         }
@@ -336,24 +337,81 @@ void Viewer::fillArea(QRect rect, bool shift)
     update();
 }
 
-// TODO
+//
+// Clean history
+//
 void Viewer::flushEdits()
 {
+    while (!undoState.isEmpty())
+        undoState.takeFirst();
+    while (!redoState.isEmpty())
+        redoState.takeFirst();
 }
 
-// TODO
+//
+// Save a copy of the current image for editting
+//
 void Viewer::pushImage()
 {
+    if (currImage.isNull())
+        return;
+
+    // Add to beginning and trim list to 5 elements
+    undoState.insert(0, currImage.copy());
+    if (undoState.count() > 5)
+        undoState.takeLast();
+
+    // Clear redo state
+    while (!redoState.isEmpty())
+        redoState.takeFirst();
 }
 
-// TODO
+//
+// Roll back one change
+//
 void Viewer::undoEdit()
 {
+    if (currImage.isNull())
+        return;
+
+    if (undoState.count() > 0)
+    {
+        // Add current image to beginning of redo state
+        redoState.insert(0, currImage);
+
+        // Recover image from undoState
+        currImage = undoState.takeFirst();
+
+        // Update listwidget with new image
+        currListItem->setData(Qt::UserRole, currImage);
+        currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() - 1);
+        emit imageChangedSig();
+        update();
+    }
 }
 
-// TODO
+//
+// Re-apply last change
+//
 void Viewer::redoEdit()
 {
+    if (currImage.isNull())
+        return;
+
+    if (redoState.count() > 0)
+    {
+        // Add current image to beginning of undo state
+        undoState.insert(0, currImage);
+
+        // Recover image from redoState
+        currImage = redoState.takeFirst();
+
+        // Update listwidget with new image
+        currListItem->setData(Qt::UserRole, currImage);
+        currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() - 1);
+        emit imageChangedSig();
+        update();
+    }
 }
 
 //

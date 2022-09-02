@@ -72,6 +72,7 @@ private:
     QRubberBand *rubberBand = NULL;
     QPoint origin;
     bool drawing = false;
+    QList<QImage> undoState, redoState;
 };
 
 #endif
