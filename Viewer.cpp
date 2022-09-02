@@ -158,6 +158,17 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         QWidget::mouseReleaseEvent(event);
 }
 
+// Handle scroll wheel
+//
+void Viewer::wheelEvent(QWheelEvent *event)
+{
+    if (event->angleDelta().y() > 0)
+        zoomWheel(event->pos(), 1.25);
+    else
+        zoomWheel(event->pos(), 0.8);
+    event->accept();
+}
+
 //
 // Replace paintEvent to get proper scaling of image
 //
@@ -436,6 +447,28 @@ void Viewer::zoomArea(QRect rect)
     scrollArea->verticalScrollBar()->setValue(int(
                 centerY * scrollArea->verticalScrollBar()->maximum() +
                 ((centerY - 0.5) * scrollArea->verticalScrollBar()->pageStep())));
+    emit zoomSig();
+}
+
+//
+// Zoom to wheel event
+//
+void Viewer::zoomWheel(QPoint pos, float factor)
+{
+    if (currImage.isNull())
+        return;
+
+    // Apply the zoom
+    scaleFactor *= factor;
+    setTransform();
+    updateGeometry();
+    updateScrollBars();
+    scrollArea->horizontalScrollBar()->setValue(int(
+                scrollArea->horizontalScrollBar()->value() +
+                (factor - 1) * pos.x()));
+    scrollArea->verticalScrollBar()->setValue(int(
+                scrollArea->verticalScrollBar()->value() +
+                (factor - 1) * pos.y()));
     emit zoomSig();
 }
 

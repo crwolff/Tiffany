@@ -47,6 +47,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
 
@@ -55,6 +56,7 @@ private:
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool shift);
     void zoomArea(QRect rect);
+    void zoomWheel(QPoint pos, float factor);
     void flushEdits();
     void pushImage();
     void updateScrollBars();
