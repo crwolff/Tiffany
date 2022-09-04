@@ -186,18 +186,12 @@ void Bookmarks::deleteSelection()
 
 //
 // Rotate selected items
+//  1 = 90
+//  2 = 180
+//  3 = 270
 //
-void Bookmarks::rotateSelection()
+void Bookmarks::rotateSelection(int rot)
 {
-    QString whom = QObject::sender()->objectName();
-    int rot;
-
-    if (whom == "rotateCWAct")
-        rot = 1;
-    else if (whom == "rotate180ACT")
-        rot = 2;
-    else
-        rot = 3;
     QTransform tmat = QTransform().rotate(rot * 90.0);
 
     // Get list of all selected items
@@ -235,6 +229,30 @@ void Bookmarks::rotateSelection()
 
     // Signal redraw
     emit currentItemChanged(currentItem(), NULL);
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotateCW()
+{
+    rotateSelection(1);
+}
+
+//
+// Rotate counter-clockwise
+//
+void Bookmarks::rotateCCW()
+{
+    rotateSelection(3);
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotate180()
+{
+    rotateSelection(2);
 }
 
 //

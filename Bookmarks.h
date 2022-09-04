@@ -22,13 +22,16 @@ public slots:
     void selectEven();
     void selectOdd();
     void deleteSelection();
-    void rotateSelection();
+    void rotateCW();
+    void rotateCCW();
+    void rotate180();
     void updateIcon();
 
 signals:
     void progressSig(QString descr, int val);
 
 private:
+    void rotateSelection(int val);
     QIcon makeIcon(QImage &image, bool flag);
 };
 
