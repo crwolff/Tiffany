@@ -122,6 +122,18 @@ void Bookmarks::readFiles()
 }
 
 // TODO
+void Bookmarks::toGrayscale()
+{
+    qInfo() << QObject::sender()->objectName();
+}
+
+// TODO
+void Bookmarks::toBinary()
+{
+    qInfo() << QObject::sender()->objectName();
+}
+
+// TODO
 void Bookmarks::saveFiles()
 {
     qInfo() << QObject::sender()->objectName();

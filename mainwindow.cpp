@@ -80,6 +80,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
     QObject::connect( ui->redoAct, &QAction::triggered, ui->viewer, &Viewer::redoEdit );
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
+    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
+    QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -163,6 +165,15 @@ void MainWindow::buildToolBar()
     colorToolButton.setDefaultAction(ui->colorAct);
     colorToolButton.setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
     ui->toolBar->addWidget(&colorToolButton);
+
+    // Format conversion button
+    QMenu *reFormatMenu = new QMenu();
+    reFormatMenu->addAction(ui->binaryAct);
+    reFormatMenu->addAction(ui->grayscaleAct);
+    PopupQToolButton *reFormatToolButton = new PopupQToolButton();
+    reFormatToolButton->setMenu(reFormatMenu);
+    reFormatToolButton->setDefaultAction(ui->binaryAct);
+    ui->toolBar->addWidget(reFormatToolButton);
 
     // Adjust text for better toolbar layout
     ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));

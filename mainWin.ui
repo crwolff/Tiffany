@@ -464,6 +464,30 @@
     <string>Undo previous undo</string>
    </property>
   </action>
+  <action name="grayscaleAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/grayscale.svg</normaloff>:/images/assets/grayscale.svg</iconset>
+   </property>
+   <property name="text">
+    <string>to Grayscale</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert to grayscale</string>
+   </property>
+  </action>
+  <action name="binaryAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/binary.svg</normaloff>:/images/assets/binary.svg</iconset>
+   </property>
+   <property name="text">
+    <string>to Binary</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert to binary</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

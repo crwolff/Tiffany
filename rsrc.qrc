@@ -30,5 +30,7 @@
     <file>assets/rotate_CW.svg</file>
     <file>assets/zoom_in.svg</file>
     <file>assets/zoom_out.svg</file>
+    <file>assets/binary.svg</file>
+    <file>assets/grayscale.svg</file>
   </qresource>
 </RCC>

@@ -14,6 +14,8 @@ public:
 
 public slots:
     void readFiles();
+    void toGrayscale();
+    void toBinary();
     void saveFiles();
     void saveAsFiles();
     void createTIFF();
