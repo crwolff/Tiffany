@@ -18,42 +18,29 @@ Bookmarks::~Bookmarks()
 //
 // Load files into bookmark viewer
 //
-void Bookmarks::readFiles()
+void Bookmarks::readFiles(QString cmd)
 {
-    QString whom = QObject::sender()->objectName();
-    QString txt;
-
-    // Determine button pressed
-    if (whom == "openAct")
-        txt = "Open Files";
-    else if (whom == "insertAct")
-        txt = "Insert Files";
-    else if (whom == "replaceAct")
-        txt = "Replace Files";
-    else
-        txt = "Huh?";
-
-    // Popup file dialog
-    QStringList filenames = QFileDialog::getOpenFileNames(this, txt, "", "Images (*.png)");
-    if (filenames.isEmpty())
-        return;
-
     // For replace or insert, get list of items
     QVector<int> rows;
-    if ((whom == "insertAct") || (whom == "replaceAct"))
+    if ((cmd == "Insert") || (cmd == "Replace"))
     {
         QList<QListWidgetItem*> items = selectedItems();
         foreach(QListWidgetItem* item, items)
             rows.append(item->text().toInt() - 1);
         if (rows.count() == 0)
         {
-            QMessageBox::information(this, txt, "Insertion point must be selected");
+            QMessageBox::information(this, cmd + " Files", "Insertion point must be selected");
             return;
         }
         std::sort(rows.begin(), rows.end());
     }
-    else // openAct
+    else // For open, get last item
         rows.append(count());
+
+    // Popup file dialog
+    QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "Images (*.png)");
+    if (filenames.isEmpty())
+        return;
 
     // Add progress to status bar
     emit progressSig("Reading...", filenames.count());
@@ -74,7 +61,7 @@ void Bookmarks::readFiles()
                 image = image.convertToFormat(QImage::Format_Grayscale8);
 
             // Remove the next item to be replaced
-            if (whom == "replaceAct")
+            if (cmd == "Replace")
                 delete takeItem(rows[0]);
 
             // Build list item and insert
@@ -87,17 +74,17 @@ void Bookmarks::readFiles()
             insertItem(rows[0], newItem);
 
             // Update row for next item
-            if (whom == "replaceAct")
+            if (cmd == "Replace")
             {
                 if (rows.count() > 1)
                     rows.remove(0);
                 else
                     // Out of replacement items, switch to insert
-                    whom = "insertAct";
+                    cmd = "Insert";
             }
 
             // Next item goes after current one
-            if ((whom == "openAct") || (whom == "insertAct"))
+            if ((cmd == "Open") || (cmd == "Insert"))
                 rows[0] = rows[0] + 1;
         }
 
@@ -111,7 +98,7 @@ void Bookmarks::readFiles()
     }
 
     // Remove any remaining selections
-    if (whom == "replaceAct")
+    if (cmd == "Replace")
         for(int idx=rows.count()-1;idx >= 0; idx--)
             delete takeItem(rows[idx]);
 
@@ -124,6 +111,30 @@ void Bookmarks::readFiles()
 
     // Signal redraw
     emit currentItemChanged(currentItem(), NULL);
+}
+
+//
+// Open files and append to list
+//
+void Bookmarks::openFiles()
+{
+    readFiles("Open");
+}
+
+//
+// Open files and insert into list
+//
+void Bookmarks::insertFiles()
+{
+    readFiles("Insert");
+}
+
+//
+// Open files and replace ones already in list
+//
+void Bookmarks::replaceFiles()
+{
+    readFiles("Replace");
 }
 
 // TODO

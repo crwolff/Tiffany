@@ -13,7 +13,9 @@ public:
     ~Bookmarks();
 
 public slots:
-    void readFiles();
+    void openFiles();
+    void insertFiles();
+    void replaceFiles();
     void toGrayscale();
     void toBinary();
     void saveFiles();
@@ -31,6 +33,7 @@ signals:
     void progressSig(QString descr, int val);
 
 private:
+    void readFiles(QString cmd);
     void rotateSelection(int val);
     QIcon makeIcon(QImage &image, bool flag);
 };

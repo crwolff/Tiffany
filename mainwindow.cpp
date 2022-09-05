@@ -39,9 +39,9 @@ MainWindow::~MainWindow()
 void MainWindow::connectSignalSlots()
 {
     // File menu
-    QObject::connect( ui->openAct, &QAction::triggered, ui->bookmarks, &Bookmarks::readFiles );
-    QObject::connect( ui->insertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::readFiles );
-    QObject::connect( ui->replaceAct, &QAction::triggered, ui->bookmarks, &Bookmarks::readFiles );
+    QObject::connect( ui->openAct, &QAction::triggered, ui->bookmarks, &Bookmarks::openFiles );
+    QObject::connect( ui->insertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::insertFiles );
+    QObject::connect( ui->replaceAct, &QAction::triggered, ui->bookmarks, &Bookmarks::replaceFiles );
     QObject::connect( ui->saveFilesAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveFiles );
     QObject::connect( ui->saveAsAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveAsFiles );
     QObject::connect( ui->createTIFFAct, &QAction::triggered, ui->bookmarks, &Bookmarks::createTIFF );
