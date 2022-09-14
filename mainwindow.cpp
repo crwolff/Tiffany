@@ -172,7 +172,7 @@ void MainWindow::buildToolBar()
     reFormatMenu->addAction(ui->grayscaleAct);
     PopupQToolButton *reFormatToolButton = new PopupQToolButton();
     reFormatToolButton->setMenu(reFormatMenu);
-    reFormatToolButton->setDefaultAction(ui->binaryAct);
+    reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
 
     // Adjust text for better toolbar layout
@@ -234,10 +234,10 @@ void MainWindow::updateProgress(QString descr, int val)
 //
 // Enable zoom icons if scale factor in range
 //
-void MainWindow::updateActions()
+void MainWindow::updateActions(float scale)
 {
-    ui->zoomInAct->setEnabled(ui->viewer->scaleFactor < 10.0);
-    ui->zoomOutAct->setEnabled(ui->viewer->scaleFactor > 0.1);
+    ui->zoomInAct->setEnabled(scale < 10.0);
+    ui->zoomOutAct->setEnabled(scale > 0.1);
 }
 
 //

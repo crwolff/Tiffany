@@ -177,8 +177,11 @@ void Viewer::paintEvent(QPaintEvent *)
 {
     if (currPage.isNull() == false)
     {
+        float scale = currPage.scaleFactor() * currPage.scaleBase();
+        QTransform transform = QTransform().scale(scale, scale);
+
         QPainter p(this);
-        p.setTransform(currTransform);
+        p.setTransform(transform);
         p.drawImage(currPage.rect().topLeft(), currPage);
         p.end();
     }
@@ -211,7 +214,7 @@ QSize Viewer::sizeHint() const
 {
     if (currPage.isNull())
         return QWidget::sizeHint();
-    return currPage.size() * scaleFactor * scaleBase;
+    return currPage.size() * currPage.scaleFactor() * currPage.scaleBase();
 }
 
 //
@@ -279,30 +282,19 @@ void Viewer::setBrush_12()
 }
 
 //
-// Pre-compute the scaling transformation matrix
-//
-void Viewer::setTransform()
-{
-    // Avoid overflow
-    if (scaleFactor > 10000)
-        scaleFactor = 10000;
-
-    // Make transforms from screen to image
-    currTransform = QTransform();
-    currTransform.scale(scaleFactor * scaleBase, scaleFactor * scaleBase);
-    currInverse = currTransform.inverted();
-}
-
-//
 // Draw/Erase a line in the foreground/background color
 //
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 {
     if (currPage.isNull())
         return;
+
+    float scale = currPage.scaleFactor() * currPage.scaleBase();
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
     QPainter p(&currPage);
-    p.setTransform(currInverse);
-    qreal brush = int(brushSize * scaleFactor * scaleBase);
+    p.setTransform(transform);
+    qreal brush = int(brushSize * currPage.scaleFactor() * currPage.scaleBase());
     p.setPen(QPen(color, brush, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
@@ -316,10 +308,14 @@ void Viewer::fillArea(QRect rect, bool shift)
 {
     if (currPage.isNull())
         return;
+
+    float scale = currPage.scaleFactor() * currPage.scaleBase();
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
     QPainter p(&currPage);
     if (shift)
     {
-        QRect box = currInverse.mapRect(rect);
+        QRect box = transform.mapRect(rect);
         int imgW = currPage.size().width();
         int imgH = currPage.size().height();
 
@@ -330,7 +326,7 @@ void Viewer::fillArea(QRect rect, bool shift)
     }
     else
     {
-        p.setTransform(currInverse);
+        p.setTransform(transform);
         p.fillRect(rect, backgroundColor);
     }
     p.end();
@@ -440,12 +436,11 @@ void Viewer::zoomIn()
 {
     if (currPage.isNull())
         return;
-    scaleFactor = scaleFactor * 1.25;
-    setTransform();
+    currPage.setScaleFactor(currPage.scaleFactor() * 1.25);
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(1.25);
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -454,12 +449,11 @@ void Viewer::zoomOut()
 {
     if (currPage.isNull())
         return;
-    scaleFactor = scaleFactor * 0.8;
-    setTransform();
+    currPage.setScaleFactor(currPage.scaleFactor() * 0.8);
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(0.8);
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -489,10 +483,9 @@ void Viewer::zoomArea(QRect rect)
     if ((rectW < 5) || (rectH < 5))
         return;
     if ((rectW * viewH) > (rectH * viewW))
-        scaleFactor *= (float)viewW / rectW;
+        currPage.setScaleFactor(currPage.scaleFactor() * (float)viewW / rectW);
     else
-        scaleFactor *= (float)viewH / rectH;
-    setTransform();
+        currPage.setScaleFactor(currPage.scaleFactor() * (float)viewH / rectH);
     updateGeometry();
     updateScrollBars();
 
@@ -503,7 +496,7 @@ void Viewer::zoomArea(QRect rect)
     scrollArea->verticalScrollBar()->setValue(int(
                 centerY * scrollArea->verticalScrollBar()->maximum() +
                 ((centerY - 0.5) * scrollArea->verticalScrollBar()->pageStep())));
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -515,8 +508,7 @@ void Viewer::zoomWheel(QPoint pos, float factor)
         return;
 
     // Apply the zoom
-    scaleFactor *= factor;
-    setTransform();
+    currPage.setScaleFactor(currPage.scaleFactor() * factor);
     updateGeometry();
     updateScrollBars();
     scrollArea->horizontalScrollBar()->setValue(int(
@@ -525,7 +517,7 @@ void Viewer::zoomWheel(QPoint pos, float factor)
     scrollArea->verticalScrollBar()->setValue(int(
                 scrollArea->verticalScrollBar()->value() +
                 (factor - 1) * pos.y()));
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -566,21 +558,19 @@ void Viewer::fitToWindow()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    scaleBase = 1.0;
-    scaleFactor = 1.0;
+    currPage.setScaleFactor(1.0);
     if (currPage.isNull())
         return;
 
     // Scale to larger dimension
     if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)viewH / imageH;
+        currPage.setScaleBase((float)viewH / imageH);
     else
-        scaleBase = (float)viewW / imageW;
-    setTransform();
+        currPage.setScaleBase((float)viewW / imageW);
 
     // Update scrollarea
     updateGeometry();
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -590,21 +580,19 @@ void Viewer::fitWidth()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    scaleBase = 1.0;
-    scaleFactor = 1.0;
+    currPage.setScaleFactor(1.0);
     if (currPage.isNull())
         return;
 
     // If height is larger dimension, leave space for vertical scroll bar
     if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)(viewW - scrollBarSize) / imageW;
+        currPage.setScaleBase((float)(viewW - scrollBarSize) / imageW);
     else
-        scaleBase = (float)viewW / imageW;
-    setTransform();
+        currPage.setScaleBase((float)viewW / imageW);
 
     // Update scrollarea
     updateGeometry();
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -614,21 +602,19 @@ void Viewer::fitHeight()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    scaleBase = 1.0;
-    scaleFactor = 1.0;
+    currPage.setScaleFactor(1.0);
     if (currPage.isNull())
         return;
 
     // If width is larger dimension, leave space for horizontal scroll bar
     if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)(viewH - scrollBarSize) / imageH;
+        currPage.setScaleBase((float)(viewH - scrollBarSize) / imageH);
     else
-        scaleBase = (float)viewH / imageH;
-    setTransform();
+        currPage.setScaleBase((float)viewH / imageH);
 
     // Update scrollarea
     updateGeometry();
-    emit zoomSig();
+    emit zoomSig(currPage.scaleFactor());
 }
 
 //
@@ -638,8 +624,7 @@ void Viewer::fillWindow()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    scaleBase = 1.0;
-    scaleFactor = 1.0;
+    currPage.setScaleFactor(1.0);
     if (currPage.isNull())
         return;
 

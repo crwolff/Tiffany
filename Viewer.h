@@ -18,8 +18,6 @@ public:
 
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
-    float scaleBase = 1.0;
-    float scaleFactor = 1.0;
 
 public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
@@ -41,7 +39,7 @@ public slots:
     void fillWindow();
 
 signals:
-    void zoomSig();
+    void zoomSig(float scale);
     void imageChangedSig();
 
 protected:
@@ -53,7 +51,6 @@ protected:
     QSize sizeHint() const override;
 
 private:
-    void setTransform();
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool shift);
     void zoomArea(QRect rect);
@@ -67,7 +64,6 @@ private:
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
     QScrollArea *scrollArea = NULL;
-    QTransform currTransform, currInverse;
     QString leftMode = "Pointer";
     qreal brushSize = 1.0;
     QRubberBand *rubberBand = NULL;

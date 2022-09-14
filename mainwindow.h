@@ -21,7 +21,7 @@ public:
 
 public slots:
     void updateProgress(QString descr, int val);
-    void updateActions();
+    void updateActions(float scale);
     void about();
 
 private:
