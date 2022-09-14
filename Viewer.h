@@ -1,6 +1,7 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include "PageData.h"
 #include <QWidget>
 #include <QColor>
 #include <QImage>
@@ -64,7 +65,7 @@ private:
     bool measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
 
     QListWidgetItem *currListItem = NULL;
-    QImage currImage;
+    PageData currPage;
     QScrollArea *scrollArea = NULL;
     QTransform currTransform, currInverse;
     QString leftMode = "Pointer";
@@ -72,7 +73,7 @@ private:
     QRubberBand *rubberBand = NULL;
     QPoint origin;
     bool drawing = false;
-    QList<QImage> undoState, redoState;
+    QList<PageData> undoState, redoState;
 };
 
 #endif

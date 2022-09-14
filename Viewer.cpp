@@ -128,16 +128,16 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry(), shift);
-            currListItem->setData(Qt::UserRole, currImage);
-            currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() + 1);
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
         }
         else if (drawing)
         {
             drawing = false;
             setCursor(Qt::ArrowCursor);
-            currListItem->setData(Qt::UserRole, currImage);
-            currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() + 1);
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
         }
         flag = true;
@@ -175,11 +175,11 @@ void Viewer::wheelEvent(QWheelEvent *event)
 //
 void Viewer::paintEvent(QPaintEvent *)
 {
-    if (currImage.isNull() == false)
+    if (currPage.isNull() == false)
     {
         QPainter p(this);
         p.setTransform(currTransform);
-        p.drawImage(currImage.rect().topLeft(), currImage);
+        p.drawImage(currPage.rect().topLeft(), currPage);
         p.end();
     }
 }
@@ -193,13 +193,13 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
     if (curr != NULL)
     {
         currListItem = curr;
-        currImage = curr->data(Qt::UserRole).value<QImage>();
+        currPage = curr->data(Qt::UserRole).value<PageData>();
         fitToWindow();
     }
     else
     {
         currListItem = NULL;
-        currImage = QImage();
+        currPage = PageData();
     }
     update();
 }
@@ -209,9 +209,9 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 //
 QSize Viewer::sizeHint() const
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return QWidget::sizeHint();
-    return currImage.size() * scaleFactor * scaleBase;
+    return currPage.size() * scaleFactor * scaleBase;
 }
 
 //
@@ -298,9 +298,9 @@ void Viewer::setTransform()
 //
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
-    QPainter p(&currImage);
+    QPainter p(&currPage);
     p.setTransform(currInverse);
     qreal brush = int(brushSize * scaleFactor * scaleBase);
     p.setPen(QPen(color, brush, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -314,14 +314,14 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 //
 void Viewer::fillArea(QRect rect, bool shift)
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
-    QPainter p(&currImage);
+    QPainter p(&currPage);
     if (shift)
     {
         QRect box = currInverse.mapRect(rect);
-        int imgW = currImage.size().width();
-        int imgH = currImage.size().height();
+        int imgW = currPage.size().width();
+        int imgH = currPage.size().height();
 
         p.fillRect(0, 0, imgW, box.top(), backgroundColor);
         p.fillRect(0, 0, box.left(), imgH, backgroundColor);
@@ -353,11 +353,11 @@ void Viewer::flushEdits()
 //
 void Viewer::pushImage()
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // Add to beginning and trim list to 5 elements
-    undoState.insert(0, currImage.copy());
+    undoState.insert(0, currPage);
     if (undoState.count() > 5)
         undoState.takeLast();
 
@@ -371,20 +371,19 @@ void Viewer::pushImage()
 //
 void Viewer::undoEdit()
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     if (undoState.count() > 0)
     {
         // Add current image to beginning of redo state
-        redoState.insert(0, currImage);
+        redoState.insert(0, currPage);
 
         // Recover image from undoState
-        currImage = undoState.takeFirst();
+        currPage = undoState.takeFirst();
 
         // Update listwidget with new image
-        currListItem->setData(Qt::UserRole, currImage);
-        currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() - 1);
+        currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
         emit imageChangedSig();
         update();
     }
@@ -395,20 +394,19 @@ void Viewer::undoEdit()
 //
 void Viewer::redoEdit()
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     if (redoState.count() > 0)
     {
         // Add current image to beginning of undo state
-        undoState.insert(0, currImage);
+        undoState.insert(0, currPage);
 
         // Recover image from redoState
-        currImage = redoState.takeFirst();
+        currPage = redoState.takeFirst();
 
         // Update listwidget with new image
-        currListItem->setData(Qt::UserRole, currImage);
-        currListItem->setData(Qt::UserRole+2, currListItem->data(Qt::UserRole+2).value<int>() - 1);
+        currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
         emit imageChangedSig();
         update();
     }
@@ -440,7 +438,7 @@ void Viewer::adjustScrollBars(float factor)
 //
 void Viewer::zoomIn()
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
     scaleFactor = scaleFactor * 1.25;
     setTransform();
@@ -454,7 +452,7 @@ void Viewer::zoomIn()
 // Draw image 20% smaller
 void Viewer::zoomOut()
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
     scaleFactor = scaleFactor * 0.8;
     setTransform();
@@ -469,7 +467,7 @@ void Viewer::zoomOut()
 //
 void Viewer::zoomArea(QRect rect)
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // Get center of zoom rectangle
@@ -513,7 +511,7 @@ void Viewer::zoomArea(QRect rect)
 //
 void Viewer::zoomWheel(QPoint pos, float factor)
 {
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // Apply the zoom
@@ -552,8 +550,8 @@ bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW,
         viewH += scrollBarSize;
 
     // Size of image
-    imageW = currImage.size().width();
-    imageH = currImage.size().height();
+    imageW = currPage.size().width();
+    imageH = currPage.size().height();
 
     // Scale to horizontal if it is larger
     if (viewW * imageH > viewH * imageW)
@@ -570,7 +568,7 @@ void Viewer::fitToWindow()
 
     scaleBase = 1.0;
     scaleFactor = 1.0;
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // Scale to larger dimension
@@ -594,7 +592,7 @@ void Viewer::fitWidth()
 
     scaleBase = 1.0;
     scaleFactor = 1.0;
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // If height is larger dimension, leave space for vertical scroll bar
@@ -618,7 +616,7 @@ void Viewer::fitHeight()
 
     scaleBase = 1.0;
     scaleFactor = 1.0;
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // If width is larger dimension, leave space for horizontal scroll bar
@@ -642,7 +640,7 @@ void Viewer::fillWindow()
 
     scaleBase = 1.0;
     scaleFactor = 1.0;
-    if (currImage.isNull())
+    if (currPage.isNull())
         return;
 
     // Scale to smaller dimension

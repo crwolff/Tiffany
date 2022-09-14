@@ -46,19 +46,20 @@ void Bookmarks::readFiles(QString cmd)
     emit progressSig("Reading...", filenames.count());
 
     // Open each file in turn and add to listWidget
-    QImage image;
+    PageData p;
+    PageData q;
     int progress = 1;
     for(int idx=0; idx < filenames.count(); idx++)
     {
         // Read image and add to listwidget
-        image = QImage(filenames.at(idx));
-        if (image.isNull())
+        p = PageData(filenames.at(idx));
+        if (p.isNull())
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
             // Cannot paint on indexed8, so convert to grayscale
-            if (image.format() == QImage::Format_Indexed8)
-                image = image.convertToFormat(QImage::Format_Grayscale8);
+            if (p.format() == QImage::Format_Indexed8)
+                p = p.convertToFormat(QImage::Format_Grayscale8);
 
             // Remove the next item to be replaced
             if (cmd == "Replace")
@@ -67,10 +68,8 @@ void Bookmarks::readFiles(QString cmd)
             // Build list item and insert
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
-            newItem->setData(Qt::UserRole, image);
-            newItem->setData(Qt::UserRole+1, 0);
-            newItem->setData(Qt::UserRole+2, 0);
-            newItem->setIcon(makeIcon(image, false));
+            newItem->setData(Qt::UserRole, QVariant::fromValue(p));
+            newItem->setIcon(makeIcon(p, p.modified()));
             insertItem(rows[0], newItem);
 
             // Update row for next item
@@ -216,18 +215,14 @@ void Bookmarks::rotateSelection(int rot)
         foreach(QListWidgetItem* item, items)
         {
             // Rotate old image and update rotation flag
-            QImage oldImage = item->data(Qt::UserRole).value<QImage>();
-            QImage rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
-            int rotation = rot + item->data(Qt::UserRole+1).value<int>();
-            int changes = item->data(Qt::UserRole+2).value<int>();
-            if (rotation > 3)
-                rotation = rotation - 4;
-            bool flag = (rotation != 0) || (changes != 0);
+            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
+            PageData rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
+            rotImage.setChanges(oldImage.changes());
+            rotImage.setRotation(oldImage.rotation() + rot);
 
             // Update item
-            item->setData(Qt::UserRole, rotImage);
-            item->setData(Qt::UserRole+1, rotation);
-            item->setIcon(makeIcon(rotImage, flag));
+            item->setData(Qt::UserRole, QVariant::fromValue(rotImage));
+            item->setIcon(makeIcon(rotImage, rotImage.modified()));
 
             // Update progress
             emit progressSig("", progress);
@@ -272,16 +267,14 @@ void Bookmarks::rotate180()
 void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
-    QImage image = item->data(Qt::UserRole).value<QImage>();
-    bool flag = (item->data(Qt::UserRole+1).value<int>() != 0) ||
-                (item->data(Qt::UserRole+2).value<int>() != 0);
-    item->setIcon(makeIcon(image, flag));
+    PageData image = item->data(Qt::UserRole).value<PageData>();
+    item->setIcon(makeIcon(image, image.modified()));
 }
 
 //
 // Make an icon from the image and add a marker if it has changed
 //
-QIcon Bookmarks::makeIcon(QImage &image, bool flag)
+QIcon Bookmarks::makeIcon(PageData &image, bool flag)
 {
     // Fill background
     QImage qimg(100, 100, QImage::Format_RGB32);

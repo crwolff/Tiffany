@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include "PageData.h"
 
 class Bookmarks : public QListWidget
 {
@@ -35,7 +36,7 @@ signals:
 private:
     void readFiles(QString cmd);
     void rotateSelection(int val);
-    QIcon makeIcon(QImage &image, bool flag);
+    QIcon makeIcon(PageData &image, bool flag);
 };
 
 #endif
