@@ -213,7 +213,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 QSize Viewer::sizeHint() const
 {
     if (currPage.isNull())
-        return QWidget::sizeHint();
+        return parentWidget()->sizeHint();
     return currPage.size() * currPage.scaleFactor() * currPage.scaleBase();
 }
 
