@@ -17,6 +17,8 @@ Viewer::~Viewer()
 //
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     // Create rubberBand
@@ -27,17 +29,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         origin = event->pos();
-        if (leftMode == "Pointer")
-        {
-            setCursor(Qt::OpenHandCursor);
-        }
-        else if ((leftMode == "Draw") || (leftMode == "Erase"))
+        if ((leftMode == "Draw") || (leftMode == "Erase"))
         {
             pushImage();
             drawing = true;
             setCursor(Qt::CrossCursor);
         }
-        else // Fill
+        else if (leftMode == "Fill")
         {
             pushImage();
             rubberBand->setGeometry(QRect(origin, QSize()));
@@ -50,8 +48,15 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::RightButton)
     {
         origin = event->pos();
-        rubberBand->setGeometry(QRect(origin, QSize()));
-        rubberBand->show();
+        if (shift)
+        {
+            setCursor(Qt::OpenHandCursor);
+        }
+        else
+        {
+            rubberBand->setGeometry(QRect(origin, QSize()));
+            rubberBand->show();
+        }
         flag = true;
     }
 
@@ -67,29 +72,23 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 //
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     // If left mouse button is pressed
     if (event->buttons() & Qt::LeftButton)
     {
-        if (leftMode == "Pointer")
-        {
-            QPoint delta = event->pos() - origin;
-            scrollArea->horizontalScrollBar()->setValue(
-                scrollArea->horizontalScrollBar()->value() - delta.x());
-            scrollArea->verticalScrollBar()->setValue(
-                scrollArea->verticalScrollBar()->value() - delta.y());
-        }
-        else if (leftMode == "Fill")
-        {
-            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
-            flag = true;
-        }
-        else if (drawing)
+        if (drawing)
         {
             QColor color = (leftMode == "Draw") ? foregroundColor : backgroundColor;
             drawLine(origin, event->pos(), color);
             origin = event->pos();
+            flag = true;
+        }
+        else if (leftMode == "Fill")
+        {
+            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
             flag = true;
         }
     }
@@ -97,7 +96,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // If right mouse button pressed
     if (event->buttons() & Qt::RightButton)
     {
-        rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+        if (shift)
+        {
+            QPoint delta = event->pos() - origin;
+            scrollArea->horizontalScrollBar()->setValue(
+                scrollArea->horizontalScrollBar()->value() - delta.x());
+            scrollArea->verticalScrollBar()->setValue(
+                scrollArea->verticalScrollBar()->value() - delta.y());
+        }
+        else
+        {
+            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+        }
         flag = true;
     }
 
@@ -120,22 +130,18 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If left mouse button was released
     if (event->button() == Qt::LeftButton)
     {
-        if (leftMode == "Pointer")
+        if (drawing)
         {
+            drawing = false;
             setCursor(Qt::ArrowCursor);
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit imageChangedSig();
         }
         else if (leftMode == "Fill")
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry(), shift);
-            currPage.setChanges(currPage.changes() + 1);
-            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-            emit imageChangedSig();
-        }
-        else if (drawing)
-        {
-            drawing = false;
-            setCursor(Qt::ArrowCursor);
             currPage.setChanges(currPage.changes() + 1);
             currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
@@ -146,9 +152,15 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
     {
-
-        rubberBand->hide();
-        zoomArea(rubberBand->geometry());
+        if (shift)
+        {
+            setCursor(Qt::ArrowCursor);
+        }
+        else
+        {
+            rubberBand->hide();
+            zoomArea(rubberBand->geometry());
+        }
         flag = true;
     }
 
