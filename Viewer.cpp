@@ -1,11 +1,13 @@
 #include "Viewer.h"
 #include <QDebug>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 Viewer::~Viewer()
@@ -29,15 +31,20 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         origin = event->pos();
-        if ((leftMode == "Draw") || (leftMode == "Erase"))
+        if (pasting)
+        {
+            pushImage();
+        }
+        else if ((leftMode == "Draw") || (leftMode == "Erase"))
         {
             pushImage();
             drawing = true;
             setCursor(Qt::CrossCursor);
         }
-        else if (leftMode == "Fill")
+        else if ((leftMode == "Pointer") || (leftMode == "Fill"))
         {
-            pushImage();
+            if (leftMode == "Fill")
+                pushImage();
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
         }
@@ -76,19 +83,27 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
-    // If left mouse button is pressed
-    if (event->buttons() & Qt::LeftButton)
+    if (pasting)
     {
-        if (drawing)
+        pasteLoc = event->pos();
+        flag = true;
+        update();
+    }
+    else
+    {
+        // If left mouse button is pressed
+        if (event->buttons() & Qt::LeftButton)
         {
-            QColor color = (leftMode == "Draw") ? foregroundColor : backgroundColor;
-            drawLine(origin, event->pos(), color);
-            origin = event->pos();
-            flag = true;
-        }
-        else if (leftMode == "Fill")
-        {
-            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+            if (drawing)
+            {
+                QColor color = (leftMode == "Draw") ? foregroundColor : backgroundColor;
+                drawLine(origin, event->pos(), color);
+                origin = event->pos();
+            }
+            else if ((leftMode == "Pointer") || (leftMode == "Fill"))
+            {
+                rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+            }
             flag = true;
         }
     }
@@ -130,23 +145,29 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If left mouse button was released
     if (event->button() == Qt::LeftButton)
     {
-        if (drawing)
+        if (pasting)
+        {
+            pasteSelection();
+            flag = true;
+        }
+        else if (drawing)
         {
             drawing = false;
             setCursor(Qt::ArrowCursor);
-            currPage.setChanges(currPage.changes() + 1);
-            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-            emit imageChangedSig();
+            flag = true;
         }
         else if (leftMode == "Fill")
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry(), shift);
+            flag = true;
+        }
+        if (flag)
+        {
             currPage.setChanges(currPage.changes() + 1);
             currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
         }
-        flag = true;
     }
 
     // If right mouse button was released
@@ -171,6 +192,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         QWidget::mouseReleaseEvent(event);
 }
 
+//
 // Handle scroll wheel
 //
 void Viewer::wheelEvent(QWheelEvent *event)
@@ -180,6 +202,42 @@ void Viewer::wheelEvent(QWheelEvent *event)
     else
         zoomWheel(event->pos(), 0.8);
     event->accept();
+}
+
+//
+// Handle key press
+//
+void Viewer::keyPressEvent(QKeyEvent *event)
+{
+    bool flag = false;
+
+    if (event->matches(QKeySequence::Copy))
+    {
+        copySelection();
+        flag = true;
+    }
+    else if (event->matches(QKeySequence::Paste))
+    {
+        pasting = true;
+        setMouseTracking(true);
+        flag = true;
+    }
+    else if (event->matches(QKeySequence::Undo))
+    {
+        undoEdit();
+        flag = true;
+    }
+    else if (event->matches(QKeySequence::Redo))
+    {
+        redoEdit();
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::keyPressEvent(event);
 }
 
 //
@@ -195,6 +253,14 @@ void Viewer::paintEvent(QPaintEvent *)
         QPainter p(this);
         p.setTransform(transform);
         p.drawImage(currPage.rect().topLeft(), currPage);
+        if (pasting)
+        {
+            qreal imgW = copyImage.size().width();
+            qreal imgH = copyImage.size().width();
+            QPointF loc = transform.inverted().map(pasteLoc) - QPointF(imgW/2.0, imgH/2.0);
+            p.setOpacity(0.3);
+            p.drawImage(loc, copyImage);
+        }
         p.end();
     }
 }
@@ -341,6 +407,49 @@ void Viewer::fillArea(QRect rect, bool shift)
         p.setTransform(transform);
         p.fillRect(rect, backgroundColor);
     }
+    p.end();
+    update();
+}
+
+//
+// Copy selected region into local clipboard
+//
+void Viewer::copySelection()
+{
+    if (currPage.isNull())
+        return;
+    if ((rubberBand == NULL) || rubberBand->isHidden())
+    {
+        QMessageBox::information(this, "Copy", "Area must be selected");
+        return;
+    }
+
+    // Get rectangle in image coordinates
+    float scale = currPage.scaleFactor() * currPage.scaleBase();
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QRect box = transform.mapRect(rubberBand->geometry());
+
+    copyImage = currPage.copy(box);
+}
+
+//
+// Paste from clipboard into page
+//
+void Viewer::pasteSelection()
+{
+    pasting = false;
+    setMouseTracking(false);
+
+    // Calculate position in image from pointer location
+    float scale = currPage.scaleFactor() * currPage.scaleBase();
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+    qreal imgW = copyImage.size().width();
+    qreal imgH = copyImage.size().width();
+    QPointF loc = transform.map(pasteLoc) - QPointF(imgW/2.0, imgH/2.0);
+
+    // Paint the copied section
+    QPainter p(&currPage);
+    p.drawImage(loc, copyImage);
     p.end();
     update();
 }

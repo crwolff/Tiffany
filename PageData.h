@@ -13,7 +13,6 @@ public:
     PageData() : QImage() { _init(); }
     PageData(const QString &fileName, const char *format = nullptr) : QImage(fileName, format) { _init(); }
     PageData(const QImage &image) : QImage(image) { _init(); }
-//    PageData(const PageData &p) : QImage(p) { m_changes = p.m_changes; m_rotation = p.m_rotation; }
     ~PageData() {}
 
     inline int changes() { return m_changes; }

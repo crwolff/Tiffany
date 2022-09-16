@@ -47,12 +47,15 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
 
 private:
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool shift);
+    void copySelection();
+    void pasteSelection();
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
     void flushEdits();
@@ -70,6 +73,9 @@ private:
     QPoint origin;
     bool drawing = false;
     QList<PageData> undoState, redoState;
+    bool pasting = false;
+    QPoint pasteLoc;
+    QImage copyImage;
 };
 
 #endif
