@@ -98,8 +98,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     if (pasting)
     {
         pasteLoc = event->pos();
-        flag = true;
         update();
+        flag = true;
     }
     else
     {
@@ -294,6 +294,8 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         currListItem = NULL;
         currPage = PageData();
     }
+    if (rubberBand != NULL)
+        rubberBand->hide();
     update();
 }
 
@@ -442,6 +444,7 @@ void Viewer::copySelection()
     QRect box = transform.mapRect(rubberBand->geometry());
 
     copyImage = currPage.copy(box);
+    rubberBand->hide();
 }
 
 //
