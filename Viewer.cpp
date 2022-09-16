@@ -232,6 +232,8 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         pasting = true;
         setMouseTracking(true);
+        pasteLoc = mapFromGlobal(cursor().pos());
+        update();
         flag = true;
     }
     else if (event->matches(QKeySequence::Undo))
