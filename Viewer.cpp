@@ -7,11 +7,23 @@
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
-    setFocusPolicy(Qt::StrongFocus);
+    setFocusPolicy(Qt::WheelFocus);
 }
 
 Viewer::~Viewer()
 {
+}
+
+void Viewer::enterEvent(QEvent *event)
+{
+    setFocus();
+    event->accept();
+}
+
+void Viewer::leaveEvent(QEvent *event)
+{
+    clearFocus();
+    event->accept();
 }
 
 //

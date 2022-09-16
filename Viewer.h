@@ -43,6 +43,8 @@ signals:
     void imageChangedSig();
 
 protected:
+    void enterEvent(QEvent *event) override;
+    void leaveEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
