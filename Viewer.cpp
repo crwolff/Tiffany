@@ -296,8 +296,12 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         currListItem = NULL;
         currPage = PageData();
     }
+
+    // Turn off active operations
     if (rubberBand != NULL)
         rubberBand->hide();
+    pasting = false;
+    setMouseTracking(false);
     update();
 }
 
