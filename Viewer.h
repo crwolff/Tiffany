@@ -63,7 +63,7 @@ private:
     void pushImage();
     void updateScrollBars();
     void adjustScrollBars(float factor);
-    bool measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+    bool measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
 
     QListWidgetItem *currListItem = NULL;
     PageData currPage;

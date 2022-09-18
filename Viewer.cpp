@@ -635,7 +635,7 @@ void Viewer::zoomWheel(QPoint pos, float factor)
 // Helper function for window fit functions
 //     returns true if horizontal dimension is larger
 //
-bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
+bool Viewer::measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
 {
     // Get handle to parent's scrollbars
     if (scrollArea == NULL)
@@ -653,8 +653,8 @@ bool Viewer::measureAll(int &scrollBarSize, int &viewW, int &viewH, int &imageW,
         viewH += scrollBarSize;
 
     // Size of image
-    imageW = currPage.size().width();
-    imageH = currPage.size().height();
+    imageW = page.size().width();
+    imageH = page.size().height();
 
     // Scale to horizontal if it is larger
     if (viewW * imageH > viewH * imageW)
@@ -674,7 +674,7 @@ void Viewer::fitToWindow()
         return;
 
     // Scale to larger dimension
-    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+    if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
         currPage.setScaleBase((float)viewH / imageH);
     else
         currPage.setScaleBase((float)viewW / imageW);
@@ -696,7 +696,7 @@ void Viewer::fitWidth()
         return;
 
     // If height is larger dimension, leave space for vertical scroll bar
-    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+    if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
         currPage.setScaleBase((float)(viewW - scrollBarSize) / imageW);
     else
         currPage.setScaleBase((float)viewW / imageW);
@@ -718,7 +718,7 @@ void Viewer::fitHeight()
         return;
 
     // If width is larger dimension, leave space for horizontal scroll bar
-    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+    if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
         currPage.setScaleBase((float)(viewH - scrollBarSize) / imageH);
     else
         currPage.setScaleBase((float)viewH / imageH);
@@ -740,7 +740,7 @@ void Viewer::fillWindow()
         return;
 
     // Scale to smaller dimension
-    if (measureAll(scrollBarSize, viewW, viewH, imageW, imageH))
+    if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
         fitWidth();
     else
         fitHeight();
