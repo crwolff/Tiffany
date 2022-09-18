@@ -139,10 +139,49 @@ void Bookmarks::replaceFiles()
     readFiles("Replace");
 }
 
-// TODO
+//
+// Convert selected images from color to grayscale
+//
 void Bookmarks::toGrayscale()
 {
-    qInfo() << QObject::sender()->objectName();
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Converting...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            // Convert to grayscale
+            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
+            if ((oldImage.format() == QImage::Format_Grayscale8) || (oldImage.format() == QImage::Format_Mono))
+                continue;
+            PageData newImage = oldImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+            newImage.copyOtherData(oldImage);
+            newImage.setChanges(oldImage.changes() + 1);
+
+            // Push old image into the undo buffer
+            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
+            ub.pushImage(oldImage);
+            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+            // Update item
+            item->setData(Qt::UserRole, QVariant::fromValue(newImage));
+            item->setIcon(makeIcon(newImage, true));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
+
+    // Signal redraw
+    emit currentItemChanged(currentItem(), NULL);
 }
 
 // TODO
@@ -220,7 +259,7 @@ void Bookmarks::rotateSelection(int rot)
             // Rotate old image and update rotation flag
             PageData oldImage = item->data(Qt::UserRole).value<PageData>();
             PageData rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
-            rotImage.setChanges(oldImage.changes());
+            rotImage.copyOtherData(oldImage);
             rotImage.setRotation(oldImage.rotation() + rot);
 
             // Push old image into the undo buffer

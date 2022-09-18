@@ -26,6 +26,15 @@ public:
     inline void setScaleFactor(float val) { m_scaleFactor = (val > 10000) ? 10000 : val; }
     inline float scale() const { return (m_scaleBase * m_scaleFactor > 0) ? (m_scaleBase * m_scaleFactor) : 1.0; }
 
+    // Copy metadata from old page to new
+    inline void copyOtherData(PageData &old)
+    {
+        m_changes = old.m_changes;
+        m_rotation = old.m_rotation;
+        m_scaleBase = old.m_scaleBase;
+        m_scaleFactor = old.m_scaleFactor;
+    }
+
 private:
     void _init()
     {
