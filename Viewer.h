@@ -60,7 +60,6 @@ private:
     void pasteSelection();
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
-    void flushEdits();
     void pushImage();
     void updateScrollBars();
     void adjustScrollBars(float factor);
@@ -74,7 +73,6 @@ private:
     QRubberBand *rubberBand = NULL;
     QPoint origin;
     bool drawing = false;
-    QList<PageData> undoState, redoState;
     bool pasting = false;
     QPoint pasteLoc;
     QImage copyImage;

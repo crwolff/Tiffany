@@ -1,4 +1,5 @@
 #include "Bookmarks.h"
+#include "UndoBuffer.h"
 #include <QColor>
 #include <QDebug>
 #include <QFileDialog>
@@ -47,7 +48,7 @@ void Bookmarks::readFiles(QString cmd)
 
     // Open each file in turn and add to listWidget
     PageData p;
-    PageData q;
+    UndoBuffer ub;
     int progress = 1;
     for(int idx=0; idx < filenames.count(); idx++)
     {
@@ -69,6 +70,8 @@ void Bookmarks::readFiles(QString cmd)
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
             newItem->setData(Qt::UserRole, QVariant::fromValue(p));
+            ub = UndoBuffer();
+            newItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
             newItem->setIcon(makeIcon(p, p.modified()));
             insertItem(rows[0], newItem);
 

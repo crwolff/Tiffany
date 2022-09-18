@@ -1,4 +1,5 @@
 #include "Viewer.h"
+#include "UndoBuffer.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -284,7 +285,6 @@ void Viewer::paintEvent(QPaintEvent *)
 //
 void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 {
-    flushEdits();
     if (curr != NULL)
     {
         currListItem = curr;
@@ -476,32 +476,16 @@ void Viewer::pasteSelection()
 }
 
 //
-// Clean history
-//
-void Viewer::flushEdits()
-{
-    while (!undoState.isEmpty())
-        undoState.takeFirst();
-    while (!redoState.isEmpty())
-        redoState.takeFirst();
-}
-
-//
-// Save a copy of the current image for editting
+// Save current image to undo buffer
 //
 void Viewer::pushImage()
 {
     if (currPage.isNull())
         return;
 
-    // Add to beginning and trim list to 5 elements
-    undoState.insert(0, currPage);
-    if (undoState.count() > 5)
-        undoState.takeLast();
-
-    // Clear redo state
-    while (!redoState.isEmpty())
-        redoState.takeFirst();
+    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    ub.pushImage(currPage);
+    currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 }
 
 //
@@ -512,19 +496,14 @@ void Viewer::undoEdit()
     if (currPage.isNull())
         return;
 
-    if (undoState.count() > 0)
-    {
-        // Add current image to beginning of redo state
-        redoState.insert(0, currPage);
+    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    currPage = ub.undoEdit(currPage);
+    currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
-        // Recover image from undoState
-        currPage = undoState.takeFirst();
-
-        // Update listwidget with new image
-        currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-        emit imageChangedSig();
-        update();
-    }
+    // Update listwidget with new image
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
 }
 
 //
@@ -535,19 +514,14 @@ void Viewer::redoEdit()
     if (currPage.isNull())
         return;
 
-    if (redoState.count() > 0)
-    {
-        // Add current image to beginning of undo state
-        undoState.insert(0, currPage);
+    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    currPage = ub.redoEdit(currPage);
+    currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
-        // Recover image from redoState
-        currPage = redoState.takeFirst();
-
-        // Update listwidget with new image
-        currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-        emit imageChangedSig();
-        update();
-    }
+    // Update listwidget with new image
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
 }
 
 //
