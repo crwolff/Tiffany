@@ -24,6 +24,7 @@ public:
     inline void setScaleBase(float val) { m_scaleBase = val; }
     inline float scaleFactor() const { return m_scaleFactor; }
     inline void setScaleFactor(float val) { m_scaleFactor = (val > 10000) ? 10000 : val; }
+    inline float scale() const { return (m_scaleBase * m_scaleFactor > 0) ? (m_scaleBase * m_scaleFactor) : 1.0; }
 
 private:
     void _init()

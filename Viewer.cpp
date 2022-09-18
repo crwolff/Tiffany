@@ -262,8 +262,7 @@ void Viewer::paintEvent(QPaintEvent *)
 {
     if (currPage.isNull() == false)
     {
-        float scale = currPage.scaleFactor() * currPage.scaleBase();
-        QTransform transform = QTransform().scale(scale, scale);
+        QTransform transform = QTransform().scale(currPage.scale(), currPage.scale());
 
         QPainter p(this);
         p.setTransform(transform);
@@ -312,7 +311,7 @@ QSize Viewer::sizeHint() const
 {
     if (currPage.isNull())
         return parentWidget()->sizeHint();
-    return currPage.size() * currPage.scaleFactor() * currPage.scaleBase();
+    return currPage.size() * currPage.scale();
 }
 
 //
@@ -387,12 +386,11 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
     if (currPage.isNull())
         return;
 
-    float scale = currPage.scaleFactor() * currPage.scaleBase();
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(currPage.scale(), currPage.scale()).inverted();
 
     QPainter p(&currPage);
     p.setTransform(transform);
-    qreal brush = int(brushSize * currPage.scaleFactor() * currPage.scaleBase());
+    qreal brush = int(brushSize * currPage.scale());
     p.setPen(QPen(color, brush, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
@@ -407,8 +405,7 @@ void Viewer::fillArea(QRect rect, bool shift)
     if (currPage.isNull())
         return;
 
-    float scale = currPage.scaleFactor() * currPage.scaleBase();
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(currPage.scale(), currPage.scale()).inverted();
 
     QPainter p(&currPage);
     if (shift)
@@ -445,8 +442,7 @@ void Viewer::copySelection()
     }
 
     // Get rectangle in image coordinates
-    float scale = currPage.scaleFactor() * currPage.scaleBase();
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(currPage.scale(), currPage.scale()).inverted();
     QRect box = transform.mapRect(rubberBand->geometry());
 
     copyImage = currPage.copy(box);
@@ -462,8 +458,7 @@ void Viewer::pasteSelection()
     setMouseTracking(false);
 
     // Calculate position in image from pointer location
-    float scale = currPage.scaleFactor() * currPage.scaleBase();
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(currPage.scale(), currPage.scale()).inverted();
     qreal imgW = copyImage.size().width();
     qreal imgH = copyImage.size().width();
     QPointF loc = transform.map(pasteLoc) - QPointF(imgW/2.0, imgH/2.0);
