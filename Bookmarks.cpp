@@ -262,11 +262,6 @@ void Bookmarks::rotateSelection(int rot)
             rotImage.copyOtherData(oldImage);
             rotImage.setRotation(oldImage.rotation() + rot);
 
-            // Push old image into the undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.pushImage(oldImage);
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
             // Update item
             item->setData(Qt::UserRole, QVariant::fromValue(rotImage));
             item->setIcon(makeIcon(rotImage, rotImage.modified()));
