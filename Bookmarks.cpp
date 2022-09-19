@@ -164,7 +164,7 @@ void Bookmarks::toGrayscale()
 
             // Push old image into the undo buffer
             UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.pushImage(oldImage);
+            ub.push(oldImage);
             item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
             // Update item

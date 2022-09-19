@@ -484,7 +484,7 @@ void Viewer::pushImage()
         return;
 
     UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    ub.pushImage(currPage);
+    ub.push(currPage);
     currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 }
 
@@ -497,7 +497,7 @@ void Viewer::undoEdit()
         return;
 
     UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    currPage = ub.undoEdit(currPage);
+    currPage = ub.undo(currPage);
     currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
     // Update listwidget with new image
@@ -515,7 +515,7 @@ void Viewer::redoEdit()
         return;
 
     UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    currPage = ub.redoEdit(currPage);
+    currPage = ub.redo(currPage);
     currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
     // Update listwidget with new image

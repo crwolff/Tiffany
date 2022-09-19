@@ -15,7 +15,7 @@ public:
     ~UndoBuffer() {}
 
     // Add current page to undo list
-    void pushImage(PageData &page)
+    void push(PageData &page)
     {
         if (page.isNull())
             return;
@@ -27,7 +27,7 @@ public:
     }
 
     // Rollback one change
-    PageData undoEdit(PageData &page)
+    PageData undo(PageData &page)
     {
         if (page.isNull())
             return page;
@@ -41,7 +41,7 @@ public:
     }
 
     // Reapply previous undo
-    PageData redoEdit(PageData &page)
+    PageData redo(PageData &page)
     {
         if (page.isNull())
             return page;
