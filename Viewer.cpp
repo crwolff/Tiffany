@@ -287,9 +287,12 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 {
     if (curr != NULL)
     {
-        currListItem = curr;
         currPage = curr->data(Qt::UserRole).value<PageData>();
-        fitToWindow();
+        if (currListItem != curr)
+        {
+            currListItem = curr;
+            fitToWindow();
+        }
     }
     else
     {
