@@ -209,20 +209,38 @@ void Bookmarks::toBinary()
             ub.push(oldImage);
             item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
+            // Convert color images to grayscale first
+            if (oldImage.format() != QImage::Format_Grayscale8)
+            {
+                PageData newImage = oldImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+                newImage.copyOtherData(oldImage);
+                oldImage = newImage;
+            }
+
             // Convert to OpenCV
             cv::Mat mat = QImage2OCV(oldImage);
 
-            // Gausian filter, then Otsu's threshold (good for noisy images)
+            // Gausian filter to clean up noise
             if (false)
             {
                 cv::Mat tmp;
                 cv::GaussianBlur(mat, tmp, cv::Size(5,5), 0);
                 mat = tmp;
             }
+
+            // Otsu's local threshold
             if (true)
             {
                 cv::Mat tmp;
                 cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+                mat = tmp;
+            }
+
+            // Adaptive threshold - this hollows out diodes, etc
+            if (false)
+            {
+                cv::Mat tmp;
+                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
                 mat = tmp;
             }
 
