@@ -1,5 +1,6 @@
 #include "Bookmarks.h"
 #include "UndoBuffer.h"
+#include "QImage2OCV.h"
 #include <QColor>
 #include <QDebug>
 #include <QFileDialog>
@@ -184,10 +185,69 @@ void Bookmarks::toGrayscale()
     emit currentItemChanged(currentItem(), NULL);
 }
 
-// TODO
+//
+// Convert selected images from grayscale to mono
+//
 void Bookmarks::toBinary()
 {
-    qInfo() << QObject::sender()->objectName();
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Converting...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
+            if (oldImage.format() == QImage::Format_Mono)
+                continue;
+
+            // Push old image into the undo buffer
+            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
+            ub.push(oldImage);
+            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+            // Convert to OpenCV
+            cv::Mat mat = QImage2OCV(oldImage);
+
+            // Gausian filter, then Otsu's threshold (good for noisy images)
+            if (false)
+            {
+                cv::Mat tmp;
+                cv::GaussianBlur(mat, tmp, cv::Size(5,5), 0);
+                mat = tmp;
+            }
+            if (true)
+            {
+                cv::Mat tmp;
+                cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+                mat = tmp;
+            }
+
+            // Convert back to QImage
+            PageData newImage = OCV2QImage(mat);
+
+            // Restore metadata
+            newImage.copyOtherData(oldImage);
+            newImage.setChanges(oldImage.changes() + 1);
+
+            // Update item
+            item->setData(Qt::UserRole, QVariant::fromValue(newImage));
+            item->setIcon(makeIcon(newImage, true));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
+
+    // Signal redraw
+    emit currentItemChanged(currentItem(), NULL);
 }
 
 // TODO

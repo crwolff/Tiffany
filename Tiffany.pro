@@ -29,9 +29,9 @@ UI_DIR = ./.build
 QT += widgets gui
 
 # Input
-HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h
+HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h QImage2OCV.h
 FORMS += mainWin.ui
-SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp ColorQToolButton.cpp PopupQToolButton.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp ColorQToolButton.cpp PopupQToolButton.cpp QImage2OCV.cpp
 RESOURCES += rsrc.qrc
 
 # OpenCV
