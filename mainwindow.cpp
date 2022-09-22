@@ -43,7 +43,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->insertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::insertFiles );
     QObject::connect( ui->replaceAct, &QAction::triggered, ui->bookmarks, &Bookmarks::replaceFiles );
     QObject::connect( ui->saveFilesAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveFiles );
-    QObject::connect( ui->saveAsAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveAsFiles );
+    QObject::connect( ui->saveToAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveToDir );
     QObject::connect( ui->createTIFFAct, &QAction::triggered, ui->bookmarks, &Bookmarks::createTIFF );
     QObject::connect( ui->exitAct, &QAction::triggered, this, &MainWindow::close );
 
@@ -112,7 +112,7 @@ void MainWindow::buildToolBar()
     // Save button
     QMenu *saveMenu = new QMenu();
     saveMenu->addAction(ui->saveFilesAct);
-    saveMenu->addAction(ui->saveAsAct);
+    saveMenu->addAction(ui->saveToAct);
     saveMenu->addAction(ui->createTIFFAct);
     PopupQToolButton *saveToolButton = new PopupQToolButton();
     saveToolButton->setMenu(saveMenu);

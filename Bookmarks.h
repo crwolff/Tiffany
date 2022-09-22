@@ -20,7 +20,7 @@ public slots:
     void toGrayscale();
     void toBinary();
     void saveFiles();
-    void saveAsFiles();
+    void saveToDir();
     void createTIFF();
     void selectEven();
     void selectOdd();

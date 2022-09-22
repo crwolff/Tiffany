@@ -268,16 +268,125 @@ void Bookmarks::toBinary()
     emit currentItemChanged(currentItem(), NULL);
 }
 
-// TODO
+//
+// Save selected files, making backups
+//
 void Bookmarks::saveFiles()
 {
-    qInfo() << QObject::sender()->objectName();
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Saving...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            // Skip if unchanged
+            PageData image = item->data(Qt::UserRole).value<PageData>();
+            if (!image.modified())
+                continue;
+
+            // Get the filenames
+            QString fileName = item->toolTip();
+            QString backupName = fileName + ".bak";
+
+            // If <fileName>.BAK exists, delete it
+            if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
+                QFile(backupName).remove();
+
+            // Rename <fileName> to <fileName>.BAK
+            QFile(fileName).rename(backupName);
+
+            // Save image to <fileName>
+            image.save(fileName,"PNG");
+
+            // Clear file change marks
+            image.setChanges(0);
+            image.setRotation(0);
+
+            // Update item
+            item->setData(Qt::UserRole, QVariant::fromValue(image));
+            item->setIcon(makeIcon(image, false));
+
+            // Flush undo buffer
+            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
+            ub.flush();
+            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
 }
 
-// TODO
-void Bookmarks::saveAsFiles()
+//
+// Save selected files to new directory, making backups if required
+//
+void Bookmarks::saveToDir()
 {
-    qInfo() << QObject::sender()->objectName();
+    // Get directory to save into
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "",
+            QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir == "")
+        return;
+
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Saving...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            // Skip if unchanged
+            PageData image = item->data(Qt::UserRole).value<PageData>();
+            if (!image.modified())
+                continue;
+
+            // Get the filenames
+            QString oldName = item->toolTip();
+            QString fileName = dir + "/" + QFileInfo(oldName).fileName();
+            QString backupName = fileName + ".bak";
+
+            // If <fileName>.BAK exists, delete it
+            if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
+                QFile(backupName).remove();
+
+            // Rename <fileName> to <fileName>.BAK
+            QFile(fileName).rename(backupName);
+
+            // Save image to <fileName>
+            image.save(fileName,"PNG");
+
+            // Clear file change marks
+            image.setChanges(0);
+            image.setRotation(0);
+
+            // Update item
+            item->setData(Qt::UserRole, QVariant::fromValue(image));
+            item->setIcon(makeIcon(image, false));
+
+            // Flush undo buffer
+            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
+            ub.flush();
+            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
 }
 
 // TODO

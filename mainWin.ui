@@ -93,7 +93,7 @@
     <addaction name="replaceAct"/>
     <addaction name="separator"/>
     <addaction name="saveFilesAct"/>
-    <addaction name="saveAsAct"/>
+    <addaction name="saveToAct"/>
     <addaction name="createTIFFAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
@@ -206,7 +206,7 @@
     <string>&amp;Save</string>
    </property>
   </action>
-  <action name="saveAsAct">
+  <action name="saveToAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/file_saveas.svg</normaloff>:/images/assets/file_saveas.svg</iconset>
