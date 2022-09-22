@@ -14,6 +14,15 @@ public:
     UndoBuffer() {}
     ~UndoBuffer() {}
 
+    // Flush undo buffer
+    void flush()
+    {
+        while (!m_undoState.isEmpty())
+            m_undoState.takeFirst();
+        while (!m_redoState.isEmpty())
+            m_redoState.takeFirst();
+    }
+
     // Add current page to undo list
     void push(PageData &page)
     {
