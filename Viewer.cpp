@@ -465,7 +465,9 @@ void Viewer::blankPage()
     pushImage();
     QPainter p(&currPage);
     p.fillRect(currPage.rect(), backgroundColor);
-    p.drawText(currPage.rect(), Qt::AlignCenter, tr("Blank"));
+    p.setPen(foregroundColor);
+    p.setFont(QFont("Courier", 20));
+    p.drawText(currPage.rect(), Qt::AlignCenter, tr("BLANK"));
     p.end();
     currPage.setChanges(currPage.changes() + 1);
     currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
