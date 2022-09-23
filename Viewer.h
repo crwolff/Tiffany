@@ -55,7 +55,7 @@ protected:
 
 private:
     void drawLine(QPoint start, QPoint finish, QColor color);
-    void fillArea(QRect rect, bool shift);
+    void fillArea(QRect rect, bool outside);
     void copySelection();
     void pasteSelection();
     void zoomArea(QRect rect);

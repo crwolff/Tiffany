@@ -247,6 +247,27 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         redoEdit();
         flag = true;
     }
+    else if (event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        if (event->key() == Qt::Key_X)
+        {
+            rubberBand->hide();
+            fillArea(rubberBand->geometry(), false);
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_B)
+        {
+            rubberBand->hide();
+            fillArea(rubberBand->geometry(), true);
+            flag = true;
+        }
+        if (flag)
+        {
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit imageChangedSig();
+        }
+    }
 
     // Event was handled
     if (flag)
@@ -405,7 +426,7 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 //
 // Fill area with background color
 //
-void Viewer::fillArea(QRect rect, bool shift)
+void Viewer::fillArea(QRect rect, bool outside)
 {
     if (currPage.isNull())
         return;
@@ -414,7 +435,7 @@ void Viewer::fillArea(QRect rect, bool shift)
     QTransform transform = QTransform().scale(scale, scale).inverted();
 
     QPainter p(&currPage);
-    if (shift)
+    if (outside)
     {
         QRect box = transform.mapRect(rect);
         int imgW = currPage.size().width();

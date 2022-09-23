@@ -6,8 +6,8 @@ Left Mouse Button:
 * pointer to draw selection rectangle
 * Draw Line
 * Erase Line
-* Fill area with background color
-* Shift fill area with foreground color
+* No shift: Fill area with background color
+* Shift: fill outside area with background color
 
 Right Mouse Button:
 * Zoom to rectangle
@@ -16,6 +16,8 @@ Right Mouse Button:
 ^C - Copy from selection rectangle
 ^V - Drag copied data around with mouse, LMB to place
 ^Z - Undo previous edit
+^X - Fill area with background color
+^B - Fill outside area with background color
 Shift-^Z - Redo previous undo
 
 ## To compile:
