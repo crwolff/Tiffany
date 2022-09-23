@@ -56,8 +56,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         }
         else if ((leftMode == "Pointer") || (leftMode == "Fill"))
         {
-            if (leftMode == "Fill")
-                pushImage();
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
         }
@@ -434,6 +432,7 @@ void Viewer::fillArea(QRect rect, bool outside)
     float scale = scaleBase * scaleFactor;
     QTransform transform = QTransform().scale(scale, scale).inverted();
 
+    pushImage();
     QPainter p(&currPage);
     if (outside)
     {
