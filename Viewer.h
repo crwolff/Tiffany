@@ -29,6 +29,7 @@ public slots:
     void setBrush_4();
     void setBrush_8();
     void setBrush_12();
+    void blankPage();
     void undoEdit();
     void redoEdit();
     void zoomIn();

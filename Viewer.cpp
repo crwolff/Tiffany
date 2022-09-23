@@ -455,6 +455,25 @@ void Viewer::fillArea(QRect rect, bool outside)
 }
 
 //
+// Erase current page and insert 'Blank' into center
+//
+void Viewer::blankPage()
+{
+    if (currPage.isNull())
+        return;
+
+    pushImage();
+    QPainter p(&currPage);
+    p.fillRect(currPage.rect(), backgroundColor);
+    p.drawText(currPage.rect(), Qt::AlignCenter, tr("Blank"));
+    p.end();
+    currPage.setChanges(currPage.changes() + 1);
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
+}
+
+//
 // Copy selected region into local clipboard
 //
 void Viewer::copySelection()

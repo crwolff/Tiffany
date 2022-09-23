@@ -51,6 +51,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->selectEvenAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectEven );
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
+    QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
     QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
@@ -119,6 +120,7 @@ void MainWindow::buildToolBar()
 
     // Delete actions
     ui->toolBar->addAction(ui->deleteAct);
+    ui->toolBar->addAction(ui->blankAct);
 
     // Rotate button
     QMenu *rotateMenu = new QMenu();
@@ -174,6 +176,7 @@ void MainWindow::buildToolBar()
     ui->toolBar->addWidget(reFormatToolButton);
 
     // Adjust text for better toolbar layout
+    ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
     ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
     ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
     ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));

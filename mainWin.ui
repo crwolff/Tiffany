@@ -106,6 +106,7 @@
     <addaction name="selectEvenAct"/>
     <addaction name="separator"/>
     <addaction name="deleteAct"/>
+    <addaction name="blankAct"/>
     <addaction name="separator"/>
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
@@ -479,6 +480,18 @@
    </property>
    <property name="toolTip">
     <string>Convert to binary</string>
+   </property>
+  </action>
+  <action name="blankAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/blank.svg</normaloff>:/images/assets/blank.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Blank Page</string>
+   </property>
+   <property name="toolTip">
+    <string>Erase page and insert 'Blank'</string>
    </property>
   </action>
  </widget>
