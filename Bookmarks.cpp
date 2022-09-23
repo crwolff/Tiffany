@@ -389,12 +389,6 @@ void Bookmarks::saveToDir()
     }
 }
 
-// TODO
-void Bookmarks::createTIFF()
-{
-    qInfo() << QObject::sender()->objectName();
-}
-
 //
 // Select all even numbered items
 //

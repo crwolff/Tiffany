@@ -94,7 +94,6 @@
     <addaction name="separator"/>
     <addaction name="saveFilesAct"/>
     <addaction name="saveToAct"/>
-    <addaction name="createTIFFAct"/>
     <addaction name="separator"/>
     <addaction name="exitAct"/>
    </widget>
@@ -205,6 +204,9 @@
    <property name="text">
     <string>&amp;Save</string>
    </property>
+   <property name="toolTip">
+    <string>Save changed files</string>
+   </property>
   </action>
   <action name="saveToAct">
    <property name="icon">
@@ -212,19 +214,10 @@
      <normaloff>:/images/assets/file_saveas.svg</normaloff>:/images/assets/file_saveas.svg</iconset>
    </property>
    <property name="text">
-    <string>Save &amp;As</string>
-   </property>
-  </action>
-  <action name="createTIFFAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/create_tiff.svg</normaloff>:/images/assets/create_tiff.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Create &amp;TIFF</string>
+    <string>Save &amp;To</string>
    </property>
    <property name="toolTip">
-    <string>Create TIFF</string>
+    <string>Save changed files to directory</string>
    </property>
   </action>
   <action name="exitAct">

@@ -21,7 +21,6 @@ public slots:
     void toBinary();
     void saveFiles();
     void saveToDir();
-    void createTIFF();
     void selectEven();
     void selectOdd();
     void deleteSelection();
