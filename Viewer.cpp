@@ -169,7 +169,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         }
         else if (leftMode == "Fill")
         {
-            rubberBand->hide();
             fillArea(rubberBand->geometry(), shift);
             flag = true;
         }
@@ -225,6 +224,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape)
     {
         pasting = false;
+        update();
         flag = true;
     }
     else if (event->matches(QKeySequence::Copy))
@@ -254,13 +254,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         if (event->key() == Qt::Key_X)
         {
-            rubberBand->hide();
             fillArea(rubberBand->geometry(), false);
             flag = true;
         }
         else if (event->key() == Qt::Key_S)
         {
-            rubberBand->hide();
             fillArea(rubberBand->geometry(), true);
             flag = true;
         }
@@ -433,6 +431,11 @@ void Viewer::fillArea(QRect rect, bool outside)
 {
     if (currPage.isNull())
         return;
+    if ((rubberBand == NULL) || rubberBand->isHidden())
+    {
+        QMessageBox::information(this, "Fill", "Area must be selected");
+        return;
+    }
 
     float scale = scaleBase * scaleFactor;
     QTransform transform = QTransform().scale(scale, scale).inverted();
