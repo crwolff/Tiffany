@@ -72,6 +72,7 @@ private:
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
     QString leftMode = "Pointer";
+    QString rightMode = "";
     qreal brushSize = 1.0;
     QRubberBand *rubberBand = NULL;
     QPoint origin;

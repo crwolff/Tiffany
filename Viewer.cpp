@@ -69,11 +69,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         if (shift)
         {
             setCursor(Qt::OpenHandCursor);
+            rightMode = "Pan";
         }
         else
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
+            rightMode = "Zoom";
         }
         flag = true;
     }
@@ -90,8 +92,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 //
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
-    Qt::KeyboardModifiers keyMod = event->modifiers();
-    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     if (pasting)
@@ -122,7 +122,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // If right mouse button pressed
     if (event->buttons() & Qt::RightButton)
     {
-        if (shift)
+        if (rightMode == "Pan")
         {
             QPoint delta = event->pos() - origin;
             scrollArea->horizontalScrollBar()->setValue(
@@ -183,7 +183,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
     {
-        if (shift)
+        if (rightMode == "Pan")
         {
             setCursor(Qt::ArrowCursor);
         }
