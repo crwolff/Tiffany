@@ -222,7 +222,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 {
     bool flag = false;
 
-    if (event->matches(QKeySequence::Copy))
+    if (event->key() == Qt::Key_Escape)
+    {
+        pasting = false;
+        flag = true;
+    }
+    else if (event->matches(QKeySequence::Copy))
     {
         copySelection();
         flag = true;
@@ -253,7 +258,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             fillArea(rubberBand->geometry(), false);
             flag = true;
         }
-        else if (event->key() == Qt::Key_B)
+        else if (event->key() == Qt::Key_S)
         {
             rubberBand->hide();
             fillArea(rubberBand->geometry(), true);
