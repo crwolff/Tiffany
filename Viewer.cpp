@@ -296,7 +296,7 @@ void Viewer::paintEvent(QPaintEvent *)
         {
             qreal imgW = copyImage.size().width();
             qreal imgH = copyImage.size().height();
-            QPointF loc = transform.inverted().map(pasteLoc) - QPointF(imgW/2.0, imgH/2.0);
+            QPointF loc = transform.inverted().map(pasteLoc) - QPoint(imgW/2, imgH/2);
             p.setOpacity(0.3);
             p.drawImage(loc, copyImage);
         }
@@ -515,7 +515,7 @@ void Viewer::pasteSelection()
     QTransform transform = QTransform().scale(scale, scale).inverted();
     qreal imgW = copyImage.size().width();
     qreal imgH = copyImage.size().height();
-    QPointF loc = transform.map(pasteLoc) - QPointF(imgW/2.0, imgH/2.0);
+    QPointF loc = transform.map(pasteLoc) - QPoint(imgW/2, imgH/2);
 
     // Paint the copied section
     QPainter p(&currPage);
