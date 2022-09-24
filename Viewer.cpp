@@ -436,6 +436,7 @@ void Viewer::fillArea(QRect rect, bool outside)
         QMessageBox::information(this, "Fill", "Area must be selected");
         return;
     }
+    rubberBand->hide();
 
     float scale = scaleBase * scaleFactor;
     QTransform transform = QTransform().scale(scale, scale).inverted();
