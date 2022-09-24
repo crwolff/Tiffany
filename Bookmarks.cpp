@@ -59,9 +59,9 @@ void Bookmarks::readFiles(QString cmd)
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
-            // Cannot paint on indexed8, so convert to grayscale
+            // Cannot paint on indexed8, so convert to RGB
             if (p.format() == QImage::Format_Indexed8)
-                p = p.convertToFormat(QImage::Format_Grayscale8);
+                p = p.convertToFormat(QImage::Format_RGB32);
 
             // Remove the next item to be replaced
             if (cmd == "Replace")
