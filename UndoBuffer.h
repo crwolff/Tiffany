@@ -62,7 +62,7 @@ public:
         else
             return page;
     }
- 
+
 
 private:
     QList<PageData> m_undoState;

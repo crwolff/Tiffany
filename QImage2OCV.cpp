@@ -41,7 +41,7 @@ cv::Mat QImage2OCV(QImage &img)
 //      Works for color and grayscale
 //
 QImage OCV2QImage(cv::Mat &mat)
-{ 
+{
     QImage::Format fmt;
 
     // Pick destination format
