@@ -527,6 +527,30 @@ QIcon Bookmarks::makeIcon(PageData &image, bool flag)
         painter.fillPath(path, Qt::red);
         painter.drawPath(path);
     }
+
+    // Display format
+    QString txt = "";
+    switch (image.format())
+    {
+        case QImage::Format_RGB888:
+        case QImage::Format_RGB32:
+        case QImage::Format_ARGB32:
+            txt = "RGB";
+            break;
+        case QImage::Format_Grayscale8:
+            txt = "GS";
+            break;
+        case QImage::Format_Mono:
+            txt = "BW";
+            break;
+        default:
+            txt = "???";
+            break;
+    }
+    painter.setPen(Qt::black);
+    painter.setFont(QFont("Courier", 8));
+    painter.drawText(QRect(0,0,100,100), Qt::AlignRight|Qt::AlignBottom, txt);
+
     painter.end();
 
     // Convert to icon
