@@ -678,16 +678,16 @@ void Viewer::zoomWheel(QPoint pos, float factor)
     if (currPage.isNull())
         return;
 
+    // Save for later
+    int hVal = scrollArea->horizontalScrollBar()->value();
+    int vVal = scrollArea->verticalScrollBar()->value();
+
     // Apply the zoom
     scaleFactor *= factor;
     updateGeometry();
     updateScrollBars();
-    scrollArea->horizontalScrollBar()->setValue(int(
-                scrollArea->horizontalScrollBar()->value() +
-                (factor - 1) * pos.x()));
-    scrollArea->verticalScrollBar()->setValue(int(
-                scrollArea->verticalScrollBar()->value() +
-                (factor - 1) * pos.y()));
+    scrollArea->horizontalScrollBar()->setValue(int(hVal + (factor - 1) * pos.x()));
+    scrollArea->verticalScrollBar()->setValue(int(vVal + (factor - 1) * pos.y()));
     emit zoomSig(scaleFactor);
 }
 
