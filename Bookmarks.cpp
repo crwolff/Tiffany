@@ -247,13 +247,17 @@ void Bookmarks::toBinary()
             // Convert back to QImage
             PageData newImage = OCV2QImage(mat);
 
+            // Make it mono
+            PageData monoImage = newImage.convertToFormat(QImage::Format_Mono,
+                    Qt::MonoOnly|Qt::ThresholdDither|Qt::AvoidDither);
+
             // Restore metadata
-            newImage.copyOtherData(oldImage);
-            newImage.setChanges(oldImage.changes() + 1);
+            monoImage.copyOtherData(oldImage);
+            monoImage.setChanges(oldImage.changes() + 1);
 
             // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(newImage));
-            item->setIcon(makeIcon(newImage, true));
+            item->setData(Qt::UserRole, QVariant::fromValue(monoImage));
+            item->setIcon(makeIcon(monoImage, true));
 
             // Update progress
             emit progressSig("", progress);
