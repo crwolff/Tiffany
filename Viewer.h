@@ -69,8 +69,6 @@ private:
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
-    QString leftMode = "Pointer";
-    QString rightMode = "";
     qreal brushSize = 1.0;
     QRubberBand *rubberBand = NULL;
     QPoint origin;
@@ -80,6 +78,11 @@ private:
     QImage copyImage;
     QCursor PencilCursor;
     QCursor DropperCursor;
+
+    enum LeftMode { Select, ColorSelect, Draw };
+    enum RightMode { Idle, Zoom, Pan };
+    LeftMode leftMode = Select;
+    RightMode rightMode = Idle;
 };
 
 #endif

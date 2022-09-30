@@ -55,13 +55,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             pushImage();
         }
-        else if (leftMode == "Draw")
+        else if (leftMode == Draw)
         {
             pushImage();
             drawing = true;
             setCursor(PencilCursor);
         }
-        else if (leftMode == "Pointer")
+        else if (leftMode == Select)
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
@@ -76,13 +76,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         if (shift)
         {
             setCursor(Qt::OpenHandCursor);
-            rightMode = "Pan";
+            rightMode = Pan;
         }
         else
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
-            rightMode = "Zoom";
+            rightMode = Zoom;
         }
         flag = true;
     }
@@ -117,7 +117,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
                 drawLine(origin, event->pos(), foregroundColor);
                 origin = event->pos();
             }
-            else if (leftMode == "Pointer")
+            else if (leftMode == Select)
             {
                 rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
             }
@@ -128,7 +128,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // If right mouse button pressed
     if (event->buttons() & Qt::RightButton)
     {
-        if (rightMode == "Pan")
+        if (rightMode == Pan)
         {
             QPoint delta = event->pos() - origin;
             scrollArea->horizontalScrollBar()->setValue(
@@ -182,7 +182,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
     {
-        if (rightMode == "Pan")
+        if (rightMode == Pan)
         {
             setCursor(Qt::ArrowCursor);
         }
@@ -191,6 +191,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             rubberBand->hide();
             zoomArea(rubberBand->geometry());
         }
+        rightMode = Idle;
         flag = true;
     }
 
@@ -344,7 +345,7 @@ QSize Viewer::sizeHint() const
 //
 void Viewer::pointerMode()
 {
-    leftMode = "Pointer";
+    leftMode = Select;
 }
 
 //
@@ -352,7 +353,7 @@ void Viewer::pointerMode()
 //
 void Viewer::pencilMode()
 {
-    leftMode = "Draw";
+    leftMode = Draw;
 }
 
 //
