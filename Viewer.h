@@ -71,7 +71,7 @@ private:
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
     qreal brushSize = 1.0;
-    QRubberBand *rubberBand = NULL;
+    QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     QPoint origin;
     bool drawing = false;
     bool pasting = false;

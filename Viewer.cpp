@@ -43,10 +43,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
-    // Create rubberBand
-    if (rubberBand == NULL)
-        rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-
     // If left mouse button is pressed
     if (event->button() == Qt::LeftButton)
     {
@@ -323,8 +319,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
     }
 
     // Turn off active operations
-    if (rubberBand != NULL)
-        rubberBand->hide();
+    rubberBand->hide();
     pasting = false;
     setMouseTracking(false);
     update();
@@ -423,7 +418,7 @@ void Viewer::fillArea(QRect rect, bool outside)
 {
     if (currPage.isNull())
         return;
-    if ((rubberBand == NULL) || rubberBand->isHidden())
+    if (rubberBand->isHidden())
     {
         QMessageBox::information(this, "Fill", "Area must be selected");
         return;
@@ -483,7 +478,7 @@ void Viewer::copySelection()
 {
     if (currPage.isNull())
         return;
-    if ((rubberBand == NULL) || rubberBand->isHidden())
+    if (rubberBand->isHidden())
     {
         QMessageBox::information(this, "Copy", "Area must be selected");
         return;
