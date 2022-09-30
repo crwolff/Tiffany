@@ -218,6 +218,7 @@ void MainWindow::updateProgress(QString descr, int val)
     {
         progressBar->hide();
         statusLabel->setText("Ready");
+        QGuiApplication::restoreOverrideCursor();
     }
     else if (descr != "")
     {
@@ -225,6 +226,7 @@ void MainWindow::updateProgress(QString descr, int val)
         progressBar->setRange(0, val);
         progressBar->setValue(0);
         progressBar->show();
+        QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     }
     else
     {
