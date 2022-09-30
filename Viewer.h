@@ -23,8 +23,6 @@ public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
     void pointerMode();
     void pencilMode();
-    void eraserMode();
-    void areaFillMode();
     void setBrush_1();
     void setBrush_4();
     void setBrush_8();

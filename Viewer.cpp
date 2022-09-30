@@ -55,13 +55,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             pushImage();
         }
-        else if ((leftMode == "Draw") || (leftMode == "Erase"))
+        else if (leftMode == "Draw")
         {
             pushImage();
             drawing = true;
             setCursor(PencilCursor);
         }
-        else if ((leftMode == "Pointer") || (leftMode == "Fill"))
+        else if (leftMode == "Pointer")
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
@@ -114,11 +114,10 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         {
             if (drawing)
             {
-                QColor color = (leftMode == "Draw") ? foregroundColor : backgroundColor;
-                drawLine(origin, event->pos(), color);
+                drawLine(origin, event->pos(), foregroundColor);
                 origin = event->pos();
             }
-            else if ((leftMode == "Pointer") || (leftMode == "Fill"))
+            else if (leftMode == "Pointer")
             {
                 rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
             }
@@ -156,8 +155,6 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 //
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
-    Qt::KeyboardModifiers keyMod = event->modifiers();
-    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     // If left mouse button was released
@@ -172,11 +169,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             drawing = false;
             setCursor(Qt::ArrowCursor);
-            flag = true;
-        }
-        else if (leftMode == "Fill")
-        {
-            fillArea(rubberBand->geometry(), shift);
             flag = true;
         }
         if (flag)
@@ -364,22 +356,6 @@ void Viewer::pencilMode()
 }
 
 //
-// Select erase line tool
-//
-void Viewer::eraserMode()
-{
-    leftMode = "Erase";
-}
-
-//
-// Select erase/fill area tool
-//
-void Viewer::areaFillMode()
-{
-    leftMode = "Fill";
-}
-
-//
 // Select narrow brush
 //
 void Viewer::setBrush_1()
@@ -412,7 +388,7 @@ void Viewer::setBrush_12()
 }
 
 //
-// Draw/Erase a line in the foreground/background color
+// Draw a line in the foreground color
 //
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 {

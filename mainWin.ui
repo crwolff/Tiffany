@@ -129,8 +129,6 @@
     </property>
     <addaction name="pointerAct"/>
     <addaction name="pencilAct"/>
-    <addaction name="eraserAct"/>
-    <addaction name="areaFillAct"/>
    </widget>
    <widget class="QMenu" name="menu_Stroke">
     <property name="title">
@@ -353,24 +351,6 @@
    </property>
    <property name="text">
     <string>&amp;Pencil</string>
-   </property>
-  </action>
-  <action name="eraserAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/eraser.svg</normaloff>:/images/assets/eraser.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Eraser</string>
-   </property>
-  </action>
-  <action name="areaFillAct">
-   <property name="icon">
-    <iconset resource="rsrc.qrc">
-     <normaloff>:/images/assets/fill_area.svg</normaloff>:/images/assets/fill_area.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Fill Area</string>
    </property>
   </action>
   <action name="pix1Act">

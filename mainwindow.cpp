@@ -67,8 +67,6 @@ void MainWindow::connectSignalSlots()
     // Tools menu
     QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
-    QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
-    QObject::connect( ui->areaFillAct, &QAction::triggered, ui->viewer, &Viewer::areaFillMode );
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
@@ -143,8 +141,6 @@ void MainWindow::buildToolBar()
     QMenu *toolsMenu = new QMenu();
     toolsMenu->addAction(ui->pointerAct);
     toolsMenu->addAction(ui->pencilAct);
-    toolsMenu->addAction(ui->eraserAct);
-    toolsMenu->addAction(ui->areaFillAct);
     PopupQToolButton *toolsToolButton = new PopupQToolButton();
     toolsToolButton->setMenu(toolsMenu);
     toolsToolButton->setDefaultAction(ui->pointerAct);
