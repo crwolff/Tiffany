@@ -32,5 +32,6 @@
     <file>assets/zoom_out.svg</file>
     <file>assets/binary.svg</file>
     <file>assets/grayscale.svg</file>
+    <file>assets/dropper.svg</file>
   </qresource>
 </RCC>

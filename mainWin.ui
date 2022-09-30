@@ -494,6 +494,18 @@
     <string>Erase page and insert 'Blank'</string>
    </property>
   </action>
+  <action name="dropperAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/dropper.svg</normaloff>:/images/assets/dropper.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Dropper</string>
+   </property>
+   <property name="toolTip">
+    <string>Pick color with eye dropper</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
