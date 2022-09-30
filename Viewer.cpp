@@ -9,6 +9,13 @@
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
     setFocusPolicy(Qt::WheelFocus);
+
+    // Setup custom cursors
+    QPixmap p;
+    p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
+    PencilCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
+    DropperCursor = QCursor(p, 0, 31);
 }
 
 Viewer::~Viewer()
@@ -52,7 +59,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             pushImage();
             drawing = true;
-            setCursor(Qt::CrossCursor);
+            setCursor(PencilCursor);
         }
         else if ((leftMode == "Pointer") || (leftMode == "Fill"))
         {

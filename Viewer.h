@@ -80,6 +80,8 @@ private:
     bool pasting = false;
     QPoint pasteLoc;
     QImage copyImage;
+    QCursor PencilCursor;
+    QCursor DropperCursor;
 };
 
 #endif
