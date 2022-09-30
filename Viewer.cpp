@@ -54,7 +54,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         else if (leftMode == Draw)
         {
             pushImage();
-            drawing = true;
             setCursor(PencilCursor);
         }
         else if (leftMode == Select)
@@ -108,7 +107,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         // If left mouse button is pressed
         if (event->buttons() & Qt::LeftButton)
         {
-            if (drawing)
+            if (leftMode == Draw)
             {
                 drawLine(origin, event->pos(), foregroundColor);
                 origin = event->pos();
@@ -161,9 +160,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             pasteSelection();
             flag = true;
         }
-        else if (drawing)
+        else if (leftMode == Draw)
         {
-            drawing = false;
             setCursor(Qt::ArrowCursor);
             flag = true;
         }

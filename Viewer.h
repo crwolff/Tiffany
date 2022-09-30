@@ -73,7 +73,6 @@ private:
     qreal brushSize = 1.0;
     QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     QPoint origin;
-    bool drawing = false;
     bool pasting = false;
     QPoint pasteLoc;
     QImage copyImage;
