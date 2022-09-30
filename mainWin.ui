@@ -128,6 +128,7 @@
      <string>&amp;Tools</string>
     </property>
     <addaction name="pointerAct"/>
+    <addaction name="dropperAct"/>
     <addaction name="pencilAct"/>
    </widget>
    <widget class="QMenu" name="menu_Stroke">

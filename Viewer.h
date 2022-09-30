@@ -22,6 +22,7 @@ public:
 public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
     void pointerMode();
+    void dropperMode();
     void pencilMode();
     void setBrush_1();
     void setBrush_4();

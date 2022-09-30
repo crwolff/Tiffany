@@ -349,6 +349,14 @@ void Viewer::pointerMode()
 }
 
 //
+// Select color selection tool
+//
+void Viewer::dropperMode()
+{
+    leftMode = ColorSelect;
+}
+
+//
 // Select draw line tool
 //
 void Viewer::pencilMode()
