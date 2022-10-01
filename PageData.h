@@ -17,9 +17,9 @@ public:
 
     inline int changes() { return m_changes; }
     inline void setChanges(int val) { m_changes = val; }
-    inline int rotation() { return m_rotation; }
-    inline void setRotation(int val) { m_rotation = val & 3; }
-    inline bool modified() { return (m_changes != 0) || (m_rotation != 0); }
+    inline qreal rotation() { return m_rotation; }
+    inline void setRotation(qreal val) { m_rotation = (val >= 360.0) ? val - 360.0 : val; }
+    inline bool modified() { return (m_changes != 0) || (m_rotation != 0.0); }
 
     // Copy metadata from old page to new
     inline void copyOtherData(PageData &old)
@@ -32,10 +32,10 @@ private:
     void _init()
     {
         m_changes = 0;
-        m_rotation = 0;
+        m_rotation = 0.0;
     }
     int m_changes;
-    int m_rotation;
+    qreal m_rotation;
 };
 
 Q_DECLARE_METATYPE(PageData)

@@ -18,16 +18,12 @@ public:
 
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
+    qreal brushSize = 1.0;
+    enum LeftMode { Select, ColorSelect, Draw };
+    LeftMode leftMode = Select;
 
 public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
-    void pointerMode();
-    void dropperMode();
-    void pencilMode();
-    void setBrush_1();
-    void setBrush_4();
-    void setBrush_8();
-    void setBrush_12();
     void blankPage();
     void undoEdit();
     void redoEdit();
@@ -70,7 +66,6 @@ private:
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
-    qreal brushSize = 1.0;
     QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     QPoint origin;
     bool pasting = false;
@@ -79,9 +74,7 @@ private:
     QCursor PencilCursor;
     QCursor DropperCursor;
 
-    enum LeftMode { Select, ColorSelect, Draw };
     enum RightMode { Idle, Zoom, Pan };
-    LeftMode leftMode = Select;
     RightMode rightMode = Idle;
 };
 

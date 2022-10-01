@@ -14,9 +14,7 @@ public:
     ~Bookmarks();
 
 public slots:
-    void openFiles();
-    void insertFiles();
-    void replaceFiles();
+    void readFiles(QString cmd);
     void toGrayscale();
     void toBinary();
     void saveFiles();
@@ -24,17 +22,13 @@ public slots:
     void selectEven();
     void selectOdd();
     void deleteSelection();
-    void rotateCW();
-    void rotateCCW();
-    void rotate180();
+    void rotateSelection(qreal val);
     void updateIcon();
 
 signals:
     void progressSig(QString descr, int val);
 
 private:
-    void readFiles(QString cmd);
-    void rotateSelection(int val);
     QIcon makeIcon(PageData &image, bool flag);
 };
 

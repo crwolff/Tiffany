@@ -334,62 +334,6 @@ QSize Viewer::sizeHint() const
 }
 
 //
-// Select pointer tool
-//
-void Viewer::pointerMode()
-{
-    leftMode = Select;
-}
-
-//
-// Select color selection tool
-//
-void Viewer::dropperMode()
-{
-    leftMode = ColorSelect;
-}
-
-//
-// Select draw line tool
-//
-void Viewer::pencilMode()
-{
-    leftMode = Draw;
-}
-
-//
-// Select narrow brush
-//
-void Viewer::setBrush_1()
-{
-    brushSize = 1;
-}
-
-//
-// Select medium brush
-//
-void Viewer::setBrush_4()
-{
-    brushSize = 4;
-}
-
-//
-// Select wide brush
-//
-void Viewer::setBrush_8()
-{
-    brushSize = 8;
-}
-
-//
-// Select extra-wide brush
-//
-void Viewer::setBrush_12()
-{
-    brushSize = 12;
-}
-
-//
 // Draw a line in the foreground color
 //
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)

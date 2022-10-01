@@ -39,9 +39,9 @@ MainWindow::~MainWindow()
 void MainWindow::connectSignalSlots()
 {
     // File menu
-    QObject::connect( ui->openAct, &QAction::triggered, ui->bookmarks, &Bookmarks::openFiles );
-    QObject::connect( ui->insertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::insertFiles );
-    QObject::connect( ui->replaceAct, &QAction::triggered, ui->bookmarks, &Bookmarks::replaceFiles );
+    QObject::connect( ui->openAct, &QAction::triggered, [this]() { this->ui->bookmarks->readFiles("Open"); });
+    QObject::connect( ui->insertAct, &QAction::triggered, [this]() { this->ui->bookmarks->readFiles("Insert"); });
+    QObject::connect( ui->replaceAct, &QAction::triggered, [this]() { this->ui->bookmarks->readFiles("Replace"); });
     QObject::connect( ui->saveFilesAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveFiles );
     QObject::connect( ui->saveToAct, &QAction::triggered, ui->bookmarks, &Bookmarks::saveToDir );
     QObject::connect( ui->exitAct, &QAction::triggered, this, &MainWindow::close );
@@ -52,9 +52,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
     QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
-    QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
-    QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
-    QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
+    QObject::connect( ui->rotateCWAct, &QAction::triggered, [this]() { this->ui->bookmarks->rotateSelection(90.0); });
+    QObject::connect( ui->rotate180Act, &QAction::triggered, [this]() { this->ui->bookmarks->rotateSelection(180.0); });
+    QObject::connect( ui->rotateCCWAct, &QAction::triggered, [this]() { this->ui->bookmarks->rotateSelection(270.0); });
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -65,15 +65,15 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
 
     // Tools menu
-    QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
-    QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
-    QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->leftMode = Viewer::Select; });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->leftMode = Viewer::ColorSelect; });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->leftMode = Viewer::Draw; });
 
     // Stroke menu
-    QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
-    QObject::connect( ui->pix4Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_4 );
-    QObject::connect( ui->pix8Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_8 );
-    QObject::connect( ui->pix12Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_12 );
+    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { this->ui->viewer->brushSize = 1; });
+    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { this->ui->viewer->brushSize = 4; });
+    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { this->ui->viewer->brushSize = 8; });
+    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { this->ui->viewer->brushSize = 12; });
 
     // Toolbar
     QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
