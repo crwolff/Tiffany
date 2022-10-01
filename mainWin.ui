@@ -54,14 +54,6 @@
         <set>Qt::AlignCenter</set>
        </property>
        <widget class="Viewer" name="viewer">
-        <property name="geometry">
-         <rect>
-          <x>450</x>
-          <y>402</y>
-          <width>18</width>
-          <height>18</height>
-         </rect>
-        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
