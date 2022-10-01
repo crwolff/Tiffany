@@ -117,6 +117,30 @@ void Bookmarks::readFiles(QString cmd)
 }
 
 //
+// Open files and append to list
+//
+void Bookmarks::openFiles()
+{
+    readFiles("Open");
+}
+
+//
+// Open files and insert into list
+//
+void Bookmarks::insertFiles()
+{
+    readFiles("Insert");
+}
+
+//
+// Open files and replace ones already in list
+//
+void Bookmarks::replaceFiles()
+{
+    readFiles("Replace");
+}
+
+//
 // Convert selected images from color to grayscale
 //
 void Bookmarks::toGrayscale()
@@ -399,10 +423,13 @@ void Bookmarks::deleteSelection()
 
 //
 // Rotate selected items
+//  1 = 90
+//  2 = 180
+//  3 = 270
 //
-void Bookmarks::rotateSelection(qreal rot)
+void Bookmarks::rotateSelection(int rot)
 {
-    QTransform tmat = QTransform().rotate(rot);
+    QTransform tmat = QTransform().rotate(rot * 90.0);
 
     // Get list of all selected items
     QList<QListWidgetItem*> items = selectedItems();
@@ -435,6 +462,30 @@ void Bookmarks::rotateSelection(qreal rot)
 
     // Signal redraw
     emit currentItemChanged(currentItem(), NULL);
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotateCW()
+{
+    rotateSelection(1);
+}
+
+//
+// Rotate counter-clockwise
+//
+void Bookmarks::rotateCCW()
+{
+    rotateSelection(3);
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotate180()
+{
+    rotateSelection(2);
 }
 
 //
