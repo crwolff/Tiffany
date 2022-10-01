@@ -78,6 +78,7 @@ private:
     QImage copyImage;
     QCursor PencilCursor;
     QCursor DropperCursor;
+    QImage logo;
 
     enum LeftMode { Select, ColorSelect, Draw };
     enum RightMode { Idle, Zoom, Pan };

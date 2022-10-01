@@ -10,6 +10,9 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
     setFocusPolicy(Qt::WheelFocus);
 
+    // Setup logo
+    logo = QImage(":/images/assets/tiffany.png");
+
     // Setup custom cursors
     QPixmap p;
     p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
@@ -276,12 +279,13 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 //
 void Viewer::paintEvent(QPaintEvent *)
 {
+    QPainter p(this);
+
     if (currPage.isNull() == false)
     {
         float scale = scaleBase * scaleFactor;
         QTransform transform = QTransform().scale(scale, scale);
 
-        QPainter p(this);
         p.setTransform(transform);
         p.drawImage(currPage.rect().topLeft(), currPage);
         if (pasting)
@@ -292,8 +296,10 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setOpacity(0.3);
             p.drawImage(loc, copyImage);
         }
-        p.end();
     }
+    else
+        p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
+    p.end();
 }
 
 //
@@ -329,7 +335,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 QSize Viewer::sizeHint() const
 {
     if (currPage.isNull())
-        return parentWidget()->sizeHint();
+        return logo.size();
     return currPage.size() * scaleBase * scaleFactor;
 }
 
