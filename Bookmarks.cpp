@@ -91,10 +91,6 @@ void Bookmarks::readFiles(QString cmd)
                 rows[0] = rows[0] + 1;
         }
 
-        // Select first item read in
-        if (count() == 1)
-            setCurrentItem(item(0));
-
         // Update progress bar
         emit progressSig("", progress);
         progress = progress + 1;
@@ -111,6 +107,10 @@ void Bookmarks::readFiles(QString cmd)
     // (Re)number all the loaded pages
     for(int idx = 0; idx < count(); idx++)
         item(idx)->setText(QString::number(idx+1));
+
+    // Select first item read in
+    if (currentItem() == nullptr)
+        setCurrentItem(item(0));
 
     // Signal redraw
     emit currentItemChanged(currentItem(), NULL);
