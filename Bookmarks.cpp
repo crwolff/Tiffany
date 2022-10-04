@@ -38,6 +38,7 @@ void Bookmarks::readFiles(QString cmd)
     }
     else // For open, get last item
         rows.append(count());
+    int firstIdx = rows[0];
 
     // Popup file dialog
     QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "Images (*.png)");
@@ -109,11 +110,7 @@ void Bookmarks::readFiles(QString cmd)
         item(idx)->setText(QString::number(idx+1));
 
     // Select first item read in
-    if (currentItem() == nullptr)
-        setCurrentItem(item(0));
-
-    // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
+    setCurrentRow(firstIdx);
 }
 
 //
