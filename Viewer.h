@@ -21,6 +21,7 @@ public:
 
 public slots:
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
+    void updateViewer();
     void pointerMode();
     void dropperMode();
     void pencilMode();

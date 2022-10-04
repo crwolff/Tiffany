@@ -31,6 +31,7 @@ public slots:
 
 signals:
     void progressSig(QString descr, int val);
+    void updateViewerSig();
 
 private:
     void readFiles(QString cmd);

@@ -179,7 +179,7 @@ void Bookmarks::toGrayscale()
     }
 
     // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
+    emit updateViewerSig();
 }
 
 //
@@ -266,7 +266,7 @@ void Bookmarks::toBinary()
     }
 
     // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
+    emit updateViewerSig();
 }
 
 //

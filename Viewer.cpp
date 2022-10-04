@@ -303,7 +303,7 @@ void Viewer::paintEvent(QPaintEvent *)
 }
 
 //
-// Update viewer image from bookmarks
+// Update image selection from bookmarks
 //
 void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 {
@@ -318,6 +318,16 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         currListItem = NULL;
         currPage = PageData();
     }
+    updateViewer();
+}
+
+//
+// Update viewer image from bookmarks
+//
+void Viewer::updateViewer()
+{
+    // Reload image from list
+    currPage = currListItem->data(Qt::UserRole).value<PageData>();
 
     // Turn off active operations
     rubberBand->hide();
