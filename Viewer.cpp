@@ -42,6 +42,9 @@ void Viewer::leaveEvent(QEvent *event)
 //
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
+    if (currPage.isNull())
+        return;
+
     Qt::KeyboardModifiers keyMod = event->modifiers();
     bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
@@ -97,6 +100,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 //
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
+    if (currPage.isNull())
+        return;
+
     bool flag = false;
 
     if (pasting)
@@ -153,6 +159,9 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 //
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (currPage.isNull())
+        return;
+
     bool flag = false;
 
     // If left mouse button was released
@@ -204,6 +213,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 //
 void Viewer::wheelEvent(QWheelEvent *event)
 {
+    if (currPage.isNull())
+        return;
+
     if (event->angleDelta().y() > 0)
         zoomWheel(event->pos(), 1.25);
     else
@@ -216,6 +228,9 @@ void Viewer::wheelEvent(QWheelEvent *event)
 //
 void Viewer::keyPressEvent(QKeyEvent *event)
 {
+    if (currPage.isNull())
+        return;
+
     bool flag = false;
 
     if (event->key() == Qt::Key_Escape)
@@ -281,7 +296,7 @@ void Viewer::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
-    if (currPage.isNull() == false)
+    if (!currPage.isNull())
     {
         float scale = scaleBase * scaleFactor;
         QTransform transform = QTransform().scale(scale, scale);
@@ -326,6 +341,9 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 //
 void Viewer::updateViewer()
 {
+    if (currPage.isNull())
+        return;
+
     // Reload image from list
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
 
