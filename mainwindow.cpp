@@ -96,6 +96,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->bookmarks, &Bookmarks::updateViewerSig, ui->viewer, &Viewer::updateViewer );
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
+    QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
 }
 

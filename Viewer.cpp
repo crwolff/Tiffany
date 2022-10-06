@@ -284,6 +284,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
                 fillArea(rubberBand->geometry(), false);
             else
             {
+                blinkTimer->stop();
                 applyMask(currMask, false);
                 currMask = QImage();
             }
@@ -291,7 +292,14 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         else if (event->key() == Qt::Key_S)
         {
-            fillArea(rubberBand->geometry(), true);
+            if (currMask.isNull())
+                fillArea(rubberBand->geometry(), true);
+            else
+            {
+                blinkTimer->stop();
+                applyMask(currMask, true);
+                currMask = QImage();
+            }
             flag = true;
         }
         if (flag)
@@ -333,13 +341,30 @@ void Viewer::paintEvent(QPaintEvent *)
         }
         else if (!currMask.isNull())
         {
-            p.setOpacity(0.5);
+            p.setOpacity(maskLvl);
             p.drawImage(QPoint(0,0), currMask);
         }
     }
     else
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     p.end();
+}
+
+//
+// Blink mask to may it easier to see
+//
+void Viewer::blinker()
+{
+    if (currPage.isNull() || currMask.isNull())
+    {
+        blinkTimer->stop();
+        return;
+    }
+    if (maskLvl < 0.5)
+        maskLvl = 0.8;
+    else
+        maskLvl = 0.2;
+    update();
 }
 
 //
@@ -578,6 +603,7 @@ void Viewer::colorSelect()
                 *maskPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
             }
         }
+        blinkTimer->start(500);
     }
     else if (currPage.format() == QImage::Format_Grayscale8)
     {
@@ -600,6 +626,7 @@ void Viewer::colorSelect()
                 *maskPtr++ = (val == 255) || (max > dropperThreshold) ? white : black;
             }
         }
+        blinkTimer->start(500);
     }
     else
     {

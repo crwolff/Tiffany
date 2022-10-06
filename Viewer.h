@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
+#include <QTimer>
 
 class Viewer : public QWidget
 {
@@ -18,8 +19,10 @@ public:
 
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
+    QTimer *blinkTimer = new QTimer();
 
 public slots:
+    void blinker();
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
     void updateViewer();
     void pointerMode();
@@ -72,6 +75,7 @@ private:
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
     QImage currMask;
+    float maskLvl = 0.5;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
