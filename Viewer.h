@@ -30,6 +30,7 @@ public slots:
     void setBrush_8();
     void setBrush_12();
     void blankPage();
+    void colorSelect(QPoint pos);
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -57,6 +58,7 @@ protected:
 private:
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool outside);
+    void applyMask(QImage &mask, bool flag);
     void copySelection();
     void pasteSelection();
     void zoomArea(QRect rect);
@@ -68,6 +70,7 @@ private:
 
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
+    QImage currMask;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;

@@ -1,5 +1,6 @@
 #include "Viewer.h"
 #include "UndoBuffer.h"
+#include "QImage2OCV.h"
 #include <QDebug>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -66,6 +67,10 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             rubberBand->setGeometry(QRect(origin, QSize()));
             rubberBand->show();
+        }
+        else if (leftMode == ColorSelect)
+        {
+            setCursor(DropperCursor);
         }
         flag = true;
     }
@@ -177,6 +182,11 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             setCursor(Qt::ArrowCursor);
             flag = true;
         }
+        else if (leftMode == ColorSelect)
+        {
+            colorSelect(event->pos());
+            setCursor(Qt::ArrowCursor);
+        }
         if (flag)
         {
             currPage.setChanges(currPage.changes() + 1);
@@ -235,6 +245,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_Escape)
     {
+        currMask = QImage();
         pasting = false;
         update();
         flag = true;
@@ -266,7 +277,13 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         if (event->key() == Qt::Key_X)
         {
-            fillArea(rubberBand->geometry(), false);
+            if (currMask.isNull())
+                fillArea(rubberBand->geometry(), false);
+            else
+            {
+                applyMask(currMask, false);
+                currMask = QImage();
+            }
             flag = true;
         }
         else if (event->key() == Qt::Key_S)
@@ -311,6 +328,11 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setOpacity(0.3);
             p.drawImage(loc, copyImage);
         }
+        else if (!currMask.isNull())
+        {
+            p.setOpacity(0.5);
+            p.drawImage(QPoint(0,0), currMask);
+        }
     }
     else
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
@@ -346,6 +368,7 @@ void Viewer::updateViewer()
 
     // Reload image from list
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
+    currMask = QImage();
 
     // Turn off active operations
     rubberBand->hide();
@@ -370,6 +393,7 @@ QSize Viewer::sizeHint() const
 void Viewer::pointerMode()
 {
     leftMode = Select;
+    currMask = QImage();
 }
 
 //
@@ -386,6 +410,7 @@ void Viewer::dropperMode()
 void Viewer::pencilMode()
 {
     leftMode = Draw;
+    currMask = QImage();
 }
 
 //
@@ -497,6 +522,71 @@ void Viewer::blankPage()
     currPage.setChanges(currPage.changes() + 1);
     currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
     emit imageChangedSig();
+    update();
+}
+
+//
+// Select all pixels near the cursor's color
+//
+void Viewer::colorSelect(QPoint pos)
+{
+    int threshold = 20; //TODO - need slider
+
+    if (currPage.isNull())
+        return;
+
+    if (currPage.format() != QImage::Format_RGB32)
+    {
+        QMessageBox::information(this, "colorSelect", "Only works on RGB images");
+        return;
+    }
+
+    // Get pixel under cursor
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QPointF mPos = transform.map(QPointF(pos));
+    QRgb pixel = currPage.pixel(mPos.x(), mPos.y());
+    int red = qRed(pixel);
+    int grn = qGreen(pixel);
+    int blu = qBlue(pixel);
+
+    // Identically sized grayscale image
+    currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+
+    // Scan through page seeking matches
+    QRgb white = qRgba(255,255,255,0);  // Transparent white
+    QRgb black = qRgba(0,0,0,255);      // Opaque black
+    for(int i=0; i<currPage.height(); i++)
+    {
+        QRgb *rgbPtr = (QRgb *)currPage.scanLine(i);
+        QRgb *gsPtr = (QRgb *)currMask.scanLine(i);
+        for(int j=0; j<currPage.width(); j++)
+        {
+            QRgb val = *rgbPtr++;
+            int max = abs(red - qRed(val));
+            int tmp = abs(grn - qGreen(val));
+            if (tmp > max)
+                max = tmp;
+            tmp = abs(blu - qBlue(val));
+            if (tmp > max)
+                max = tmp;
+            *gsPtr++ = (max > threshold) ? white : black;
+        }
+    }
+    update();
+}
+
+//
+// Apply the mask to the current image
+//
+void Viewer::applyMask(QImage &mask, bool flag)
+{
+    // Paint the copied section
+    QPainter p(&currPage);
+    if (!flag)
+        mask.invertPixels(QImage::InvertRgb);
+    p.drawImage(QPoint(0,0), mask);
+    p.end();
     update();
 }
 
