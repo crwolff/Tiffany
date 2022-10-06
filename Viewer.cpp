@@ -184,7 +184,10 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         }
         else if (leftMode == ColorSelect)
         {
-            colorSelect(event->pos());
+            float scale = scaleBase * scaleFactor;
+            QTransform transform = QTransform().scale(scale, scale).inverted();
+            dropperLoc = transform.map(QPointF(event->pos()));
+            colorSelect();
             setCursor(Qt::ArrowCursor);
         }
         if (flag)
@@ -531,30 +534,25 @@ void Viewer::blankPage()
 void Viewer::setThreshold(int val)
 {
     dropperThreshold = val;
-    currMask = QImage();
-    update();
+    colorSelect();
 }
 
 //
 // Select all pixels near the cursor's color
 //
-void Viewer::colorSelect(QPoint pos)
+void Viewer::colorSelect()
 {
     if (currPage.isNull())
         return;
 
     // Get pixel under cursor
-    float scale = scaleBase * scaleFactor;
-    QTransform transform = QTransform().scale(scale, scale).inverted();
-    QPointF mPos = transform.map(QPointF(pos));
-    QRgb pixel = currPage.pixel(mPos.x(), mPos.y());
+    QRgb pixel = currPage.pixel(dropperLoc.x(), dropperLoc.y());
 
     if (currPage.format() == QImage::Format_RGB32)
     {
         int red = qRed(pixel);
         int grn = qGreen(pixel);
         int blu = qBlue(pixel);
-        qInfo() << red << grn << blu;
 
         // Identically sized grayscale image
         currMask = QImage(currPage.size(), QImage::Format_ARGB32);
