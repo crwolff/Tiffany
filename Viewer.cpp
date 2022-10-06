@@ -543,44 +543,70 @@ void Viewer::colorSelect(QPoint pos)
     if (currPage.isNull())
         return;
 
-    if (currPage.format() != QImage::Format_RGB32)
-    {
-        QMessageBox::information(this, "colorSelect", "Only works on RGB images");
-        return;
-    }
-
     // Get pixel under cursor
     float scale = scaleBase * scaleFactor;
     QTransform transform = QTransform().scale(scale, scale).inverted();
     QPointF mPos = transform.map(QPointF(pos));
     QRgb pixel = currPage.pixel(mPos.x(), mPos.y());
-    int red = qRed(pixel);
-    int grn = qGreen(pixel);
-    int blu = qBlue(pixel);
 
-    // Identically sized grayscale image
-    currMask = QImage(currPage.size(), QImage::Format_ARGB32);
-
-    // Scan through page seeking matches
-    QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
-    QRgb white = qRgba(255,255,255,0);  // Transparent white
-    QRgb black = qRgba(0,0,0,255);      // Opaque black
-    for(int i=0; i<currPage.height(); i++)
+    if (currPage.format() == QImage::Format_RGB32)
     {
-        QRgb *rgbPtr = (QRgb *)currPage.scanLine(i);
-        QRgb *gsPtr = (QRgb *)currMask.scanLine(i);
-        for(int j=0; j<currPage.width(); j++)
+        int red = qRed(pixel);
+        int grn = qGreen(pixel);
+        int blu = qBlue(pixel);
+        qInfo() << red << grn << blu;
+
+        // Identically sized grayscale image
+        currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+
+        // Scan through page seeking matches
+        QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
+        QRgb white = qRgba(255,255,255,0);  // Transparent white
+        QRgb black = qRgba(0,0,0,255);      // Opaque black
+        for(int i=0; i<currPage.height(); i++)
         {
-            QRgb val = *rgbPtr++;
-            int max = abs(red - qRed(val));
-            int tmp = abs(grn - qGreen(val));
-            if (tmp > max)
-                max = tmp;
-            tmp = abs(blu - qBlue(val));
-            if (tmp > max)
-                max = tmp;
-            *gsPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
+            QRgb *srcPtr = (QRgb *)currPage.scanLine(i);
+            QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+            for(int j=0; j<currPage.width(); j++)
+            {
+                QRgb val = *srcPtr++;
+                int max = abs(red - qRed(val));
+                int tmp = abs(grn - qGreen(val));
+                if (tmp > max)
+                    max = tmp;
+                tmp = abs(blu - qBlue(val));
+                if (tmp > max)
+                    max = tmp;
+                *maskPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
+            }
         }
+    }
+    else if (currPage.format() == QImage::Format_Grayscale8)
+    {
+        int pix = qRed(pixel);
+
+        // Identically sized grayscale image
+        currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+
+        // Scan through page seeking matches
+        QRgb white = qRgba(255,255,255,0);  // Transparent white
+        QRgb black = qRgba(0,0,0,255);      // Opaque black
+        for(int i=0; i<currPage.height(); i++)
+        {
+            uchar *srcPtr = currPage.scanLine(i);
+            QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+            for(int j=0; j<currPage.width(); j++)
+            {
+                int val = *srcPtr++;
+                int max = abs(pix - val);
+                *maskPtr++ = (val == 255) || (max > dropperThreshold) ? white : black;
+            }
+        }
+    }
+    else
+    {
+        QMessageBox::information(this, "colorSelect", "Only works on RGB and grayscale images");
+        return;
     }
     update();
 }
