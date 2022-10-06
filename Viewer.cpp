@@ -526,12 +526,20 @@ void Viewer::blankPage()
 }
 
 //
+// slot to set dropper threshold
+//
+void Viewer::setThreshold(int val)
+{
+    dropperThreshold = val;
+    currMask = QImage();
+    update();
+}
+
+//
 // Select all pixels near the cursor's color
 //
 void Viewer::colorSelect(QPoint pos)
 {
-    int threshold = 20; //TODO - need slider
-
     if (currPage.isNull())
         return;
 
@@ -554,6 +562,7 @@ void Viewer::colorSelect(QPoint pos)
     currMask = QImage(currPage.size(), QImage::Format_ARGB32);
 
     // Scan through page seeking matches
+    QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
     QRgb white = qRgba(255,255,255,0);  // Transparent white
     QRgb black = qRgba(0,0,0,255);      // Opaque black
     for(int i=0; i<currPage.height(); i++)
@@ -570,7 +579,7 @@ void Viewer::colorSelect(QPoint pos)
             tmp = abs(blu - qBlue(val));
             if (tmp > max)
                 max = tmp;
-            *gsPtr++ = (max > threshold) ? white : black;
+            *gsPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
         }
     }
     update();
@@ -582,6 +591,7 @@ void Viewer::colorSelect(QPoint pos)
 void Viewer::applyMask(QImage &mask, bool flag)
 {
     // Paint the copied section
+    pushImage();
     QPainter p(&currPage);
     if (!flag)
         mask.invertPixels(QImage::InvertRgb);

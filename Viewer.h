@@ -30,6 +30,7 @@ public slots:
     void setBrush_8();
     void setBrush_12();
     void blankPage();
+    void setThreshold(int val);
     void colorSelect(QPoint pos);
     void undoEdit();
     void redoEdit();
@@ -83,6 +84,7 @@ private:
     QCursor PencilCursor;
     QCursor DropperCursor;
     QImage logo;
+    int dropperThreshold = 20;
 
     enum LeftMode { Select, ColorSelect, Draw };
     enum RightMode { Idle, Zoom, Pan };

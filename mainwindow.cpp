@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainWin.h"
 #include "PopupQToolButton.h"
+#include "SpinWidget.h"
 #include <QColorDialog>
 #include <QDebug>
 #include <QMessageBox>
@@ -13,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    connectSignalSlots();
     buildToolBar();
+    connectSignalSlots();
 
     // Initialize status bar
     statusLabel = new QLabel("Ready");
@@ -66,8 +67,11 @@ void MainWindow::connectSignalSlots()
 
     // Tools menu
     QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
     QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->threshold->setVisible(true); });
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
@@ -92,6 +96,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->bookmarks, &Bookmarks::updateViewerSig, ui->viewer, &Viewer::updateViewer );
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
+    QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
 }
 
 //
@@ -148,6 +153,11 @@ void MainWindow::buildToolBar()
     toolsToolButton->setMenu(toolsMenu);
     toolsToolButton->setDefaultAction(ui->pointerAct);
     ui->toolBar->addWidget(toolsToolButton);
+
+    // Optional spinbox for dropper tool
+    thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
+    threshold = ui->toolBar->addWidget(thresholdWidget);
+    threshold->setVisible(false);
 
     // Line button
     QMenu *toolSizeMenu = new QMenu();

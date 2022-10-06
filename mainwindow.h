@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QProgressBar>
+#include <QVBoxLayout>
 #include "ColorQToolButton.h"
+#include "SpinWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,5 +34,7 @@ private:
 
     QLabel *statusLabel;
     QProgressBar *progressBar;
+    SpinWidget *thresholdWidget;
+    QAction *threshold;
 };
 #endif // MAINWINDOW_H
