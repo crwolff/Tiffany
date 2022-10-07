@@ -103,6 +103,7 @@
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
     <addaction name="rotate180Act"/>
+    <addaction name="rotateAct"/>
    </widget>
    <widget class="QMenu" name="menu_View">
     <property name="title">
@@ -269,6 +270,15 @@
    </property>
    <property name="text">
     <string>Rotate 180</string>
+   </property>
+  </action>
+  <action name="deskewAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/deskew.svg</normaloff>:/images/assets/deskew.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Deskew</string>
    </property>
   </action>
   <action name="zoomInAct">

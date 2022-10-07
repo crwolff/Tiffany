@@ -35,6 +35,8 @@ public slots:
     void blankPage();
     void setThreshold(int val);
     void colorSelect();
+    void setDeskew(int val);
+    void deskew();
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -89,6 +91,7 @@ private:
     QCursor DropperCursor;
     QImage logo;
     int dropperThreshold = 20;
+    int deskewAngle = 0;
     QPointF dropperLoc = QPointF(0,0);
 
     enum LeftMode { Select, ColorSelect, Draw };

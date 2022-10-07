@@ -54,8 +54,13 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
     QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
     QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
+    QObject::connect( ui->rotateCWAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
+    QObject::connect( ui->rotateCCWAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
+    QObject::connect( ui->rotate180Act, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskew );
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->deskew->setVisible(true); });
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -98,6 +103,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
+    QObject::connect( deskewWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
 }
 
 //
@@ -133,10 +139,16 @@ void MainWindow::buildToolBar()
     rotateMenu->addAction(ui->rotateCWAct);
     rotateMenu->addAction(ui->rotateCCWAct);
     rotateMenu->addAction(ui->rotate180Act);
+    rotateMenu->addAction(ui->deskewAct);
     PopupQToolButton *rotateToolButton = new PopupQToolButton();
     rotateToolButton->setMenu(rotateMenu);
     rotateToolButton->setDefaultAction(ui->rotateCWAct);
     ui->toolBar->addWidget(rotateToolButton);
+
+    // Optional spinbox for deskew tool
+    deskewWidget = new SpinWidget(-45, 45, 0, "Skew\nAngle", ui->toolBar);
+    deskew = ui->toolBar->addWidget(deskewWidget);
+    deskew->setVisible(false);
 
     // Edit actions
     ui->toolBar->addAction(ui->undoAct);

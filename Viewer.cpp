@@ -660,6 +660,23 @@ void Viewer::applyMask(QImage &mask, bool flag)
 }
 
 //
+// Set deskew angle
+//
+void Viewer::setDeskew(int angle)
+{
+    deskewAngle = angle;
+    deskew();
+}
+
+//
+// Deskew image by small amount
+//
+void Viewer::deskew()
+{
+    qInfo() << "Deskew:" << deskewAngle;
+}
+
+//
 // Copy selected region into local clipboard
 //
 void Viewer::copySelection()

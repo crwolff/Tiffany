@@ -306,6 +306,7 @@ void Bookmarks::saveFiles()
             // Clear file change marks
             image.setChanges(0);
             image.setRotation(0);
+            image.setDeskew(0);
 
             // Update item
             item->setData(Qt::UserRole, QVariant::fromValue(image));
@@ -370,6 +371,7 @@ void Bookmarks::saveToDir()
             // Clear file change marks
             image.setChanges(0);
             image.setRotation(0);
+            image.setDeskew(0);
 
             // Update item
             item->setData(Qt::UserRole, QVariant::fromValue(image));

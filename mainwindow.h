@@ -36,5 +36,7 @@ private:
     QProgressBar *progressBar;
     SpinWidget *thresholdWidget;
     QAction *threshold;
+    SpinWidget *deskewWidget;
+    QAction *deskew;
 };
 #endif // MAINWINDOW_H
