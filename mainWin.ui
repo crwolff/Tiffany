@@ -103,7 +103,6 @@
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
     <addaction name="rotate180Act"/>
-    <addaction name="rotateAct"/>
    </widget>
    <widget class="QMenu" name="menu_View">
     <property name="title">
@@ -123,6 +122,7 @@
     <addaction name="pointerAct"/>
     <addaction name="dropperAct"/>
     <addaction name="pencilAct"/>
+    <addaction name="deskewAct"/>
    </widget>
    <widget class="QMenu" name="menu_Stroke">
     <property name="title">

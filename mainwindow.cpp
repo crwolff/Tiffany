@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainWin.h"
 #include "PopupQToolButton.h"
+#include "DoubleSpinWidget.h"
 #include "SpinWidget.h"
 #include <QColorDialog>
 #include <QDebug>
@@ -54,13 +55,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
     QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
     QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
-    QObject::connect( ui->rotateCWAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
-    QObject::connect( ui->rotateCCWAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
-    QObject::connect( ui->rotate180Act, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskew );
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->deskew->setVisible(true); });
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -72,11 +68,19 @@ void MainWindow::connectSignalSlots()
 
     // Tools menu
     QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
-    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
     QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->threshold->setVisible(true); });
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
+    QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
+
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->threshold->setVisible(true); });
     QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
+
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->deskew->setVisible(true); });
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
@@ -103,7 +107,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
-    QObject::connect( deskewWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
+    QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
 }
 
 //
@@ -139,16 +143,10 @@ void MainWindow::buildToolBar()
     rotateMenu->addAction(ui->rotateCWAct);
     rotateMenu->addAction(ui->rotateCCWAct);
     rotateMenu->addAction(ui->rotate180Act);
-    rotateMenu->addAction(ui->deskewAct);
     PopupQToolButton *rotateToolButton = new PopupQToolButton();
     rotateToolButton->setMenu(rotateMenu);
     rotateToolButton->setDefaultAction(ui->rotateCWAct);
     ui->toolBar->addWidget(rotateToolButton);
-
-    // Optional spinbox for deskew tool
-    deskewWidget = new SpinWidget(-45, 45, 0, "Skew\nAngle", ui->toolBar);
-    deskew = ui->toolBar->addWidget(deskewWidget);
-    deskew->setVisible(false);
 
     // Edit actions
     ui->toolBar->addAction(ui->undoAct);
@@ -162,6 +160,7 @@ void MainWindow::buildToolBar()
     toolsMenu->addAction(ui->pointerAct);
     toolsMenu->addAction(ui->dropperAct);
     toolsMenu->addAction(ui->pencilAct);
+    toolsMenu->addAction(ui->deskewAct);
     PopupQToolButton *toolsToolButton = new PopupQToolButton();
     toolsToolButton->setMenu(toolsMenu);
     toolsToolButton->setDefaultAction(ui->pointerAct);
@@ -171,6 +170,11 @@ void MainWindow::buildToolBar()
     thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
+
+    // Optional spinbox for deskew tool
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, "Skew\nAngle", ui->toolBar);
+    deskew = ui->toolBar->addWidget(deskewWidget);
+    deskew->setVisible(false);
 
     // Line button
     QMenu *toolSizeMenu = new QMenu();

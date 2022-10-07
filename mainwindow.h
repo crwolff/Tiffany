@@ -6,6 +6,7 @@
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include "ColorQToolButton.h"
+#include "DoubleSpinWidget.h"
 #include "SpinWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -36,7 +37,7 @@ private:
     QProgressBar *progressBar;
     SpinWidget *thresholdWidget;
     QAction *threshold;
-    SpinWidget *deskewWidget;
+    DoubleSpinWidget *deskewWidget;
     QAction *deskew;
 };
 #endif // MAINWINDOW_H

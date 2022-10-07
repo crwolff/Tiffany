@@ -28,6 +28,7 @@ public slots:
     void pointerMode();
     void dropperMode();
     void pencilMode();
+    void deskewMode();
     void setBrush_1();
     void setBrush_4();
     void setBrush_8();
@@ -35,7 +36,7 @@ public slots:
     void blankPage();
     void setThreshold(int val);
     void colorSelect();
-    void setDeskew(int val);
+    void setDeskew(double val);
     void deskew();
     void undoEdit();
     void redoEdit();
@@ -77,6 +78,7 @@ private:
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
     QImage currMask;
+    QImage deskewMask;
     float maskLvl = 0.5;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
@@ -91,10 +93,10 @@ private:
     QCursor DropperCursor;
     QImage logo;
     int dropperThreshold = 20;
-    int deskewAngle = 0;
+    double deskewAngle = 0.0;
     QPointF dropperLoc = QPointF(0,0);
 
-    enum LeftMode { Select, ColorSelect, Draw };
+    enum LeftMode { Select, ColorSelect, Draw, Deskew };
     enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;

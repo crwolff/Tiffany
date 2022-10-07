@@ -249,6 +249,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape)
     {
         currMask = QImage();
+        deskewMask = QImage();
         pasting = false;
         update();
         flag = true;
@@ -405,6 +406,7 @@ void Viewer::updateViewer()
     // Reload image from list
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
     currMask = QImage();
+    deskewMask = QImage();
 
     // Turn off active operations
     rubberBand->hide();
@@ -430,6 +432,7 @@ void Viewer::pointerMode()
 {
     leftMode = Select;
     currMask = QImage();
+    deskewMask = QImage();
 }
 
 //
@@ -438,6 +441,8 @@ void Viewer::pointerMode()
 void Viewer::dropperMode()
 {
     leftMode = ColorSelect;
+    currMask = QImage();
+    deskewMask = QImage();
 }
 
 //
@@ -447,6 +452,17 @@ void Viewer::pencilMode()
 {
     leftMode = Draw;
     currMask = QImage();
+    deskewMask = QImage();
+}
+
+//
+// Select deskew mode
+//
+void Viewer::deskewMode()
+{
+    leftMode = Deskew;
+    currMask = QImage();
+    deskewMask = QImage();
 }
 
 //
@@ -589,6 +605,7 @@ void Viewer::colorSelect()
 
         // Identically sized grayscale image
         currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+        deskewMask = QImage();
 
         // Scan through page seeking matches
         QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
@@ -662,7 +679,7 @@ void Viewer::applyMask(QImage &mask, bool flag)
 //
 // Set deskew angle
 //
-void Viewer::setDeskew(int angle)
+void Viewer::setDeskew(double angle)
 {
     deskewAngle = angle;
     deskew();
