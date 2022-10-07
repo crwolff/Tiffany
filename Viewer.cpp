@@ -309,6 +309,14 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             emit imageChangedSig();
         }
     }
+    else // Not control
+    {
+        if (event->key() == Qt::Key_F)
+        {
+            fitToWindow();
+            flag = true;
+        }
+    }
 
     // Event was handled
     if (flag)
