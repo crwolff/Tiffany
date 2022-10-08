@@ -298,7 +298,8 @@ void Bookmarks::saveFiles()
                 QFile(backupName).remove();
 
             // Rename <fileName> to <fileName>.BAK
-            QFile(fileName).rename(backupName);
+            if (QFileInfo(fileName).isFile() && QFileInfo(fileName).isWritable())
+                QFile(fileName).rename(backupName);
 
             // Save image to <fileName>
             image.save(fileName,"PNG");
@@ -328,68 +329,63 @@ void Bookmarks::saveFiles()
 }
 
 //
-// Save selected files to new directory, making backups if required
+// Save all files to new directory, making backups if required
 //
 void Bookmarks::saveToDir()
 {
+    if (count() == 0)
+        return;
+
     // Get directory to save into
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "",
             QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     if (dir == "")
         return;
 
-    // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
+    // Add progress to status bar
+    emit progressSig("Saving...", count());
+
+    int progress = 1;
+    for(int idx=0; idx<count(); idx++)
     {
-        // Add progress to status bar
-        emit progressSig("Saving...", items.count());
+        // Get the filenames
+        QString oldName = item(idx)->toolTip();
+        QString fileName = dir + "/" + QFileInfo(oldName).fileName();
+        QString backupName = fileName + ".bak";
 
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
-        {
-            // Skip if unchanged
-            PageData image = item->data(Qt::UserRole).value<PageData>();
-            if (!image.modified())
-                continue;
+        // If <fileName>.BAK exists, delete it
+        if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
+            QFile(backupName).remove();
 
-            // Get the filenames
-            QString oldName = item->toolTip();
-            QString fileName = dir + "/" + QFileInfo(oldName).fileName();
-            QString backupName = fileName + ".bak";
-
-            // If <fileName>.BAK exists, delete it
-            if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
-                QFile(backupName).remove();
-
-            // Rename <fileName> to <fileName>.BAK
+        // Rename <fileName> to <fileName>.BAK
+        if (QFileInfo(fileName).isFile() && QFileInfo(fileName).isWritable())
             QFile(fileName).rename(backupName);
 
-            // Save image to <fileName>
-            image.save(fileName,"PNG");
+        // Save image to <fileName>
+        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
+        image.save(fileName,"PNG");
 
-            // Clear file change marks
-            image.setChanges(0);
-            image.setRotation(0);
-            image.setDeskew(0);
+        // Clear file change marks
+        image.setChanges(0);
+        image.setRotation(0);
+        image.setDeskew(0);
 
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(image));
-            item->setIcon(makeIcon(image, false));
+        // Update item
+        item(idx)->setData(Qt::UserRole, QVariant::fromValue(image));
+        item(idx)->setIcon(makeIcon(image, false));
 
-            // Flush undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.flush();
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+        // Flush undo buffer
+        UndoBuffer ub = item(idx)->data(Qt::UserRole+1).value<UndoBuffer>();
+        ub.flush();
+        item(idx)->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
-        }
-
-        // Cleanup status bar
-        emit progressSig("", -1);
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
     }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
 }
 
 //
