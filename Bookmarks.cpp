@@ -393,6 +393,20 @@ void Bookmarks::saveToDir()
 }
 
 //
+// Check if any pages have been modified and not saved
+//
+bool Bookmarks::anyModified()
+{
+    for(int idx=0; idx<count(); idx++)
+    {
+        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
+        if (image.modified())
+            return true;
+    }
+    return false;
+}
+
+//
 // Select all even numbered items
 //
 void Bookmarks::selectEven()

@@ -21,6 +21,7 @@ public slots:
     void toBinary();
     void saveFiles();
     void saveToDir();
+    bool anyModified();
     void selectEven();
     void selectOdd();
     void deleteSelection();

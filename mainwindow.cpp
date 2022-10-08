@@ -3,6 +3,7 @@
 #include "PopupQToolButton.h"
 #include "DoubleSpinWidget.h"
 #include "SpinWidget.h"
+#include <QCloseEvent>
 #include <QColorDialog>
 #include <QDebug>
 #include <QMessageBox>
@@ -277,3 +278,20 @@ void MainWindow::about()
             "up scanned images</p>" );
 }
 
+//
+// Check for modified files before exiting
+//
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    QMessageBox::StandardButton resBtn = QMessageBox::Yes;
+    if (ui->bookmarks->anyModified())
+    {
+        resBtn = QMessageBox::question( this, "Tiffany", tr("Modified files exist, are you sure?\n"),
+                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+    }
+
+    if (resBtn != QMessageBox::Yes)
+        event->ignore();
+    else
+        event->accept();
+}

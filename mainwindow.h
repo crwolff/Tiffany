@@ -26,6 +26,7 @@ public slots:
     void updateProgress(QString descr, int val);
     void updateActions(float scale);
     void about();
+    void closeEvent (QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
