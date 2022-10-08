@@ -491,7 +491,6 @@ void Viewer::deskewMode()
     leftMode = Deskew;
     currMask = QImage();
     deskewImg = QImage();
-    deskewAngle = 0.0;
     deskew();
 }
 
