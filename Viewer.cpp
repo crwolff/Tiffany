@@ -249,7 +249,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape)
     {
         currMask = QImage();
-        deskewMask = QImage();
+        deskewImg = QImage();
         pasting = false;
         update();
         flag = true;
@@ -261,11 +261,24 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (event->matches(QKeySequence::Paste))
     {
-        pasting = true;
-        setMouseTracking(true);
-        pasteLoc = mapFromGlobal(cursor().pos());
-        update();
-        flag = true;
+        if (deskewImg.isNull())
+        {
+            pasting = true;
+            setMouseTracking(true);
+            pasteLoc = mapFromGlobal(cursor().pos());
+            update();
+            flag = true;
+        }
+        else
+        {
+            applyDeskew();
+            deskewImg = QImage();
+            update();
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit imageChangedSig();
+            flag = true;
+        }
     }
     else if (event->matches(QKeySequence::Undo))
     {
@@ -353,6 +366,21 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setOpacity(maskLvl);
             p.drawImage(QPoint(0,0), currMask);
         }
+        else if (!deskewImg.isNull())
+        {
+            // Draw deskewed image rotated about the center
+            QRect rect(deskewImg.rect());
+            rect.moveCenter(currPage.rect().center());
+            p.drawImage(rect.topLeft(), deskewImg);
+
+            // Draw alignment grid
+            p.setTransform(QTransform());           // Reset to view coordinates
+            p.setOpacity(0.5);
+            for(int idx=(width()%50)/2; idx<width(); idx += 50)
+                p.drawLine(idx, 0, idx, height());
+            for(int idx=(height()%50)/2; idx<height(); idx += 50)
+                p.drawLine(0, idx, width(), idx);
+        }
     }
     else
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
@@ -406,7 +434,7 @@ void Viewer::updateViewer()
     // Reload image from list
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
     currMask = QImage();
-    deskewMask = QImage();
+    deskewImg = QImage();
 
     // Turn off active operations
     rubberBand->hide();
@@ -432,7 +460,7 @@ void Viewer::pointerMode()
 {
     leftMode = Select;
     currMask = QImage();
-    deskewMask = QImage();
+    deskewImg = QImage();
 }
 
 //
@@ -442,7 +470,7 @@ void Viewer::dropperMode()
 {
     leftMode = ColorSelect;
     currMask = QImage();
-    deskewMask = QImage();
+    deskewImg = QImage();
 }
 
 //
@@ -452,7 +480,7 @@ void Viewer::pencilMode()
 {
     leftMode = Draw;
     currMask = QImage();
-    deskewMask = QImage();
+    deskewImg = QImage();
 }
 
 //
@@ -462,7 +490,9 @@ void Viewer::deskewMode()
 {
     leftMode = Deskew;
     currMask = QImage();
-    deskewMask = QImage();
+    deskewImg = QImage();
+    deskewAngle = 0.0;
+    deskew();
 }
 
 //
@@ -605,7 +635,7 @@ void Viewer::colorSelect()
 
         // Identically sized grayscale image
         currMask = QImage(currPage.size(), QImage::Format_ARGB32);
-        deskewMask = QImage();
+        deskewImg = QImage();
 
         // Scan through page seeking matches
         QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
@@ -690,7 +720,32 @@ void Viewer::setDeskew(double angle)
 //
 void Viewer::deskew()
 {
-    qInfo() << "Deskew:" << deskewAngle;
+    if (currPage.isNull())
+        return;
+
+    // Identically sized image
+    deskewImg = QImage(currPage.size(), currPage.format());
+    currMask = QImage();
+
+    // Rotate page
+    QTransform tmat = QTransform().rotate(deskewAngle);
+    deskewImg = currPage.transformed(tmat, Qt::SmoothTransformation);
+    update();
+}
+
+//
+// Apply the deskewImg to the current page
+//
+void Viewer::applyDeskew()
+{
+    // Paint the deskew image rotated about the center
+    // Note: This code is identical to paintEvent
+    pushImage();
+    QPainter p(&currPage);
+    QRect rect(deskewImg.rect());
+    rect.moveCenter(currPage.rect().center());
+    p.drawImage(rect.topLeft(), deskewImg);
+    p.end();
 }
 
 //

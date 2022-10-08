@@ -4,10 +4,9 @@ A Specialized tool for editting scanned documents.
 
 Left Mouse Button:
 * pointer to draw selection rectangle
-* Draw Line
-* Erase Line
-* No shift: Fill area with background color
-* Shift: fill outside area with background color
+* Draw in foreground color
+* Dropper to select all pixels within threshold of current one (Cut to erase them)
+* Deskew tool (rotate using spinbox on toolbar, Paste to fix image)
 
 Right Mouse Button:
 * Zoom to rectangle

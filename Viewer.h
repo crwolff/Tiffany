@@ -66,6 +66,7 @@ private:
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool outside);
     void applyMask(QImage &mask, bool flag);
+    void applyDeskew();
     void copySelection();
     void pasteSelection();
     void zoomArea(QRect rect);
@@ -78,7 +79,7 @@ private:
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
     QImage currMask;
-    QImage deskewMask;
+    QImage deskewImg;
     float maskLvl = 0.5;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
