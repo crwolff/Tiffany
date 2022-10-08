@@ -351,6 +351,7 @@ void Bookmarks::saveToDir()
         // Get the filenames
         QString oldName = item(idx)->toolTip();
         QString fileName = dir + "/" + QFileInfo(oldName).fileName();
+        item(idx)->setToolTip(fileName);
         QString backupName = fileName + ".bak";
 
         // If <fileName>.BAK exists, delete it
