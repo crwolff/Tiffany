@@ -156,23 +156,15 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->zoomInAct);
     ui->toolBar->addAction(ui->fitToWindowAct);
 
-    // Tool button
-    QMenu *toolsMenu = new QMenu();
-    toolsMenu->addAction(ui->pointerAct);
-    toolsMenu->addAction(ui->dropperAct);
-    toolsMenu->addAction(ui->pencilAct);
-    toolsMenu->addAction(ui->deskewAct);
-    PopupQToolButton *toolsToolButton = new PopupQToolButton();
-    toolsToolButton->setMenu(toolsMenu);
-    toolsToolButton->setDefaultAction(ui->pointerAct);
-    ui->toolBar->addWidget(toolsToolButton);
-
-    // Optional spinbox for dropper tool
+    // Tools
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->pointerAct);
+    ui->toolBar->addAction(ui->pencilAct);
+    ui->toolBar->addAction(ui->dropperAct);
     thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
-
-    // Optional spinbox for deskew tool
+    ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, "Skew\nAngle", ui->toolBar);
     deskew = ui->toolBar->addWidget(deskewWidget);
     deskew->setVisible(false);
