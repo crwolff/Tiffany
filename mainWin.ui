@@ -123,6 +123,7 @@
     <addaction name="dropperAct"/>
     <addaction name="pencilAct"/>
     <addaction name="deskewAct"/>
+    <addaction name="despeckleAct"/>
    </widget>
    <widget class="QMenu" name="menu_Stroke">
     <property name="title">
@@ -279,6 +280,15 @@
    </property>
    <property name="text">
     <string>Deskew</string>
+   </property>
+  </action>
+  <action name="despeckleAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/despeckle.svg</normaloff>:/images/assets/despeckle.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Despeckle</string>
    </property>
   </action>
   <action name="zoomInAct">

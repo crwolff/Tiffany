@@ -32,5 +32,6 @@
     <file>assets/binary.svg</file>
     <file>assets/grayscale.svg</file>
     <file>assets/dropper.svg</file>
+    <file>assets/despeckle.svg</file>
   </qresource>
 </RCC>

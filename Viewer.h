@@ -29,6 +29,7 @@ public slots:
     void dropperMode();
     void pencilMode();
     void deskewMode();
+    void despeckleMode();
     void setBrush_1();
     void setBrush_4();
     void setBrush_8();
@@ -38,6 +39,8 @@ public slots:
     void colorSelect();
     void setDeskew(double val);
     void deskew();
+    void setDespeckle(int val);
+    void despeckle();
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -95,9 +98,10 @@ private:
     QImage logo;
     int dropperThreshold = 20;
     double deskewAngle = 0.0;
+    int despeckleArea = 50;
     QPointF dropperLoc = QPointF(0,0);
 
-    enum LeftMode { Select, ColorSelect, Draw, Deskew };
+    enum LeftMode { Select, ColorSelect, Draw, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;

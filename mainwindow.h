@@ -40,5 +40,7 @@ private:
     QAction *threshold;
     DoubleSpinWidget *deskewWidget;
     QAction *deskew;
+    SpinWidget *despeckleWidget;
+    QAction *despeckle;
 };
 #endif // MAINWINDOW_H

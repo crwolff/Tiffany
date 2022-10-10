@@ -388,7 +388,7 @@ void Viewer::paintEvent(QPaintEvent *)
 }
 
 //
-// Blink mask to may it easier to see
+// Blink mask to make it easier to see
 //
 void Viewer::blinker()
 {
@@ -492,6 +492,17 @@ void Viewer::deskewMode()
     currMask = QImage();
     deskewImg = QImage();
     deskew();
+}
+
+//
+// Select despeckle mode
+//
+void Viewer::despeckleMode()
+{
+    leftMode = Despeckle;
+    currMask = QImage();
+    deskewImg = QImage();
+    despeckle();
 }
 
 //
@@ -730,6 +741,7 @@ void Viewer::deskew()
     QTransform tmat = QTransform().rotate(deskewAngle);
     deskewImg = currPage.transformed(tmat, Qt::SmoothTransformation);
     update();
+    blinkTimer->start(500);
 }
 
 //
@@ -745,6 +757,73 @@ void Viewer::applyDeskew()
     rect.moveCenter(currPage.rect().center());
     p.drawImage(rect.topLeft(), deskewImg);
     p.end();
+}
+
+//
+// Slot to set despeckle area
+//
+void Viewer::setDespeckle(int val)
+{
+    despeckleArea = val;
+    despeckle();
+}
+
+//
+// Calculate the despeckle mask
+//
+void Viewer::despeckle()
+{
+    if (currPage.isNull())
+        return;
+
+    // Convert to grayscale
+    QImage img;
+    if (currPage.format() == QImage::Format_RGB32)
+        img = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    else
+        img = currPage;
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(img);
+
+    // Make B&W with background black
+    cv::Mat bw;
+    //cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+    cv::threshold(mat, bw, 240, 255, cv::THRESH_BINARY_INV);
+
+    // Find blobs
+    cv::Mat stats, centroids, labelImg;
+    int nLabels = cv::connectedComponentsWithStats(bw, labelImg, stats, centroids, 4, CV_32S);
+
+    // Build mask of blobs smaller than limit
+    cv::Vec4b white = cv::Vec4b(255,255,255,0);  // Transparent white
+    cv::Vec4b black = cv::Vec4b(0,0,0,255);      // Opaque black
+    cv::Mat mask(labelImg.size(), CV_8UC4, white);
+    for(int idx=1; idx<nLabels; idx++)
+    {
+        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= despeckleArea)
+        {
+            int top = stats.at<int>(idx, cv::CC_STAT_TOP);
+            int bot = stats.at<int>(idx, cv::CC_STAT_TOP) + stats.at<int>(idx, cv::CC_STAT_HEIGHT);
+            int left = stats.at<int>(idx, cv::CC_STAT_LEFT);
+            int right = stats.at<int>(idx, cv::CC_STAT_LEFT) + stats.at<int>(idx, cv::CC_STAT_WIDTH);
+            for (int row=top; row<bot; row++)
+            {
+                for (int col=left; col<right; col++)
+                {
+                    if (labelImg.at<int>(row,col) == idx)
+                    {
+                        cv::Vec4b &pixel = mask.at<cv::Vec4b>(row,col);
+                        pixel = black;
+                    }
+                }
+            }
+        }
+    }
+    currMask = OCV2QImage(mask);
+
+    // Blink mask
+    blinkTimer->start(500);
 }
 
 //
