@@ -789,7 +789,7 @@ void Viewer::despeckle()
     // Make B&W with background black
     cv::Mat bw;
     //cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
-    cv::threshold(mat, bw, 240, 255, cv::THRESH_BINARY_INV);
+    cv::threshold(mat, bw, 250, 255, cv::THRESH_BINARY_INV);
 
     // Find blobs
     cv::Mat stats, centroids, labelImg;
@@ -801,12 +801,15 @@ void Viewer::despeckle()
     cv::Mat mask(labelImg.size(), CV_8UC4, white);
     for(int idx=1; idx<nLabels; idx++)
     {
+        // Check if this blob is small enough
         if (stats.at<int>(idx, cv::CC_STAT_AREA) <= despeckleArea)
         {
             int top = stats.at<int>(idx, cv::CC_STAT_TOP);
             int bot = stats.at<int>(idx, cv::CC_STAT_TOP) + stats.at<int>(idx, cv::CC_STAT_HEIGHT);
             int left = stats.at<int>(idx, cv::CC_STAT_LEFT);
             int right = stats.at<int>(idx, cv::CC_STAT_LEFT) + stats.at<int>(idx, cv::CC_STAT_WIDTH);
+
+            // Sweep the enclosing rectangle, setting pixels in the mask
             for (int row=top; row<bot; row++)
             {
                 for (int col=left; col<right; col++)
