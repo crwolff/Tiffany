@@ -58,6 +58,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
+    QObject::connect( ui->mirrorHorizAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorHoriz );
+    QObject::connect( ui->mirrorVertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorVert );
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -154,6 +156,8 @@ void MainWindow::buildToolBar()
     rotateMenu->addAction(ui->rotateCWAct);
     rotateMenu->addAction(ui->rotateCCWAct);
     rotateMenu->addAction(ui->rotate180Act);
+    rotateMenu->addAction(ui->mirrorHorizAct);
+    rotateMenu->addAction(ui->mirrorVertAct);
     PopupQToolButton *rotateToolButton = new PopupQToolButton();
     rotateToolButton->setMenu(rotateMenu);
     rotateToolButton->setDefaultAction(ui->rotateCWAct);
@@ -170,14 +174,14 @@ void MainWindow::buildToolBar()
     ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->pointerAct);
     ui->toolBar->addAction(ui->pencilAct);
-    ui->toolBar->addAction(ui->dropperAct);
-    thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
-    threshold = ui->toolBar->addWidget(thresholdWidget);
-    threshold->setVisible(false);
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, "Skew\nAngle", ui->toolBar);
     deskew = ui->toolBar->addWidget(deskewWidget);
     deskew->setVisible(false);
+    ui->toolBar->addAction(ui->dropperAct);
+    thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
+    threshold = ui->toolBar->addWidget(thresholdWidget);
+    threshold->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
     despeckleWidget = new SpinWidget(1, 100, 50, "Despeckle\nArea", ui->toolBar);
     despeckle = ui->toolBar->addWidget(despeckleWidget);
@@ -210,6 +214,8 @@ void MainWindow::buildToolBar()
 
     // Adjust text for better toolbar layout
     ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
+    ui->mirrorHorizAct->setText(QApplication::translate("MainWindow", "Horizontal\nMirror", nullptr));
+    ui->mirrorVertAct->setText(QApplication::translate("MainWindow", "Vertical\nMirror", nullptr));
     ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
     ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
     ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));

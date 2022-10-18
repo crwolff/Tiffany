@@ -499,6 +499,63 @@ void Bookmarks::rotate180()
 }
 
 //
+// Mirror selected items
+//  1 = horizontal
+//  2 = vertical
+//  3 = both
+//
+void Bookmarks::mirrorSelection(int dir)
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+    {
+        // Add progress to status bar
+        emit progressSig("Mirroring...", items.count());
+
+        int progress = 1;
+        foreach(QListWidgetItem* item, items)
+        {
+            // Rotate old image and update mirror flag
+            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
+            PageData mirImage = oldImage.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
+            mirImage.copyOtherData(oldImage);
+            mirImage.setMirrors(oldImage.mirrors() ^ dir);
+
+            // Update item
+            item->setData(Qt::UserRole, QVariant::fromValue(mirImage));
+            item->setIcon(makeIcon(mirImage, mirImage.modified()));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+
+        // Cleanup status bar
+        emit progressSig("", -1);
+    }
+
+    // Signal redraw
+    emit currentItemChanged(currentItem(), NULL);
+}
+
+//
+// Mirror across horizontal axis
+//
+void Bookmarks::mirrorHoriz()
+{
+    mirrorSelection(1);
+}
+
+//
+// Mirror across vertical axis
+//
+void Bookmarks::mirrorVert()
+{
+    mirrorSelection(2);
+}
+
+//
 // Make a new icon after editting in Viewer
 //
 void Bookmarks::updateIcon()

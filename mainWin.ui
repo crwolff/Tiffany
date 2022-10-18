@@ -103,6 +103,8 @@
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
     <addaction name="rotate180Act"/>
+    <addaction name="mirrorHorizAct"/>
+    <addaction name="mirrorVertAct"/>
    </widget>
    <widget class="QMenu" name="menu_View">
     <property name="title">
@@ -497,6 +499,24 @@
    </property>
    <property name="toolTip">
     <string>Pick color with eye dropper</string>
+   </property>
+  </action>
+  <action name="mirrorHorizAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/mirror_horiz.svg</normaloff>:/images/assets/mirror_horiz.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Horizontal Mirror</string>
+   </property>
+  </action>
+  <action name="mirrorVertAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/mirror_vert.svg</normaloff>:/images/assets/mirror_vert.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Vertical Mirror</string>
    </property>
   </action>
  </widget>

@@ -28,6 +28,8 @@ public slots:
     void rotateCW();
     void rotateCCW();
     void rotate180();
+    void mirrorHoriz();
+    void mirrorVert();
     void updateIcon();
 
 signals:
@@ -37,6 +39,7 @@ signals:
 private:
     void readFiles(QString cmd);
     void rotateSelection(int val);
+    void mirrorSelection(int dir);
     QIcon makeIcon(PageData &image, bool flag);
 };
 

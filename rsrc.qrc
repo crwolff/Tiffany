@@ -33,5 +33,7 @@
     <file>assets/grayscale.svg</file>
     <file>assets/dropper.svg</file>
     <file>assets/despeckle.svg</file>
+    <file>assets/mirror_horiz.svg</file>
+    <file>assets/mirror_vert.svg</file>
   </qresource>
 </RCC>
