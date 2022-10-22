@@ -789,7 +789,7 @@ void Viewer::despeckle()
 
     // Convert to grayscale
     QImage img;
-    if (currPage.format() == QImage::Format_RGB32)
+    if ((currPage.format() == QImage::Format_RGB32) || (currPage.format() == QImage::Format_Mono))
         img = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
     else
         img = currPage;
@@ -810,6 +810,7 @@ void Viewer::despeckle()
     cv::Vec4b white = cv::Vec4b(255,255,255,0);  // Transparent white
     cv::Vec4b black = cv::Vec4b(0,0,0,255);      // Opaque black
     cv::Mat mask(labelImg.size(), CV_8UC4, white);
+    int cnt = 0;
     for(int idx=1; idx<nLabels; idx++)
     {
         // Check if this blob is small enough
@@ -832,8 +833,10 @@ void Viewer::despeckle()
                     }
                 }
             }
+            cnt++;
         }
     }
+    //qInfo() << cnt << "Blobs detected";
     currMask = OCV2QImage(mask);
 
     // Blink mask
