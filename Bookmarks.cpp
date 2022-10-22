@@ -218,7 +218,7 @@ void Bookmarks::toBinary()
             cv::Mat mat = QImage2OCV(oldImage);
 
             // Gausian filter to clean up noise
-            if (false)
+            if (true)
             {
                 cv::Mat tmp;
                 cv::GaussianBlur(mat, tmp, cv::Size(5,5), 0);
