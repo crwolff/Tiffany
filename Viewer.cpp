@@ -20,6 +20,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     PencilCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
     DropperCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
+    DespeckleCursor = QCursor(p, 15, 15);
 }
 
 Viewer::~Viewer()
@@ -71,6 +73,10 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         else if (leftMode == ColorSelect)
         {
             setCursor(DropperCursor);
+        }
+        else if (leftMode == Despeckle)
+        {
+            setCursor(DespeckleCursor);
         }
         flag = true;
     }
@@ -188,6 +194,11 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             QTransform transform = QTransform().scale(scale, scale).inverted();
             dropperLoc = transform.map(QPointF(event->pos()));
             colorSelect();
+            setCursor(Qt::ArrowCursor);
+        }
+        else if (leftMode == Despeckle)
+        {
+            despeckle();
             setCursor(Qt::ArrowCursor);
         }
         if (flag)

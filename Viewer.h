@@ -95,6 +95,7 @@ private:
     QImage copyImage;
     QCursor PencilCursor;
     QCursor DropperCursor;
+    QCursor DespeckleCursor;
     QImage logo;
     int dropperThreshold = 20;
     double deskewAngle = 0.0;
