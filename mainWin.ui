@@ -124,6 +124,7 @@
     <addaction name="pointerAct"/>
     <addaction name="dropperAct"/>
     <addaction name="pencilAct"/>
+    <addaction name="eraserAct"/>
     <addaction name="deskewAct"/>
     <addaction name="despeckleAct"/>
    </widget>
@@ -366,6 +367,15 @@
    </property>
    <property name="text">
     <string>&amp;Pencil</string>
+   </property>
+  </action>
+  <action name="eraserAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/eraser.svg</normaloff>:/images/assets/eraser.svg</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Eraser</string>
    </property>
   </action>
   <action name="pix1Act">

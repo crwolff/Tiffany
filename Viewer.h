@@ -28,6 +28,7 @@ public slots:
     void pointerMode();
     void dropperMode();
     void pencilMode();
+    void eraserMode();
     void deskewMode();
     void despeckleMode();
     void setBrush_1();
@@ -94,6 +95,7 @@ private:
     QPoint pasteLoc;
     QImage copyImage;
     QCursor PencilCursor;
+    QCursor EraserCursor;
     QCursor DropperCursor;
     QCursor DespeckleCursor;
     QImage logo;
@@ -102,7 +104,7 @@ private:
     int despeckleArea = 50;
     QPointF dropperLoc = QPointF(0,0);
 
-    enum LeftMode { Select, ColorSelect, Draw, Deskew, Despeckle };
+    enum LeftMode { Select, ColorSelect, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;

@@ -18,6 +18,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     QPixmap p;
     p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
     PencilCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/eraser.svg").scaled(32,32,Qt::KeepAspectRatio);
+    EraserCursor = QCursor(p, 6, 29);
     p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
     DropperCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
@@ -60,10 +62,15 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             pushImage();
         }
-        else if (leftMode == Draw)
+        else if (leftMode == Pencil)
         {
             pushImage();
             setCursor(PencilCursor);
+        }
+        else if (leftMode == Eraser)
+        {
+            pushImage();
+            setCursor(EraserCursor);
         }
         else if (leftMode == Select)
         {
@@ -127,9 +134,14 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         // If left mouse button is pressed
         if (event->buttons() & Qt::LeftButton)
         {
-            if (leftMode == Draw)
+            if (leftMode == Pencil)
             {
                 drawLine(origin, event->pos(), foregroundColor);
+                origin = event->pos();
+            }
+            else if (leftMode == Eraser)
+            {
+                drawLine(origin, event->pos(), backgroundColor);
                 origin = event->pos();
             }
             else if (leftMode == Select)
@@ -183,7 +195,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             pasteSelection();
             flag = true;
         }
-        else if (leftMode == Draw)
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             setCursor(Qt::ArrowCursor);
             flag = true;
@@ -489,7 +501,17 @@ void Viewer::dropperMode()
 //
 void Viewer::pencilMode()
 {
-    leftMode = Draw;
+    leftMode = Pencil;
+    currMask = QImage();
+    deskewImg = QImage();
+}
+
+//
+// Select erase line tool
+//
+void Viewer::eraserMode()
+{
+    leftMode = Eraser;
     currMask = QImage();
     deskewImg = QImage();
 }
