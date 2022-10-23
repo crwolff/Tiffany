@@ -242,7 +242,7 @@ void Bookmarks::toBinary()
             }
 
             // Convert back to QImage
-            PageData newImage = OCV2QImage(mat);
+            PageData newImage = OCV2QImage(mat, oldImage);
 
             // Make it mono
             PageData monoImage = newImage.convertToFormat(QImage::Format_Mono,
