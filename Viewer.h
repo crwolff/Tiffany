@@ -108,6 +108,8 @@ private:
     enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;
+    int gridOffsetX = 0;
+    int gridOffsetY = 0;
 };
 
 #endif

@@ -346,7 +346,42 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             emit imageChangedSig();
         }
     }
-    else // Not control
+    else if (event->modifiers().testFlag(Qt::ShiftModifier) && !deskewImg.isNull())
+    {
+        if (event->key() == Qt::Key_Up)
+        {
+            gridOffsetY++;
+            while (gridOffsetY > 50)
+                gridOffsetY -= 50;
+            update();
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_Down)
+        {
+            gridOffsetY--;
+            while (gridOffsetY < 0)
+                gridOffsetY += 50;
+            update();
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_Left)
+        {
+            gridOffsetX++;
+            while (gridOffsetX > 50)
+                gridOffsetX -= 50;
+            update();
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_Right)
+        {
+            gridOffsetX--;
+            while (gridOffsetX < 0)
+                gridOffsetX += 50;
+            update();
+            flag = true;
+        }
+    }
+    else // Not control or shift
     {
         if (event->key() == Qt::Key_F)
         {
@@ -399,9 +434,9 @@ void Viewer::paintEvent(QPaintEvent *)
             // Draw alignment grid
             p.setTransform(QTransform());           // Reset to view coordinates
             p.setOpacity(0.5);
-            for(int idx=(width()%50)/2; idx<width(); idx += 50)
+            for(int idx=gridOffsetX + (width() % 50)/2; idx < width(); idx += 50)
                 p.drawLine(idx, 0, idx, height());
-            for(int idx=(height()%50)/2; idx<height(); idx += 50)
+            for(int idx=gridOffsetY + (height() % 50)/2; idx < height(); idx += 50)
                 p.drawLine(0, idx, width(), idx);
         }
     }
@@ -525,6 +560,8 @@ void Viewer::deskewMode()
     currMask = QImage();
     deskewImg = QImage();
     deskew();
+    gridOffsetX = 0;
+    gridOffsetY = 0;
 }
 
 //
