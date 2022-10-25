@@ -11,7 +11,7 @@ class DoubleSpinWidget : public QWidget
     Q_OBJECT
 
 public:
-    DoubleSpinWidget(float min, float max, float val, QString text, QWidget * parent=nullptr);
+    DoubleSpinWidget(float min, float max, float val, float step, QString text, QWidget * parent=nullptr);
     ~DoubleSpinWidget();
 
     QDoubleSpinBox *spinBox;

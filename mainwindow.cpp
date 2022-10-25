@@ -189,7 +189,7 @@ void MainWindow::buildToolBar()
 
     // Remaining tools
     ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, "Skew\nAngle", ui->toolBar);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, 0.05, "Skew\nAngle", ui->toolBar);
     deskew = ui->toolBar->addWidget(deskewWidget);
     deskew->setVisible(false);
     ui->toolBar->addAction(ui->dropperAct);
