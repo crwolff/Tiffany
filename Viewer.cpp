@@ -348,7 +348,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (event->modifiers().testFlag(Qt::ShiftModifier) && !deskewImg.isNull())
     {
-        if (event->key() == Qt::Key_Up)
+        if (event->key() == Qt::Key_Down)
         {
             gridOffsetY++;
             while (gridOffsetY > 50)
@@ -356,7 +356,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             update();
             flag = true;
         }
-        else if (event->key() == Qt::Key_Down)
+        else if (event->key() == Qt::Key_Up)
         {
             gridOffsetY--;
             while (gridOffsetY < 0)
@@ -364,7 +364,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             update();
             flag = true;
         }
-        else if (event->key() == Qt::Key_Left)
+        else if (event->key() == Qt::Key_Right)
         {
             gridOffsetX++;
             while (gridOffsetX > 50)
@@ -372,7 +372,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             update();
             flag = true;
         }
-        else if (event->key() == Qt::Key_Right)
+        else if (event->key() == Qt::Key_Left)
         {
             gridOffsetX--;
             while (gridOffsetX < 0)
