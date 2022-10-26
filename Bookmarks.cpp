@@ -274,6 +274,8 @@ void Bookmarks::toBinary()
 //
 void Bookmarks::saveFiles()
 {
+    int writeErr = 0;
+
     // Get list of all selected items
     QList<QListWidgetItem*> items = selectedItems();
     if (items.count() > 0)
@@ -293,16 +295,34 @@ void Bookmarks::saveFiles()
             QString fileName = item->toolTip();
             QString backupName = fileName + ".bak";
 
-            // If <fileName>.BAK exists, delete it
-            if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
-                QFile(backupName).remove();
+            // Attempt to create backup
+            if (QFileInfo(fileName).exists())
+            {
+                // If original isn't writeable, flag error
+                if (!QFileInfo(fileName).isWritable())
+                {
+                    writeErr++;
+                    continue;
+                }
 
-            // Rename <fileName> to <fileName>.BAK
-            if (QFileInfo(fileName).isFile() && QFileInfo(fileName).isWritable())
-                QFile(fileName).rename(backupName);
+                // Delete the backup if it is writable
+                if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
+                    QFile(backupName).remove();
+
+                // Rename original to backup
+                if (QFile(fileName).rename(backupName) == false)
+                {
+                    writeErr++;
+                    continue;
+                }
+            }
 
             // Save image to <fileName>
-            image.save(fileName,"PNG");
+            if (image.save(fileName,"PNG") == false)
+            {
+                writeErr++;
+                continue;
+            }
 
             // Clear file change marks
             image.setChanges(0);
@@ -326,6 +346,10 @@ void Bookmarks::saveFiles()
         // Cleanup status bar
         emit progressSig("", -1);
     }
+
+    // Report errors
+    if (writeErr != 0)
+        QMessageBox::information(this, "Tiffany", QString("%1 files couldn't be written").arg(writeErr));
 }
 
 //
@@ -333,6 +357,8 @@ void Bookmarks::saveFiles()
 //
 void Bookmarks::saveToDir()
 {
+    int writeErr = 0;
+
     if (count() == 0)
         return;
 
@@ -348,23 +374,43 @@ void Bookmarks::saveToDir()
     int progress = 1;
     for(int idx=0; idx<count(); idx++)
     {
+        // Write all files
+        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
+
         // Get the filenames
         QString oldName = item(idx)->toolTip();
         QString fileName = dir + "/" + QFileInfo(oldName).fileName();
         item(idx)->setToolTip(fileName);
         QString backupName = fileName + ".bak";
 
-        // If <fileName>.BAK exists, delete it
-        if (QFileInfo(backupName).isFile() && QFileInfo(backupName).isWritable())
-            QFile(backupName).remove();
+        // Attempt to create backup
+        if (QFileInfo(fileName).exists())
+        {
+            // If original isn't writeable, flag error
+            if (!QFileInfo(fileName).isWritable())
+            {
+                writeErr++;
+                continue;
+            }
 
-        // Rename <fileName> to <fileName>.BAK
-        if (QFileInfo(fileName).isFile() && QFileInfo(fileName).isWritable())
-            QFile(fileName).rename(backupName);
+            // Delete the backup if it is writable
+            if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
+                QFile(backupName).remove();
+
+            // Rename original to backup
+            if (QFile(fileName).rename(backupName) == false)
+            {
+                writeErr++;
+                continue;
+            }
+        }
 
         // Save image to <fileName>
-        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
-        image.save(fileName,"PNG");
+        if (image.save(fileName,"PNG") == false)
+        {
+            writeErr++;
+            continue;
+        }
 
         // Clear file change marks
         image.setChanges(0);
@@ -387,6 +433,10 @@ void Bookmarks::saveToDir()
 
     // Cleanup status bar
     emit progressSig("", -1);
+
+    // Report errors
+    if (writeErr != 0)
+        QMessageBox::information(this, "Tiffany", QString("%1 files couldn't be written").arg(writeErr));
 }
 
 //
