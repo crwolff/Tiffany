@@ -197,7 +197,7 @@ void MainWindow::buildToolBar()
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, 35, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, 30, "Maximum\nBlob Size", ui->toolBar);
     despeckle = ui->toolBar->addWidget(despeckleWidget);
     despeckle->setVisible(false);
 
@@ -313,7 +313,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
     if (ui->bookmarks->anyModified())
     {
         resBtn = QMessageBox::question( this, "Tiffany", tr("Modified files exist, are you sure?\n"),
-                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+                QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
     }
 
     if (resBtn != QMessageBox::Yes)
