@@ -478,7 +478,22 @@ void Bookmarks::deleteSelection()
 {
     QList<QListWidgetItem*> items = selectedItems();
     foreach(QListWidgetItem* item, items)
-        delete item;
+    {
+        // Skip if changed
+        PageData image = item->data(Qt::UserRole).value<PageData>();
+        if (image.modified())
+        {
+            QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany", 
+                    item->toolTip() + " has been modified, are you sure?\n",
+                    QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
+            if (resBtn == QMessageBox::Cancel)
+                break;
+            if (resBtn == QMessageBox::Yes)
+                delete item;
+        }
+        else
+            delete item;
+    }
 }
 
 //
