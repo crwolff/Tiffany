@@ -18,8 +18,6 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     QPixmap p;
     p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
     PencilCursor = QCursor(p, 0, 31);
-    p = QPixmap(":/images/assets/eraser.svg").scaled(32,32,Qt::KeepAspectRatio);
-    EraserCursor = QCursor(p, 6, 29);
     p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
     DropperCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
@@ -70,7 +68,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         else if (leftMode == Eraser)
         {
             pushImage();
-            setCursor(EraserCursor);
+            setCursor(PencilCursor);
         }
         else if (leftMode == Select)
         {
