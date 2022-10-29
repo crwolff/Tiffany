@@ -84,7 +84,7 @@ private:
     PageData currPage;
     QImage currMask;
     QImage deskewImg;
-    float maskLvl = 0.5;
+    bool blink = false;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;

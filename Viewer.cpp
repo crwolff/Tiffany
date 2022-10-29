@@ -419,8 +419,10 @@ void Viewer::paintEvent(QPaintEvent *)
         }
         else if (!currMask.isNull())
         {
-            p.setOpacity(maskLvl);
-            p.drawImage(QPoint(0,0), currMask);
+            QImage tmp = currMask;
+            if (blink)
+                tmp.invertPixels(QImage::InvertRgb);
+            p.drawImage(QPoint(0,0), tmp);
         }
         else if (!deskewImg.isNull())
         {
@@ -453,10 +455,7 @@ void Viewer::blinker()
         blinkTimer->stop();
         return;
     }
-    if (maskLvl < 0.5)
-        maskLvl = 0.8;
-    else
-        maskLvl = 0.2;
+    blink = !blink;
     update();
 }
 
@@ -736,6 +735,7 @@ void Viewer::colorSelect()
                 *maskPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
             }
         }
+        blink = false;
         blinkTimer->start(500);
     }
     else if (currPage.format() == QImage::Format_Grayscale8)
@@ -759,6 +759,7 @@ void Viewer::colorSelect()
                 *maskPtr++ = (val == 255) || (max > dropperThreshold) ? white : black;
             }
         }
+        blink = false;
         blinkTimer->start(500);
     }
     else
@@ -809,7 +810,6 @@ void Viewer::deskew()
     QTransform tmat = QTransform().rotate(deskewAngle);
     deskewImg = currPage.transformed(tmat, Qt::SmoothTransformation);
     update();
-    blinkTimer->start(500);
 }
 
 //
@@ -897,6 +897,7 @@ void Viewer::despeckle()
     currMask = OCV2QImage(mask);
 
     // Blink mask
+    blink = false;
     blinkTimer->start(500);
 }
 

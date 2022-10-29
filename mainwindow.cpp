@@ -197,7 +197,7 @@ void MainWindow::buildToolBar()
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, 30, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, 25, "Maximum\nBlob Size", ui->toolBar);
     despeckle = ui->toolBar->addWidget(despeckleWidget);
     despeckle->setVisible(false);
 
