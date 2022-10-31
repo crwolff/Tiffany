@@ -60,13 +60,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             pushImage();
         }
-        else if (leftMode == Pencil)
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
-            pushImage();
-            setCursor(PencilCursor);
-        }
-        else if (leftMode == Eraser)
-        {
+            currColor = (leftMode == Pencil) ? foregroundColor : backgroundColor;
             pushImage();
             setCursor(PencilCursor);
         }
@@ -132,14 +128,9 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         // If left mouse button is pressed
         if (event->buttons() & Qt::LeftButton)
         {
-            if (leftMode == Pencil)
+            if ((leftMode == Pencil) || (leftMode == Eraser))
             {
-                drawLine(origin, event->pos(), foregroundColor);
-                origin = event->pos();
-            }
-            else if (leftMode == Eraser)
-            {
-                drawLine(origin, event->pos(), backgroundColor);
+                drawLine(origin, event->pos(), currColor);
                 origin = event->pos();
             }
             else if (leftMode == Select)

@@ -102,6 +102,7 @@ private:
     double deskewAngle = 0.0;
     int despeckleArea = 50;
     QPointF dropperLoc = QPointF(0,0);
+    QColor currColor = Qt::black;
 
     enum LeftMode { Select, ColorSelect, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
