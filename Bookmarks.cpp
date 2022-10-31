@@ -28,7 +28,7 @@ void Bookmarks::readFiles(QString cmd)
     {
         QList<QListWidgetItem*> items = selectedItems();
         foreach(QListWidgetItem* item, items)
-            rows.append(item->text().toInt() - 1);
+            rows.append(row(item));
         if (rows.count() == 0)
         {
             QMessageBox::information(this, cmd + " Files", "Insertion point must be selected");
