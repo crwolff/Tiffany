@@ -75,6 +75,13 @@ void Bookmarks::readFiles(QString cmd)
             ub = UndoBuffer();
             newItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
             newItem->setIcon(makeIcon(p, p.modified()));
+            QString txt = QFileInfo(filenames.at(idx)).fileName();
+            int suffix = txt.lastIndexOf(".");
+            if (suffix > 0)
+                txt = txt.left(suffix);
+            if (txt.length() >= 13)
+                txt = txt.left(5) + ".." + txt.right(5);
+            newItem->setText(txt);
             insertItem(rows[0], newItem);
 
             // Update row for next item
@@ -104,10 +111,6 @@ void Bookmarks::readFiles(QString cmd)
 
     // Cleanup status bar
     emit progressSig("", -1);
-
-    // (Re)number all the loaded pages
-    for(int idx = 0; idx < count(); idx++)
-        item(idx)->setText(QString::number(idx+1));
 
     // Select first item read in
     setCurrentRow(firstIdx);
