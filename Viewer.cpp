@@ -198,6 +198,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
+            shiftPencil = false;
+            drawLine(origin, event->pos(), currColor);
             setCursor(Qt::ArrowCursor);
             flag = true;
         }
