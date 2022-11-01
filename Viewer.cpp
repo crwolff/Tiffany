@@ -115,6 +115,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     if (currPage.isNull())
         return;
 
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
     bool flag = false;
 
     if (pasting)
@@ -130,8 +132,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         {
             if ((leftMode == Pencil) || (leftMode == Eraser))
             {
-                drawLine(origin, event->pos(), currColor);
-                origin = event->pos();
+                if (shift)
+                {
+                    shiftPencil = true;
+                    drawLoc = event->pos();
+                    update();
+                }
+                else
+                {
+                    shiftPencil = false;
+                    drawLine(origin, event->pos(), currColor);
+                    origin = event->pos();
+                }
             }
             else if (leftMode == Select)
             {
@@ -430,6 +442,13 @@ void Viewer::paintEvent(QPaintEvent *)
             for(int idx=gridOffsetY + (height() % 50)/2; idx < height(); idx += 50)
                 p.drawLine(0, idx, width(), idx);
         }
+        else if (shiftPencil)
+        {
+            QPointF start = transform.inverted().map(origin);
+            QPointF finish = transform.inverted().map(drawLoc);
+            p.setPen(QPen(currColor, brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            p.drawLine(start, finish);
+        }
     }
     else
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
@@ -608,8 +627,7 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 
     QPainter p(&currPage);
     p.setTransform(transform);
-    qreal brush = int(brushSize * scale);
-    p.setPen(QPen(color, brush, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.setPen(QPen(color, int(brushSize * scale), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
     update();
