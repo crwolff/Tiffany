@@ -280,75 +280,78 @@ void Bookmarks::saveFiles()
     int writeErr = 0;
 
     // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
     {
-        // Add progress to status bar
-        emit progressSig("Saving...", items.count());
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
 
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
+    // Add progress to status bar
+    emit progressSig("Saving...", selection.count());
+
+    int progress = 1;
+    foreach(QListWidgetItem* itemPtr, selection)
+    {
+        // Skip if unchanged
+        PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+        if (!image.modified())
+            continue;
+
+        // Get the filenames
+        QString fileName = itemPtr->toolTip();
+        QString backupName = fileName + ".bak";
+
+        // Attempt to create backup
+        if (QFileInfo(fileName).exists())
         {
-            // Skip if unchanged
-            PageData image = item->data(Qt::UserRole).value<PageData>();
-            if (!image.modified())
-                continue;
-
-            // Get the filenames
-            QString fileName = item->toolTip();
-            QString backupName = fileName + ".bak";
-
-            // Attempt to create backup
-            if (QFileInfo(fileName).exists())
-            {
-                // If original isn't writeable, flag error
-                if (!QFileInfo(fileName).isWritable())
-                {
-                    writeErr++;
-                    continue;
-                }
-
-                // Delete the backup if it is writable
-                if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
-                    QFile(backupName).remove();
-
-                // Rename original to backup
-                if (QFile(fileName).rename(backupName) == false)
-                {
-                    writeErr++;
-                    continue;
-                }
-            }
-
-            // Save image to <fileName>
-            if (image.save(fileName,"PNG") == false)
+            // If original isn't writeable, flag error
+            if (!QFileInfo(fileName).isWritable())
             {
                 writeErr++;
                 continue;
             }
 
-            // Clear file change marks
-            image.setChanges(0);
-            image.setRotation(0);
-            image.setDeskew(0);
+            // Delete the backup if it is writable
+            if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
+                QFile(backupName).remove();
 
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(image));
-            item->setIcon(makeIcon(image, false));
-
-            // Flush undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.flush();
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
+            // Rename original to backup
+            if (QFile(fileName).rename(backupName) == false)
+            {
+                writeErr++;
+                continue;
+            }
         }
 
-        // Cleanup status bar
-        emit progressSig("", -1);
+        // Save image to <fileName>
+        if (image.save(fileName,"PNG") == false)
+        {
+            writeErr++;
+            continue;
+        }
+
+        // Clear file change marks
+        image.setChanges(0);
+        image.setRotation(0);
+        image.setDeskew(0);
+
+        // Update item
+        itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
+        itemPtr->setIcon(makeIcon(image, false));
+
+        // Flush undo buffer
+        UndoBuffer ub = itemPtr->data(Qt::UserRole+1).value<UndoBuffer>();
+        ub.flush();
+        itemPtr->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
     }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
 
     // Report errors
     if (writeErr != 0)
