@@ -38,6 +38,7 @@ signals:
 
 private:
     void readFiles(QString cmd);
+    bool saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName);
     void rotateSelection(int val);
     void mirrorSelection(int dir);
     QIcon makeIcon(PageData &image, bool flag);

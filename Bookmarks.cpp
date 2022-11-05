@@ -272,6 +272,48 @@ void Bookmarks::toBinary()
     emit updateViewerSig();
 }
 
+// Common save routine
+bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName)
+{
+    // Attempt to create backup
+    if (QFileInfo(fileName).exists())
+    {
+        // If original isn't writeable, flag error
+        if (!QFileInfo(fileName).isWritable())
+            return false;
+
+        // Delete the backup if it is writable
+        if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
+            QFile(backupName).remove();
+
+        // Rename original to backup
+        if (QFile(fileName).rename(backupName) == false)
+            return false;
+    }
+
+    // Save image to <fileName>
+    PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+    if (image.save(fileName,"PNG") == false)
+        return false;
+
+    // Clear file change marks
+    image.setChanges(0);
+    image.setRotation(0);
+    image.setDeskew(0);
+
+    // Update item
+    itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
+    itemPtr->setIcon(makeIcon(image, false));
+
+    // Flush undo buffer
+    UndoBuffer ub = itemPtr->data(Qt::UserRole+1).value<UndoBuffer>();
+    ub.flush();
+    itemPtr->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+    // No errors
+    return true;
+}
+
 //
 // Save selected files, making backups
 //
@@ -302,48 +344,9 @@ void Bookmarks::saveFiles()
         QString fileName = itemPtr->toolTip();
         QString backupName = fileName + ".bak";
 
-        // Attempt to create backup
-        if (QFileInfo(fileName).exists())
-        {
-            // If original isn't writeable, flag error
-            if (!QFileInfo(fileName).isWritable())
-            {
-                writeErr++;
-                continue;
-            }
-
-            // Delete the backup if it is writable
-            if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
-                QFile(backupName).remove();
-
-            // Rename original to backup
-            if (QFile(fileName).rename(backupName) == false)
-            {
-                writeErr++;
-                continue;
-            }
-        }
-
-        // Save image to <fileName>
-        if (image.save(fileName,"PNG") == false)
-        {
+        // Create the save
+        if (!saveCommon(itemPtr, fileName, backupName))
             writeErr++;
-            continue;
-        }
-
-        // Clear file change marks
-        image.setChanges(0);
-        image.setRotation(0);
-        image.setDeskew(0);
-
-        // Update item
-        itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
-        itemPtr->setIcon(makeIcon(image, false));
-
-        // Flush undo buffer
-        UndoBuffer ub = itemPtr->data(Qt::UserRole+1).value<UndoBuffer>();
-        ub.flush();
-        itemPtr->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
         // Update progress
         emit progressSig("", progress);
@@ -359,14 +362,19 @@ void Bookmarks::saveFiles()
 }
 
 //
-// Save all files to new directory, making backups if required
+// Save selected files, making backups
 //
 void Bookmarks::saveToDir()
 {
     int writeErr = 0;
 
-    if (count() == 0)
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
         return;
+    }
 
     // Get directory to save into
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "",
@@ -375,62 +383,20 @@ void Bookmarks::saveToDir()
         return;
 
     // Add progress to status bar
-    emit progressSig("Saving...", count());
+    emit progressSig("Saving...", selection.count());
 
     int progress = 1;
-    for(int idx=0; idx<count(); idx++)
+    foreach(QListWidgetItem* itemPtr, selection)
     {
-        // Write all files
-        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
-
         // Get the filenames
-        QString oldName = item(idx)->toolTip();
+        QString oldName = itemPtr->toolTip();
         QString fileName = dir + "/" + QFileInfo(oldName).fileName();
-        item(idx)->setToolTip(fileName);
+        itemPtr->setToolTip(fileName);
         QString backupName = fileName + ".bak";
 
-        // Attempt to create backup
-        if (QFileInfo(fileName).exists())
-        {
-            // If original isn't writeable, flag error
-            if (!QFileInfo(fileName).isWritable())
-            {
-                writeErr++;
-                continue;
-            }
-
-            // Delete the backup if it is writable
-            if (QFileInfo(backupName).exists() && QFileInfo(backupName).isWritable())
-                QFile(backupName).remove();
-
-            // Rename original to backup
-            if (QFile(fileName).rename(backupName) == false)
-            {
-                writeErr++;
-                continue;
-            }
-        }
-
-        // Save image to <fileName>
-        if (image.save(fileName,"PNG") == false)
-        {
+        // Create the save
+        if (!saveCommon(itemPtr, fileName, backupName))
             writeErr++;
-            continue;
-        }
-
-        // Clear file change marks
-        image.setChanges(0);
-        image.setRotation(0);
-        image.setDeskew(0);
-
-        // Update item
-        item(idx)->setData(Qt::UserRole, QVariant::fromValue(image));
-        item(idx)->setIcon(makeIcon(image, false));
-
-        // Flush undo buffer
-        UndoBuffer ub = item(idx)->data(Qt::UserRole+1).value<UndoBuffer>();
-        ub.flush();
-        item(idx)->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
         // Update progress
         emit progressSig("", progress);
