@@ -357,6 +357,9 @@ void Bookmarks::saveFiles()
     // Cleanup status bar
     emit progressSig("", -1);
 
+    // Signal redraw
+    emit updateViewerSig();
+
     // Report errors
     if (writeErr != 0)
         QMessageBox::information(this, "Tiffany", QString("%1 files couldn't be written").arg(writeErr));
@@ -406,6 +409,9 @@ void Bookmarks::saveToDir()
 
     // Cleanup status bar
     emit progressSig("", -1);
+
+    // Signal redraw
+    emit updateViewerSig();
 
     // Report errors
     if (writeErr != 0)
