@@ -299,6 +299,7 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     // Clear file change marks
     image.setChanges(0);
     image.setRotation(0);
+    image.setMirrors(0);
     image.setDeskew(0);
 
     // Update item
