@@ -96,6 +96,7 @@ private:
     QImage copyImage;
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
+    bool pencil180 = false;
     QCursor DropperCursor;
     QCursor DespeckleCursor;
     QImage logo;

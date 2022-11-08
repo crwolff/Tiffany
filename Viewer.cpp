@@ -66,7 +66,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             currColor = (leftMode == Pencil) ? foregroundColor : backgroundColor;
             pushImage();
-            setCursor(PencilCursor);
+            setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
         }
         else if (leftMode == Select)
         {
@@ -395,10 +395,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         else if (event->key() == Qt::Key_T)
         {
-            if (cursor() == PencilCursor)
-                setCursor(Pencil180Cursor);
-            else if (cursor() == Pencil180Cursor)
-                setCursor(PencilCursor);
+            pencil180 = !pencil180;
+            if ((cursor() == PencilCursor) || (cursor() == Pencil180Cursor))
+                setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
         }
     }
 
@@ -555,6 +554,7 @@ void Viewer::dropperMode()
 void Viewer::pencilMode()
 {
     leftMode = Pencil;
+    pencil180 = false;
     currMask = QImage();
     deskewImg = QImage();
 }
@@ -565,6 +565,7 @@ void Viewer::pencilMode()
 void Viewer::eraserMode()
 {
     leftMode = Eraser;
+    pencil180 = false;
     currMask = QImage();
     deskewImg = QImage();
 }
