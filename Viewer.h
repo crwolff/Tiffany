@@ -95,6 +95,7 @@ private:
     QPoint pasteLoc;
     QImage copyImage;
     QCursor PencilCursor;
+    QCursor Pencil180Cursor;
     QCursor DropperCursor;
     QCursor DespeckleCursor;
     QImage logo;

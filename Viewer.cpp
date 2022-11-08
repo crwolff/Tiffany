@@ -18,6 +18,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     QPixmap p;
     p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
     PencilCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/pencil180.svg").scaled(32,32,Qt::KeepAspectRatio);
+    Pencil180Cursor = QCursor(p, 31, 0);
     p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
     DropperCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
@@ -390,6 +392,13 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         {
             fitToWindow();
             flag = true;
+        }
+        else if (event->key() == Qt::Key_T)
+        {
+            if (cursor() == PencilCursor)
+                setCursor(Pencil180Cursor);
+            else if (cursor() == Pencil180Cursor)
+                setCursor(PencilCursor);
         }
     }
 
