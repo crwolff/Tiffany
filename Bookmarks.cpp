@@ -224,20 +224,18 @@ void Bookmarks::toBinary()
             if (true)
             {
                 cv::Mat tmp;
-                cv::GaussianBlur(mat, tmp, cv::Size(5,5), 0);
+                cv::GaussianBlur(mat, tmp, cv::Size(9,9), 0);
                 mat = tmp;
             }
 
-            // Otsu's local threshold
+            // Otsu's threshold calculation
             if (true)
             {
                 cv::Mat tmp;
                 cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
                 mat = tmp;
             }
-
-            // Adaptive threshold - this hollows out diodes, etc
-            if (false)
+            else    // Adaptive threshold - this hollows out diodes, etc
             {
                 cv::Mat tmp;
                 cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
