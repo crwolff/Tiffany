@@ -96,6 +96,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
+    QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -111,6 +112,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
+    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setBlurRadius);
 }
 
 // Toggle visibility on the spin boxes
@@ -119,6 +121,7 @@ void MainWindow::makeVisible(int mask)
     threshold->setVisible((mask & 1) != 0);
     deskew->setVisible((mask & 2) != 0);
     despeckle->setVisible((mask & 4) != 0);
+    blur->setVisible((mask & 8) != 0);
 }
 
 //
@@ -187,11 +190,11 @@ void MainWindow::buildToolBar()
     deskew = ui->toolBar->addWidget(deskewWidget);
     deskew->setVisible(false);
     ui->toolBar->addAction(ui->dropperAct);
-    thresholdWidget = new SpinWidget(0, 255, 20, "Dropper\nThreshold", ui->toolBar);
+    thresholdWidget = new SpinWidget(0, 255, 20, 5, "Dropper\nThreshold", ui->toolBar);
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, 25, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, 25, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckle = ui->toolBar->addWidget(despeckleWidget);
     despeckle->setVisible(false);
 
@@ -219,6 +222,9 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setMenu(reFormatMenu);
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
+    blurWidget = new SpinWidget(1, 9, 5, 2, "Blur Size", ui->toolBar);
+    blur = ui->toolBar->addWidget(blurWidget);
+    blur->setVisible(false);
 
     // Adjust text for better toolbar layout
     ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));

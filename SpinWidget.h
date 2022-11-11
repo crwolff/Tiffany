@@ -11,7 +11,7 @@ class SpinWidget : public QWidget
     Q_OBJECT
 
 public:
-    SpinWidget(int min, int max, int val, QString text, QWidget * parent=nullptr);
+    SpinWidget(int min, int max, int val, int step, QString text, QWidget * parent=nullptr);
     ~SpinWidget();
 
     QSpinBox *spinBox;

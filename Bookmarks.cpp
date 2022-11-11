@@ -186,6 +186,18 @@ void Bookmarks::toGrayscale()
 }
 
 //
+// Set the blur radius for binarization
+//
+void Bookmarks::setBlurRadius(int val)
+{
+    blurRadius = val;
+
+    // Even values crash openCV
+    if (blurRadius % 2 != 1)
+        blurRadius++;
+}
+
+//
 // Convert selected images from grayscale to mono
 //
 void Bookmarks::toBinary()
@@ -224,7 +236,7 @@ void Bookmarks::toBinary()
             if (true)
             {
                 cv::Mat tmp;
-                cv::GaussianBlur(mat, tmp, cv::Size(9,9), 0);
+                cv::GaussianBlur(mat, tmp, cv::Size(blurRadius, blurRadius), 0);
                 mat = tmp;
             }
 

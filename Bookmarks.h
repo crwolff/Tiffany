@@ -18,6 +18,7 @@ public slots:
     void insertFiles();
     void replaceFiles();
     void toGrayscale();
+    void setBlurRadius(int val);
     void toBinary();
     void saveFiles();
     void saveToDir();
@@ -42,6 +43,7 @@ private:
     void rotateSelection(int val);
     void mirrorSelection(int dir);
     QIcon makeIcon(PageData &image, bool flag);
+    int blurRadius = 5;
 };
 
 #endif
