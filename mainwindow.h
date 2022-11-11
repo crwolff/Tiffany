@@ -31,6 +31,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
+    void makeVisible(int mask);
     void buildToolBar();
     void colorMagic();
 

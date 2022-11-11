@@ -77,26 +77,12 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
 
-    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->threshold->setVisible(true); });
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->threshold->setVisible(false); });
-
-    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->deskew->setVisible(true); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->deskew->setVisible(false); });
-
-    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->despeckle->setVisible(false); });
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->despeckle->setVisible(false); });
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->despeckle->setVisible(false); });
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->despeckle->setVisible(false); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->despeckle->setVisible(false); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->despeckle->setVisible(true); });
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->makeVisible(0); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(0); });
+    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(0); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(2); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(4); });
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
@@ -125,6 +111,14 @@ void MainWindow::connectSignalSlots()
     QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
+}
+
+// Toggle visibility on the spin boxes
+void MainWindow::makeVisible(int mask)
+{
+    threshold->setVisible((mask & 1) != 0);
+    deskew->setVisible((mask & 2) != 0);
+    despeckle->setVisible((mask & 4) != 0);
 }
 
 //
