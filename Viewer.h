@@ -20,6 +20,9 @@ public:
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
+    int dropperThreshold = 20;
+    double deskewAngle = 0.0;
+    int despeckleArea = 50;
 
 public slots:
     void blinker();
@@ -100,9 +103,6 @@ private:
     QCursor DropperCursor;
     QCursor DespeckleCursor;
     QImage logo;
-    int dropperThreshold = 20;
-    double deskewAngle = 0.0;
-    int despeckleArea = 50;
     QPointF dropperLoc = QPointF(0,0);
     QColor currColor = Qt::black;
     bool shiftPencil = false;

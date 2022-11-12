@@ -186,15 +186,15 @@ void MainWindow::buildToolBar()
 
     // Remaining tools
     ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, 0.0, 0.05, "Skew\nAngle", ui->toolBar);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
     deskew = ui->toolBar->addWidget(deskewWidget);
     deskew->setVisible(false);
     ui->toolBar->addAction(ui->dropperAct);
-    thresholdWidget = new SpinWidget(0, 255, 20, 5, "Dropper\nThreshold", ui->toolBar);
+    thresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
     threshold = ui->toolBar->addWidget(thresholdWidget);
     threshold->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, 25, 1, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckle = ui->toolBar->addWidget(despeckleWidget);
     despeckle->setVisible(false);
 
@@ -222,7 +222,7 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setMenu(reFormatMenu);
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
-    blurWidget = new SpinWidget(1, 9, 5, 2, "Blur Size", ui->toolBar);
+    blurWidget = new SpinWidget(1, 9, ui->bookmarks->blurRadius, 2, "Blur Size", ui->toolBar);
     blur = ui->toolBar->addWidget(blurWidget);
     blur->setVisible(false);
 
