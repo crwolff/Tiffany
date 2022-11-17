@@ -17,7 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Build options
-#CONFIG = debug
+CONFIG += debug
 
 # Keep clean
 MOC_DIR = ./.build
@@ -29,11 +29,16 @@ UI_DIR = ./.build
 QT += widgets gui
 
 # Input
-HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h QImage2OCV.h SpinWidget.h DoubleSpinWidget.h
+HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h 
+HEADERS += QImage2OCV.h SpinWidget.h DoubleSpinWidget.h QImage2PIX.h
 FORMS += mainWin.ui
-SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp ColorQToolButton.cpp PopupQToolButton.cpp QImage2OCV.cpp SpinWidget.cpp DoubleSpinWidget.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp ColorQToolButton.cpp PopupQToolButton.cpp QImage2OCV.cpp 
+SOURCES += SpinWidget.cpp DoubleSpinWidget.cpp QImage2PIX.cpp
 RESOURCES += rsrc.qrc
 
 # OpenCV
 CONFIG += link_pkgconfig
 PKGCONFIG += opencv4
+
+# Tesseract
+LIBS += -ltesseract -llept
