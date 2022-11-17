@@ -41,4 +41,4 @@ CONFIG += link_pkgconfig
 PKGCONFIG += opencv4
 
 # Tesseract
-LIBS += -ltesseract -llept
+PKGCONFIG += tesseract lept
