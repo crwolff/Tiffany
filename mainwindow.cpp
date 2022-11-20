@@ -96,7 +96,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -217,6 +219,7 @@ void MainWindow::buildToolBar()
     // Format conversion button
     QMenu *reFormatMenu = new QMenu();
     reFormatMenu->addAction(ui->binaryAct);
+    reFormatMenu->addAction(ui->adaptiveBinaryAct);
     reFormatMenu->addAction(ui->grayscaleAct);
     PopupQToolButton *reFormatToolButton = new PopupQToolButton();
     reFormatToolButton->setMenu(reFormatMenu);

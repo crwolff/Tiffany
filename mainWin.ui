@@ -484,7 +484,19 @@
     <string>to Binary</string>
    </property>
    <property name="toolTip">
-    <string>Convert to binary</string>
+    <string>Convert to binary (Otsu)</string>
+   </property>
+  </action>
+  <action name="adaptiveBinaryAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/a_binary.svg</normaloff>:/images/assets/a_binary.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Adaptive Binary</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert to binary (Adaptive)</string>
    </property>
   </action>
   <action name="blankAct">

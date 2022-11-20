@@ -197,10 +197,20 @@ void Bookmarks::setBlurRadius(int val)
         blurRadius++;
 }
 
+void Bookmarks::toBinary()
+{
+    binarization(true);
+}
+
+void Bookmarks::toAdaptive()
+{
+    binarization(false);
+}
+
 //
 // Convert selected images from grayscale to mono
 //
-void Bookmarks::toBinary()
+void Bookmarks::binarization(bool otsu)
 {
     // Get list of all selected items
     QList<QListWidgetItem*> items = selectedItems();
@@ -241,7 +251,7 @@ void Bookmarks::toBinary()
             }
 
             // Otsu's threshold calculation
-            if (true)
+            if (otsu)
             {
                 cv::Mat tmp;
                 cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
@@ -250,7 +260,7 @@ void Bookmarks::toBinary()
             else    // Adaptive threshold - this hollows out diodes, etc
             {
                 cv::Mat tmp;
-                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
+                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 21, 2);
                 mat = tmp;
             }
 
