@@ -1,5 +1,6 @@
 #include "Viewer.h"
 #include "UndoBuffer.h"
+#include "ViewData.h"
 #include "QImage2OCV.h"
 #include <QDebug>
 #include <QMessageBox>
@@ -484,11 +485,35 @@ void Viewer::blinker()
 //
 void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 {
+    // Save current view
+    if (currListItem != nullptr)
+    {
+        ViewData v = currListItem->data(Qt::UserRole+2).value<ViewData>();
+        v.scaleBase = scaleBase;
+        v.scaleFactor = scaleFactor;
+        v.horizontalScroll = scrollArea->horizontalScrollBar()->value();
+        v.verticalScroll = scrollArea->verticalScrollBar()->value();
+        currListItem->setData(Qt::UserRole+2, QVariant::fromValue(v));
+    }
+
+    // Load new page
     if (curr != NULL)
     {
         currListItem = curr;
         currPage = curr->data(Qt::UserRole).value<PageData>();
-        fitToWindow();
+        ViewData v = curr->data(Qt::UserRole+2).value<ViewData>();
+        if (v.scaleBase != 0.0)
+        {
+            scaleBase = v.scaleBase;
+            scaleFactor = v.scaleFactor;
+            updateGeometry();
+            updateScrollBars();
+            scrollArea->horizontalScrollBar()->setValue(v.horizontalScroll);
+            scrollArea->verticalScrollBar()->setValue(v.verticalScroll);
+            emit zoomSig(scaleFactor);
+        }
+        else
+            fitToWindow();
     }
     else
     {

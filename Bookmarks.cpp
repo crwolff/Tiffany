@@ -1,5 +1,6 @@
 #include "Bookmarks.h"
 #include "UndoBuffer.h"
+#include "ViewData.h"
 #include "QImage2OCV.h"
 #include <QColor>
 #include <QDebug>
@@ -50,7 +51,6 @@ void Bookmarks::readFiles(QString cmd)
 
     // Open each file in turn and add to listWidget
     PageData p;
-    UndoBuffer ub;
     int progress = 1;
     for(int idx=0; idx < filenames.count(); idx++)
     {
@@ -72,8 +72,8 @@ void Bookmarks::readFiles(QString cmd)
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
             newItem->setData(Qt::UserRole, QVariant::fromValue(p));
-            ub = UndoBuffer();
-            newItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+            newItem->setData(Qt::UserRole+1, QVariant::fromValue(UndoBuffer()));
+            newItem->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
             newItem->setIcon(makeIcon(p, p.modified()));
             QString txt = QFileInfo(filenames.at(idx)).fileName();
             int suffix = txt.lastIndexOf(".");
@@ -482,7 +482,7 @@ void Bookmarks::deleteSelection()
         PageData image = item->data(Qt::UserRole).value<PageData>();
         if (image.modified())
         {
-            QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany", 
+            QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany",
                     item->toolTip() + " has been modified, are you sure?\n",
                     QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes, QMessageBox::Yes);
             if (resBtn == QMessageBox::Cancel)
@@ -523,6 +523,7 @@ void Bookmarks::rotateSelection(int rot)
 
             // Update item
             item->setData(Qt::UserRole, QVariant::fromValue(rotImage));
+            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
             item->setIcon(makeIcon(rotImage, rotImage.modified()));
 
             // Update progress
@@ -588,6 +589,7 @@ void Bookmarks::mirrorSelection(int dir)
 
             // Update item
             item->setData(Qt::UserRole, QVariant::fromValue(mirImage));
+            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
             item->setIcon(makeIcon(mirImage, mirImage.modified()));
 
             // Update progress
