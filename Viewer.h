@@ -75,7 +75,7 @@ private:
     void applyMask(QImage &mask, bool flag);
     void applyDeskew();
     void copySelection();
-    void pasteSelection();
+    void pasteSelection(bool ctrl);
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
     void pushImage();

@@ -189,6 +189,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     if (currPage.isNull())
         return;
 
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool ctrl = keyMod.testFlag(Qt::ControlModifier);
     bool flag = false;
 
     // If left mouse button was released
@@ -196,7 +198,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if (pasting)
         {
-            pasteSelection();
+            pasteSelection(ctrl);
             flag = true;
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))
@@ -972,7 +974,7 @@ void Viewer::copySelection()
 //
 // Paste from clipboard into page
 //
-void Viewer::pasteSelection()
+void Viewer::pasteSelection(bool ctrl)
 {
     pasting = false;
     setMouseTracking(false);
@@ -983,6 +985,46 @@ void Viewer::pasteSelection()
     qreal imgW = copyImage.size().width();
     qreal imgH = copyImage.size().height();
     QPointF loc = transform.map(pasteLoc) - QPoint(imgW/2, imgH/2);
+
+    // If control is pressed, snap to 'best' location
+    if (ctrl)
+    {
+        int win = 4;
+
+        // Copy a region slightly larger than the paste
+        QImage tmp1 = currPage.copy(loc.x() - win, loc.y() - win, imgW + win*2, imgH + win*2);
+
+        // Convert color images to grayscale first
+        if (tmp1.format() != QImage::Format_Grayscale8)
+            tmp1 = tmp1.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+        // Convert to OpenCV
+        cv::Mat mat1 = QImage2OCV(tmp1);
+
+        // Copy the paste image
+        QImage tmp2 = copyImage;
+
+        // Convert color images to grayscale first
+        if (copyImage.format() != QImage::Format_Grayscale8)
+            tmp2 = tmp2.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+        // Convert to OpenCV
+        cv::Mat mat2 = QImage2OCV(tmp2);
+
+        // Make a target array
+        cv::Mat res;
+        res.create( win * 2 + 1, win * 2 + 1, CV_32FC1 );
+
+        // Correlate the images
+        cv::matchTemplate( mat1, mat2, res, cv::TM_CCOEFF );
+
+        // Find max
+        cv::Point matchLoc;
+        cv::minMaxLoc( res, NULL, NULL, NULL, &matchLoc, cv::Mat() );
+
+        // Snap to best location
+        loc = QPointF( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
+    }
 
     // Paint the copied section
     QPainter p(&currPage);
