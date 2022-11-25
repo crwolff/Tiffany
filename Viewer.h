@@ -99,6 +99,7 @@ private:
     QPoint pasteLoc;
     bool pasteCtrl;
     QImage copyImage;
+    QList<QImage> copyImageList;
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
     bool pencil180 = false;

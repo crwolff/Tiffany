@@ -294,6 +294,14 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         if (!copyImage.isNull())
         {
+            if (pasting)
+            {
+                int idx = copyImageList.indexOf(copyImage);
+                if ((idx + 1) < copyImageList.size())
+                    copyImage = copyImageList.at(idx+1);
+                else
+                    copyImage = copyImageList.at(0);
+            }
             pasting = true;
             setMouseTracking(true);
             pasteLoc = mapFromGlobal(cursor().pos());
@@ -970,6 +978,9 @@ void Viewer::copySelection()
     QRect box = transform.mapRect(rubberBand->geometry());
 
     copyImage = currPage.copy(box);
+    copyImageList.prepend(copyImage);
+    if (copyImageList.size() > 8)
+        copyImageList.removeLast();
     rubberBand->hide();
 }
 
@@ -1022,6 +1033,11 @@ void Viewer::pasteSelection(bool ctrl)
 {
     pasting = false;
     setMouseTracking(false);
+
+    // Move this copyImage to head of list (last to get dropped)
+    int idx = copyImageList.indexOf(copyImage);
+    if (idx > 0)
+        copyImageList.move(idx, 0);
 
     // Calculate position in image from pointer location
     float scale = scaleBase * scaleFactor;
