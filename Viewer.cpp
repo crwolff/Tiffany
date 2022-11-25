@@ -994,7 +994,7 @@ QPointF Viewer::pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc)
     QImage tmp2 = copyImage;
 
     // Convert color images to grayscale first
-    if (copyImage.format() != QImage::Format_Grayscale8)
+    if (tmp2.format() != QImage::Format_Grayscale8)
         tmp2 = tmp2.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
 
     // Convert to OpenCV
