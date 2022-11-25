@@ -75,6 +75,7 @@ private:
     void applyMask(QImage &mask, bool flag);
     void applyDeskew();
     void copySelection();
+    QPointF pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc);
     void pasteSelection(bool ctrl);
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
@@ -96,6 +97,7 @@ private:
     QPoint origin;
     bool pasting = false;
     QPoint pasteLoc;
+    bool pasteCtrl;
     QImage copyImage;
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
