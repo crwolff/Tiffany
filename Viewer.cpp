@@ -292,7 +292,17 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (event->matches(QKeySequence::Paste))
     {
-        if (!copyImage.isNull())
+        if (!deskewImg.isNull())
+        {
+            applyDeskew();
+            deskewImg = QImage();
+            update();
+            currPage.setChanges(currPage.changes() + 1);
+            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit imageChangedSig();
+            flag = true;
+        }
+        else if (!copyImage.isNull())
         {
             if (pasting)
             {
@@ -306,16 +316,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             setMouseTracking(true);
             pasteLoc = mapFromGlobal(cursor().pos());
             update();
-            flag = true;
-        }
-        else if (!deskewImg.isNull())
-        {
-            applyDeskew();
-            deskewImg = QImage();
-            update();
-            currPage.setChanges(currPage.changes() + 1);
-            currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-            emit imageChangedSig();
             flag = true;
         }
     }
