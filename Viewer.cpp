@@ -292,7 +292,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (event->matches(QKeySequence::Paste))
     {
-        if (deskewImg.isNull())
+        if (!copyImage.isNull())
         {
             pasting = true;
             setMouseTracking(true);
@@ -300,7 +300,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             update();
             flag = true;
         }
-        else
+        else if (!deskewImg.isNull())
         {
             applyDeskew();
             deskewImg = QImage();
