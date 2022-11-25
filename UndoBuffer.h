@@ -18,9 +18,9 @@ public:
     void flush()
     {
         while (!m_undoState.isEmpty())
-            m_undoState.takeFirst();
+            m_undoState.removeFirst();
         while (!m_redoState.isEmpty())
-            m_redoState.takeFirst();
+            m_redoState.removeFirst();
     }
 
     // Add current page to undo list
@@ -30,9 +30,9 @@ public:
             return;
         m_undoState.insert(0, page);
         if (m_undoState.count() > MAX_UNDO)
-            m_undoState.takeLast();
+            m_undoState.removeLast();
         while (!m_redoState.isEmpty())
-            m_redoState.takeFirst();
+            m_redoState.removeFirst();
     }
 
     // Rollback one change
