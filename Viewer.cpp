@@ -319,6 +319,26 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             flag = true;
         }
     }
+    else if (event->matches(QKeySequence::Delete))
+    {
+        if (pasting)
+        {
+            int idx = copyImageList.indexOf(copyImage);
+            if (idx >= 0)
+                copyImageList.removeAt(idx);
+            if (copyImageList.size() > 0)
+            {
+                copyImage = copyImageList.at(0);
+            }
+            else
+            {
+                copyImage = QImage();
+                pasting = false;
+            }
+            update();
+            flag = true;
+        }
+    }
     else if (event->matches(QKeySequence::Undo))
     {
         undoEdit();
@@ -979,7 +999,7 @@ void Viewer::copySelection()
 
     copyImage = currPage.copy(box);
     copyImageList.prepend(copyImage);
-    if (copyImageList.size() > 8)
+    if (copyImageList.size() > 12)
         copyImageList.removeLast();
     rubberBand->hide();
 }
