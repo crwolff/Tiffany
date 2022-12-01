@@ -39,7 +39,7 @@ public slots:
     void setBrush_8();
     void setBrush_12();
     void blankPage();
-    void setThreshold(int val);
+    void setDropperThreshold(int val);
     void colorSelect();
     void setDeskew(double val);
     void deskew();

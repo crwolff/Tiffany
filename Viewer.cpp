@@ -765,7 +765,7 @@ void Viewer::blankPage()
 //
 // slot to set dropper threshold
 //
-void Viewer::setThreshold(int val)
+void Viewer::setDropperThreshold(int val)
 {
     dropperThreshold = val;
     colorSelect();

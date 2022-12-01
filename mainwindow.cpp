@@ -108,7 +108,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
-    QObject::connect( thresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setThreshold);
+    QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDropperThreshold);
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setBlurRadius);
@@ -117,10 +117,10 @@ void MainWindow::connectSignalSlots()
 // Toggle visibility on the spin boxes
 void MainWindow::makeVisible(int mask)
 {
-    threshold->setVisible((mask & 1) != 0);
-    deskew->setVisible((mask & 2) != 0);
-    despeckle->setVisible((mask & 4) != 0);
-    blur->setVisible((mask & 8) != 0);
+    dropperThresholdSpin->setVisible((mask & 1) != 0);
+    deskewSpin->setVisible((mask & 2) != 0);
+    despeckleSpin->setVisible((mask & 4) != 0);
+    blurSpin->setVisible((mask & 8) != 0);
 }
 
 //
@@ -186,16 +186,16 @@ void MainWindow::buildToolBar()
     // Remaining tools
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
-    deskew = ui->toolBar->addWidget(deskewWidget);
-    deskew->setVisible(false);
+    deskewSpin = ui->toolBar->addWidget(deskewWidget);
+    deskewSpin->setVisible(false);
     ui->toolBar->addAction(ui->dropperAct);
-    thresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
-    threshold = ui->toolBar->addWidget(thresholdWidget);
-    threshold->setVisible(false);
+    dropperThresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
+    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
+    dropperThresholdSpin->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
     despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
-    despeckle = ui->toolBar->addWidget(despeckleWidget);
-    despeckle->setVisible(false);
+    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
+    despeckleSpin->setVisible(false);
 
     // Line button
     QMenu *toolSizeMenu = new QMenu();
@@ -223,8 +223,8 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
     blurWidget = new SpinWidget(1, 9, ui->bookmarks->blurRadius, 2, "Blur Size", ui->toolBar);
-    blur = ui->toolBar->addWidget(blurWidget);
-    blur->setVisible(false);
+    blurSpin = ui->toolBar->addWidget(blurWidget);
+    blurSpin->setVisible(false);
 
     // Adjust text for better toolbar layout
     ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));

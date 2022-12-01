@@ -37,13 +37,13 @@ private:
 
     QLabel *statusLabel;
     QProgressBar *progressBar;
-    SpinWidget *thresholdWidget;
-    QAction *threshold;
+    SpinWidget *dropperThresholdWidget;
+    QAction *dropperThresholdSpin;
     DoubleSpinWidget *deskewWidget;
-    QAction *deskew;
+    QAction *deskewSpin;
     SpinWidget *despeckleWidget;
-    QAction *despeckle;
+    QAction *despeckleSpin;
     SpinWidget *blurWidget;
-    QAction *blur;
+    QAction *blurSpin;
 };
 #endif // MAINWINDOW_H
