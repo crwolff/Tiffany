@@ -236,6 +236,7 @@ void MainWindow::buildToolBar()
     ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
     ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
     ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
+    ui->adaptiveBinaryAct->setText(QApplication::translate("MainWindow", "Adaptive\nBinary", nullptr));
 }
 
 //

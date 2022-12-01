@@ -260,7 +260,7 @@ void Bookmarks::binarization(bool otsu)
             else    // Adaptive threshold - this hollows out diodes, etc
             {
                 cv::Mat tmp;
-                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 21, 2);
+                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 23, 2);
                 mat = tmp;
             }
 
