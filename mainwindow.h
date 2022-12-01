@@ -39,6 +39,8 @@ private:
     QProgressBar *progressBar;
     SpinWidget *dropperThresholdWidget;
     QAction *dropperThresholdSpin;
+    SpinWidget *floodThresholdWidget;
+    QAction *floodThresholdSpin;
     DoubleSpinWidget *deskewWidget;
     QAction *deskewSpin;
     SpinWidget *despeckleWidget;

@@ -123,6 +123,7 @@
     </property>
     <addaction name="pointerAct"/>
     <addaction name="dropperAct"/>
+    <addaction name="floodAct"/>
     <addaction name="pencilAct"/>
     <addaction name="eraserAct"/>
     <addaction name="deskewAct"/>
@@ -520,7 +521,19 @@
     <string>Dropper</string>
    </property>
    <property name="toolTip">
-    <string>Pick color with eye dropper</string>
+    <string>Erase all pixels with similiar color to selection</string>
+   </property>
+  </action>
+  <action name="floodAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/flood.svg</normaloff>:/images/assets/flood.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Flood Fill</string>
+   </property>
+   <property name="toolTip">
+    <string>Erase all pixels with similiar color contiguous with selection</string>
    </property>
   </action>
   <action name="mirrorHorizAct">

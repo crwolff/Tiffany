@@ -216,6 +216,13 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             colorSelect();
             setCursor(Qt::ArrowCursor);
         }
+        else if (leftMode == FloodFill)
+        {
+            float scale = scaleBase * scaleFactor;
+            QTransform transform = QTransform().scale(scale, scale).inverted();
+            floodLoc = transform.map(QPointF(event->pos()));
+            floodFill();
+        }
         else if (leftMode == Despeckle)
         {
             despeckle();
@@ -606,6 +613,16 @@ void Viewer::dropperMode()
 }
 
 //
+// Select flood fill tool
+//
+void Viewer::floodMode()
+{
+    leftMode = FloodFill;
+    currMask = QImage();
+    deskewImg = QImage();
+}
+
+//
 // Select draw line tool
 //
 void Viewer::pencilMode()
@@ -845,6 +862,70 @@ void Viewer::colorSelect()
         QMessageBox::information(this, "colorSelect", "Only works on RGB and grayscale images");
         return;
     }
+    update();
+}
+
+//
+// slot to set flood fill threshold
+//
+void Viewer::setFloodThreshold(int val)
+{
+    floodThreshold = val;
+    floodFill();
+}
+
+//
+// Select all pixels near the cursor's color
+//
+void Viewer::floodFill()
+{
+    if (currPage.isNull())
+        return;
+
+    if (currPage.format() == QImage::Format_Mono)
+    {
+        QMessageBox::information(this, "floodFill", "Only works on RGB and grayscale images");
+        return;
+    }
+
+    // Convert to OpenCV
+    cv::Mat orig = QImage2OCV(currPage);
+    if (currPage.format() == QImage::Format_RGB32)
+        cv::cvtColor(orig, orig, cv::COLOR_RGBA2RGB);   // floodfill doesn't work with alpha channel
+
+    // Make all zero mask
+    cv::Mat floodMask = cv::Mat::zeros(currPage.height() + 2, currPage.width() + 2, CV_8UC1);
+
+    // Fill adjacent pixels
+    cv::Point loc(floodLoc.x(), floodLoc.y());
+    cv::Rect region;
+    cv::Scalar thresh(floodThreshold, floodThreshold, floodThreshold);
+    int flags = 8 | (255 << 8 ) | cv::FLOODFILL_FIXED_RANGE | cv::FLOODFILL_MASK_ONLY;
+    cv::floodFill(orig, floodMask, loc, 0, &region, thresh, thresh, flags);
+
+    // Convert mask back
+    QImage tmp = OCV2QImage(floodMask);
+    tmp = tmp.copy(1, 1, tmp.width() - 2, tmp.height() - 2);
+
+    // Identically sized image
+    currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+
+    // Scan through page seeking matches
+    QRgb white = qRgba(255,255,255,0);  // Transparent white
+    QRgb black = qRgba(0,0,0,255);      // Opaque black
+    for(int i=0; i<tmp.height(); i++)
+    {
+        uchar *srcPtr = tmp.scanLine(i);
+        QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+        for(int j=0; j<tmp.width(); j++)
+            *maskPtr++ = (*srcPtr++ > 128) ? black : white;
+    }
+
+    // Highlight changes
+    blink = false;
+    blinkTimer->start(500);
+
+    // Repaint
     update();
 }
 

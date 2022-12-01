@@ -21,6 +21,7 @@ public:
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
     int dropperThreshold = 20;
+    int floodThreshold = 20;
     double deskewAngle = 0.0;
     int despeckleArea = 50;
 
@@ -30,6 +31,7 @@ public slots:
     void updateViewer();
     void pointerMode();
     void dropperMode();
+    void floodMode();
     void pencilMode();
     void eraserMode();
     void deskewMode();
@@ -41,6 +43,8 @@ public slots:
     void blankPage();
     void setDropperThreshold(int val);
     void colorSelect();
+    void setFloodThreshold(int val);
+    void floodFill();
     void setDeskew(double val);
     void deskew();
     void setDespeckle(int val);
@@ -107,11 +111,12 @@ private:
     QCursor DespeckleCursor;
     QImage logo;
     QPointF dropperLoc = QPointF(0,0);
+    QPointF floodLoc = QPointF(0,0);
     QColor currColor = Qt::black;
     bool shiftPencil = false;
     QPoint drawLoc;
 
-    enum LeftMode { Select, ColorSelect, Pencil, Eraser, Deskew, Despeckle };
+    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;

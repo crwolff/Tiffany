@@ -72,12 +72,14 @@ void MainWindow::connectSignalSlots()
     // Tools menu
     QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
     QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
+    QObject::connect( ui->floodAct, &QAction::triggered, ui->viewer, &Viewer::floodMode );
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
     QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
 
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeVisible(16); });
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(2); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(4); });
 
@@ -109,6 +111,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDropperThreshold);
+    QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setFloodThreshold);
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setBlurRadius);
@@ -121,6 +124,7 @@ void MainWindow::makeVisible(int mask)
     deskewSpin->setVisible((mask & 2) != 0);
     despeckleSpin->setVisible((mask & 4) != 0);
     blurSpin->setVisible((mask & 8) != 0);
+    floodThresholdSpin->setVisible((mask & 16) != 0);
 }
 
 //
@@ -192,6 +196,10 @@ void MainWindow::buildToolBar()
     dropperThresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
     dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
     dropperThresholdSpin->setVisible(false);
+    ui->toolBar->addAction(ui->floodAct);
+    floodThresholdWidget = new SpinWidget(0, 255, ui->viewer->floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
+    floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
+    floodThresholdSpin->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
     despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
