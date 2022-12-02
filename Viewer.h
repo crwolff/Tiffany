@@ -21,9 +21,9 @@ public:
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
     int dropperThreshold = 20;
-    int floodThreshold = 20;
+    int floodThreshold = 50;
     double deskewAngle = 0.0;
-    int despeckleArea = 50;
+    int despeckleArea = 20;
 
 public slots:
     void blinker();
