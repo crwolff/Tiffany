@@ -785,7 +785,8 @@ void Viewer::blankPage()
 void Viewer::setDropperThreshold(int val)
 {
     dropperThreshold = val;
-    colorSelect();
+    if (leftMode == ColorSelect)
+        colorSelect();
 }
 
 //
@@ -871,7 +872,8 @@ void Viewer::colorSelect()
 void Viewer::setFloodThreshold(int val)
 {
     floodThreshold = val;
-    floodFill();
+    if (leftMode == FloodFill)
+        floodFill();
 }
 
 //
@@ -950,7 +952,8 @@ void Viewer::applyMask(QImage &mask, bool flag)
 void Viewer::setDeskew(double angle)
 {
     deskewAngle = angle;
-    deskew();
+    if (leftMode == Deskew)
+        deskew();
 }
 
 //
@@ -992,7 +995,8 @@ void Viewer::applyDeskew()
 void Viewer::setDespeckle(int val)
 {
     despeckleArea = val;
-    despeckle();
+    if (leftMode == Despeckle)
+        despeckle();
 }
 
 //
