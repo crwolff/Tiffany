@@ -3,6 +3,8 @@
 #include "ViewData.h"
 #include "QImage2OCV.h"
 #include <QDebug>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
@@ -766,17 +768,24 @@ void Viewer::blankPage()
     if (currPage.isNull())
         return;
 
-    pushImage();
-    QPainter p(&currPage);
-    p.fillRect(currPage.rect(), backgroundColor);
-    p.setPen(foregroundColor);
-    p.setFont(QFont("Courier", 20));
-    p.drawText(currPage.rect(), Qt::AlignCenter, tr("BLANK"));
-    p.end();
-    currPage.setChanges(currPage.changes() + 1);
-    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-    emit imageChangedSig();
-    update();
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Page Contents"),
+                                         "", QLineEdit::Normal,
+                                         "BLANK", &ok);
+    if (ok)
+    {
+        pushImage();
+        QPainter p(&currPage);
+        p.fillRect(currPage.rect(), backgroundColor);
+        p.setPen(foregroundColor);
+        p.setFont(QFont("Courier", 20));
+        p.drawText(currPage.rect(), Qt::AlignCenter, text);
+        p.end();
+        currPage.setChanges(currPage.changes() + 1);
+        currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+        emit imageChangedSig();
+        update();
+    }
 }
 
 //
