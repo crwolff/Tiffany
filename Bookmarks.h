@@ -12,7 +12,8 @@ class Bookmarks : public QListWidget
 public:
     Bookmarks(QWidget * parent = NULL);
     ~Bookmarks();
-    int blurRadius = 5;
+    int blurRadius;
+    int kernelSize;
 
 public slots:
     void openFiles();

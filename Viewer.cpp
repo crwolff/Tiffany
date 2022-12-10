@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
+#include <QSettings>
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
@@ -27,10 +28,26 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     DropperCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
     DespeckleCursor = QCursor(p, 15, 15);
+
+    // Load settings file
+    QSettings settings;
+    dropperThreshold = settings.value("Viewer/dropperThreshold", 20).toInt();
+    floodThreshold = settings.value("Viewer/floodThreshold", 50).toInt();
+    deskewAngle = settings.value("Viewer/deskewAngle", 0.0).toDouble();
+    despeckleArea = settings.value("Viewer/despeckleArea", 20).toInt();
+    brushSize = settings.value("Viewer/brushSize", 1.0).toDouble();
 }
 
 Viewer::~Viewer()
 {
+    QSettings settings;
+    settings.beginGroup("Viewer");
+    settings.setValue("dropperThreshold", dropperThreshold);
+    settings.setValue("floodThreshold", floodThreshold);
+    settings.setValue("deskewAngle", deskewAngle);
+    settings.setValue("despeckleArea", despeckleArea);
+    settings.setValue("brushSize", brushSize);
+    settings.endGroup();
 }
 
 void Viewer::enterEvent(QEvent *event)

@@ -20,10 +20,11 @@ public:
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
-    int dropperThreshold = 20;
-    int floodThreshold = 50;
-    double deskewAngle = 0.0;
-    int despeckleArea = 20;
+    int dropperThreshold;
+    int floodThreshold;
+    double deskewAngle;
+    int despeckleArea;
+    qreal brushSize;
 
 public slots:
     void blinker();
@@ -96,7 +97,6 @@ private:
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
-    qreal brushSize = 1.0;
     QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     QPoint origin;
     bool pasting = false;

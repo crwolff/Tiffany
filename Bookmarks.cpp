@@ -8,14 +8,28 @@
 #include <QImage>
 #include <QMessageBox>
 #include <QPainter>
+#include <QSettings>
 #include <QTransform>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)
 {
+    // Load settings file
+    QSettings settings;
+    blurRadius = settings.value("Bookmarks/blurRadius", 5).toInt();
+    if (blurRadius % 2 != 1)
+        blurRadius++;
+    kernelSize = settings.value("Bookmarks/kernelSize", 23).toInt();
+    if (kernelSize % 2 != 1)
+        kernelSize++;
 }
 
 Bookmarks::~Bookmarks()
 {
+    QSettings settings;
+    settings.beginGroup("Bookmarks");
+    settings.setValue("blurRadius", blurRadius);
+    settings.setValue("kernelSize", kernelSize);
+    settings.endGroup();
 }
 
 //
@@ -260,7 +274,7 @@ void Bookmarks::binarization(bool otsu)
             else    // Adaptive threshold - this hollows out diodes, etc
             {
                 cv::Mat tmp;
-                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 23, 2);
+                cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
                 mat = tmp;
             }
 

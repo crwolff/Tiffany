@@ -213,7 +213,14 @@ void MainWindow::buildToolBar()
     toolSizeMenu->addAction(ui->pix12Act);
     PopupQToolButton *toolSizeToolButton = new PopupQToolButton();
     toolSizeToolButton->setMenu(toolSizeMenu);
-    toolSizeToolButton->setDefaultAction(ui->pix1Act);
+    if (ui->viewer->brushSize == 12.0)
+        toolSizeToolButton->setDefaultAction(ui->pix12Act);
+    else if (ui->viewer->brushSize == 8.0)
+        toolSizeToolButton->setDefaultAction(ui->pix8Act);
+    else if (ui->viewer->brushSize == 4.0)
+        toolSizeToolButton->setDefaultAction(ui->pix4Act);
+    else
+        toolSizeToolButton->setDefaultAction(ui->pix1Act);
     ui->toolBar->addWidget(toolSizeToolButton);
 
     // Color button
