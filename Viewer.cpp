@@ -884,19 +884,20 @@ void Viewer::floodFill()
     if (currPage.isNull())
         return;
 
+    // Upconvert mono images
+    QImage tmpPage;
     if (currPage.format() == QImage::Format_Mono)
-    {
-        QMessageBox::information(this, "floodFill", "Only works on RGB and grayscale images");
-        return;
-    }
+        tmpPage = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    else
+        tmpPage = currPage;
 
     // Convert to OpenCV
-    cv::Mat orig = QImage2OCV(currPage);
-    if (currPage.format() == QImage::Format_RGB32)
+    cv::Mat orig = QImage2OCV(tmpPage);
+    if (tmpPage.format() == QImage::Format_RGB32)
         cv::cvtColor(orig, orig, cv::COLOR_RGBA2RGB);   // floodfill doesn't work with alpha channel
 
     // Make all zero mask
-    cv::Mat floodMask = cv::Mat::zeros(currPage.height() + 2, currPage.width() + 2, CV_8UC1);
+    cv::Mat floodMask = cv::Mat::zeros(tmpPage.height() + 2, tmpPage.width() + 2, CV_8UC1);
 
     // Fill adjacent pixels
     cv::Point loc(floodLoc.x(), floodLoc.y());
@@ -910,7 +911,7 @@ void Viewer::floodFill()
     tmp = tmp.copy(1, 1, tmp.width() - 2, tmp.height() - 2);
 
     // Identically sized image
-    currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+    currMask = QImage(tmpPage.size(), QImage::Format_ARGB32);
 
     // Scan through page seeking matches
     QRgb white = qRgba(255,255,255,0);  // Transparent white
