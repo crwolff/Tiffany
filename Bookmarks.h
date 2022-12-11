@@ -21,6 +21,7 @@ public slots:
     void replaceFiles();
     void toGrayscale();
     void setBlurRadius(int val);
+    void setKernelSize(int val);
     void toBinary();
     void toAdaptive();
     void saveFiles();

@@ -211,6 +211,18 @@ void Bookmarks::setBlurRadius(int val)
         blurRadius++;
 }
 
+//
+// Set the kernel size for adaptive binarization
+//
+void Bookmarks::setKernelSize(int val)
+{
+    kernelSize = val;
+
+    // Even values crash openCV
+    if (kernelSize % 2 != 1)
+        kernelSize++;
+}
+
 void Bookmarks::toBinary()
 {
     binarization(true);

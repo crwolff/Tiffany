@@ -47,5 +47,7 @@ private:
     QAction *despeckleSpin;
     SpinWidget *blurWidget;
     QAction *blurSpin;
+    SpinWidget *kernelWidget;
+    QAction *kernelSpin;
 };
 #endif // MAINWINDOW_H

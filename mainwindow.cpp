@@ -97,7 +97,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(8+32); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -115,6 +115,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setBlurRadius);
+    QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setKernelSize);
 }
 
 // Toggle visibility on the spin boxes
@@ -125,6 +126,7 @@ void MainWindow::makeVisible(int mask)
     despeckleSpin->setVisible((mask & 4) != 0);
     blurSpin->setVisible((mask & 8) != 0);
     floodThresholdSpin->setVisible((mask & 16) != 0);
+    kernelSpin->setVisible((mask & 32) != 0);
 }
 
 //
@@ -240,6 +242,9 @@ void MainWindow::buildToolBar()
     blurWidget = new SpinWidget(1, 9, ui->bookmarks->blurRadius, 2, "Blur Size", ui->toolBar);
     blurSpin = ui->toolBar->addWidget(blurWidget);
     blurSpin->setVisible(false);
+    kernelWidget = new SpinWidget(1, 99, ui->bookmarks->kernelSize, 2, "Kernel Size", ui->toolBar);
+    kernelSpin = ui->toolBar->addWidget(kernelWidget);
+    kernelSpin->setVisible(false);
 
     // Adjust text for better toolbar layout
     ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
