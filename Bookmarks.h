@@ -12,18 +12,11 @@ class Bookmarks : public QListWidget
 public:
     Bookmarks(QWidget * parent = NULL);
     ~Bookmarks();
-    int blurRadius;
-    int kernelSize;
 
 public slots:
     void openFiles();
     void insertFiles();
     void replaceFiles();
-    void toGrayscale();
-    void setBlurRadius(int val);
-    void setKernelSize(int val);
-    void toBinary();
-    void toAdaptive();
     void saveFiles();
     void saveToDir();
     bool anyModified();
@@ -45,7 +38,6 @@ private:
     void readFiles(QString cmd);
     bool saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName);
     void rotateSelection(int val);
-    void binarization(bool otsu);
     void mirrorSelection(int dir);
     QIcon makeIcon(PageData &image, bool flag);
 };

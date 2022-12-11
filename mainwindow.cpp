@@ -93,9 +93,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
     QObject::connect( ui->redoAct, &QAction::triggered, ui->viewer, &Viewer::redoEdit );
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
-    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
-    QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
+    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
+    QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(8+32); });
 
@@ -114,8 +114,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setFloodThreshold);
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
-    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setBlurRadius);
-    QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->bookmarks, &Bookmarks::setKernelSize);
+    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setBlurRadius);
+    QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setKernelSize);
 }
 
 // Toggle visibility on the spin boxes
@@ -239,10 +239,10 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setMenu(reFormatMenu);
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
-    blurWidget = new SpinWidget(1, 9, ui->bookmarks->blurRadius, 2, "Blur Size", ui->toolBar);
+    blurWidget = new SpinWidget(1, 9, ui->viewer->blurRadius, 2, "Blur Size", ui->toolBar);
     blurSpin = ui->toolBar->addWidget(blurWidget);
     blurSpin->setVisible(false);
-    kernelWidget = new SpinWidget(1, 99, ui->bookmarks->kernelSize, 2, "Kernel Size", ui->toolBar);
+    kernelWidget = new SpinWidget(1, 99, ui->viewer->kernelSize, 2, "Kernel Size", ui->toolBar);
     kernelSpin = ui->toolBar->addWidget(kernelWidget);
     kernelSpin->setVisible(false);
 

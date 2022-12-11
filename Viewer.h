@@ -25,6 +25,8 @@ public:
     double deskewAngle;
     int despeckleArea;
     qreal brushSize;
+    int blurRadius;
+    int kernelSize;
 
 public slots:
     void blinker();
@@ -50,6 +52,12 @@ public slots:
     void deskew();
     void setDespeckle(int val);
     void despeckle();
+    void toGrayscale();
+    void setBlurRadius(int val);
+    void setKernelSize(int val);
+    void toBinary();
+    void toAdaptive();
+    void binarization(bool otsu);
     void undoEdit();
     void redoEdit();
     void zoomIn();

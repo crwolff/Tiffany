@@ -36,6 +36,12 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     deskewAngle = settings.value("Viewer/deskewAngle", 0.0).toDouble();
     despeckleArea = settings.value("Viewer/despeckleArea", 20).toInt();
     brushSize = settings.value("Viewer/brushSize", 1.0).toDouble();
+    blurRadius = settings.value("Bookmarks/blurRadius", 5).toInt();
+    if (blurRadius % 2 != 1)
+        blurRadius++;
+    kernelSize = settings.value("Bookmarks/kernelSize", 23).toInt();
+    if (kernelSize % 2 != 1)
+        kernelSize++;
 }
 
 Viewer::~Viewer()
@@ -47,6 +53,8 @@ Viewer::~Viewer()
     settings.setValue("deskewAngle", deskewAngle);
     settings.setValue("despeckleArea", despeckleArea);
     settings.setValue("brushSize", brushSize);
+    settings.setValue("blurRadius", blurRadius);
+    settings.setValue("kernelSize", kernelSize);
     settings.endGroup();
 }
 
@@ -1186,6 +1194,117 @@ void Viewer::pasteSelection(bool ctrl)
     QPainter p(&currPage);
     p.drawImage(loc, copyImage);
     p.end();
+    update();
+}
+
+//
+// Convert current image to grayscale
+//
+void Viewer::toGrayscale()
+{
+    // Nothing to do
+    if (currPage.isNull() || (currPage.format() == QImage::Format_Grayscale8))
+        return;
+
+    // Convert to grayscale
+    pushImage();
+    PageData tmpImage = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    tmpImage.copyOtherData(currPage);
+    currPage = tmpImage;
+
+    // Record changes
+    currPage.setChanges(currPage.changes() + 1);
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
+}
+
+//
+// Set the blur radius for binarization
+//
+void Viewer::setBlurRadius(int val)
+{
+    blurRadius = val;
+
+    // Even values crash openCV
+    if (blurRadius % 2 != 1)
+        blurRadius++;
+}
+
+//
+// Set the kernel size for adaptive binarization
+//
+void Viewer::setKernelSize(int val)
+{
+    kernelSize = val;
+
+    // Even values crash openCV
+    if (kernelSize % 2 != 1)
+        kernelSize++;
+}
+
+void Viewer::toBinary()
+{
+    binarization(true);
+}
+
+void Viewer::toAdaptive()
+{
+    binarization(false);
+}
+
+//
+// Convert to mono
+//
+void Viewer::binarization(bool otsu)
+{
+    // Nothing to do
+    if (currPage.isNull() || (currPage.format() == QImage::Format_Mono))
+        return;
+
+    // Convert to grayscale
+    pushImage();
+    PageData tmpImage = currPage;
+
+    // Convert color images to grayscale first
+    if (currPage.format() != QImage::Format_Grayscale8)
+        tmpImage = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(tmpImage);
+
+    // Gausian filter to clean up noise
+    if (true)
+    {
+        cv::Mat tmp;
+        cv::GaussianBlur(mat, tmp, cv::Size(blurRadius, blurRadius), 0);
+        mat = tmp;
+    }
+
+    // Otsu's threshold calculation
+    if (otsu)
+    {
+        cv::Mat tmp;
+        cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+        mat = tmp;
+    }
+    else    // Adaptive threshold - this hollows out diodes, etc
+    {
+        cv::Mat tmp;
+        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
+        mat = tmp;
+    }
+
+    // Convert back to QImage and reformat
+    tmpImage = OCV2QImage(mat);
+    PageData monoImage = tmpImage.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::ThresholdDither|Qt::AvoidDither);
+    monoImage.copyOtherData(currPage);
+    currPage = monoImage;
+
+    // Record changes
+    currPage.setChanges(currPage.changes() + 1);
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
     update();
 }
 
