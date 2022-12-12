@@ -1229,6 +1229,7 @@ void Viewer::setBlurRadius(int val)
     // Even values crash openCV
     if (blurRadius % 2 != 1)
         blurRadius++;
+    binarization(lastOtsu);
 }
 
 //
@@ -1241,15 +1242,18 @@ void Viewer::setKernelSize(int val)
     // Even values crash openCV
     if (kernelSize % 2 != 1)
         kernelSize++;
+    binarization(lastOtsu);
 }
 
 void Viewer::toBinary()
 {
+    lastOtsu = true;
     binarization(true);
 }
 
 void Viewer::toAdaptive()
 {
+    lastOtsu = false;
     binarization(false);
 }
 
@@ -1259,7 +1263,19 @@ void Viewer::toAdaptive()
 void Viewer::binarization(bool otsu)
 {
     // Nothing to do
-    if (currPage.isNull() || (currPage.format() == QImage::Format_Mono))
+    if (currPage.isNull())
+        return;
+
+    // If the last edit was binarization, rollback change and rerun
+    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    if ((currPage.format() == QImage::Format_Mono) && (ub.peek(currPage).format() != QImage::Format_Mono))
+    {
+        currPage = ub.undo(currPage);
+        currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+    }
+
+    // Already mono
+    if (currPage.format() == QImage::Format_Mono)
         return;
 
     // Convert to grayscale

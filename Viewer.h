@@ -123,6 +123,7 @@ private:
     QColor currColor = Qt::black;
     bool shiftPencil = false;
     QPoint drawLoc;
+    bool lastOtsu = false;
 
     enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };

@@ -63,6 +63,14 @@ public:
             return page;
     }
 
+    // Peek at the last page saved
+    const PageData peek(PageData &page)
+    {
+        if (m_undoState.count() > 0)
+            return m_undoState.first();
+        else
+            return page;
+    }
 
 private:
     QList<PageData> m_undoState;
