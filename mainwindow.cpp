@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QDebug>
+#include <QFontDialog>
 #include <QMessageBox>
 
 //
@@ -55,6 +56,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
     QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
+    QObject::connect( ui->fontAct, &QAction::triggered, this, &MainWindow::fontSelect );
     QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
     QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
     QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
@@ -281,6 +283,17 @@ void MainWindow::colorMagic()
         ui->viewer->backgroundColor = Qt::white;
     }
     colorToolButton.setIcon(ui->viewer->foregroundColor, ui->viewer->backgroundColor);
+}
+
+//
+// Set font for text insertion
+//
+void MainWindow::fontSelect()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, ui->viewer->textFont, this);
+    if (ok)
+        ui->viewer->textFont = font;
 }
 
 //

@@ -42,6 +42,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     kernelSize = settings.value("Bookmarks/kernelSize", 23).toInt();
     if (kernelSize % 2 != 1)
         kernelSize++;
+    QString font = settings.value("Viewer/font", "Courier New,20,-1,5,50,0,0,0,0,0").toString();
+    textFont.fromString(font);
 }
 
 Viewer::~Viewer()
@@ -55,6 +57,7 @@ Viewer::~Viewer()
     settings.setValue("brushSize", brushSize);
     settings.setValue("blurRadius", blurRadius);
     settings.setValue("kernelSize", kernelSize);
+    settings.setValue("font", textFont.toString());
     settings.endGroup();
 }
 
@@ -803,7 +806,7 @@ void Viewer::blankPage()
         QPainter p(&currPage);
         p.fillRect(currPage.rect(), backgroundColor);
         p.setPen(foregroundColor);
-        p.setFont(QFont("Courier", 20));
+        p.setFont(textFont);
         p.drawText(currPage.rect(), Qt::AlignCenter, text);
         p.end();
         currPage.setChanges(currPage.changes() + 1);

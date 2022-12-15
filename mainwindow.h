@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFont>
 #include <QLabel>
 #include <QProgressBar>
 #include <QVBoxLayout>
@@ -34,6 +35,7 @@ private:
     void makeVisible(int mask);
     void buildToolBar();
     void colorMagic();
+    void fontSelect();
 
     QLabel *statusLabel;
     QProgressBar *progressBar;

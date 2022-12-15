@@ -99,6 +99,7 @@
     <addaction name="separator"/>
     <addaction name="deleteAct"/>
     <addaction name="blankAct"/>
+    <addaction name="fontAct"/>
     <addaction name="separator"/>
     <addaction name="rotateCWAct"/>
     <addaction name="rotateCCWAct"/>
@@ -510,6 +511,18 @@
    </property>
    <property name="toolTip">
     <string>Erase page and insert 'Blank'</string>
+   </property>
+  </action>
+  <action name="fontAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/font_select.svg</normaloff>:/images/assets/font_select.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Select Font</string>
+   </property>
+   <property name="toolTip">
+    <string>Font selection dialog</string>
    </property>
   </action>
   <action name="dropperAct">

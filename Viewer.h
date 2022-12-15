@@ -4,6 +4,7 @@
 #include "PageData.h"
 #include <QWidget>
 #include <QColor>
+#include <QFont>
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
@@ -27,6 +28,7 @@ public:
     qreal brushSize;
     int blurRadius;
     int kernelSize;
+    QFont textFont;
 
 public slots:
     void blinker();
