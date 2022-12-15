@@ -169,7 +169,6 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     image.setChanges(0);
     image.setRotation(0);
     image.setMirrors(0);
-    image.setDeskew(0);
 
     // Update item
     itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
