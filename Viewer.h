@@ -72,6 +72,7 @@ public slots:
 signals:
     void zoomSig(float scale);
     void imageChangedSig();
+    void setDeskewWidget(float val);
 
 protected:
     void enterEvent(QEvent *event) override;

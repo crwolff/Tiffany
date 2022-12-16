@@ -562,6 +562,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         v.scaleFactor = scaleFactor;
         v.horizontalScroll = scrollArea->horizontalScrollBar()->value();
         v.verticalScroll = scrollArea->verticalScrollBar()->value();
+        v.deskewAngle = deskewAngle;
         currListItem->setData(Qt::UserRole+2, QVariant::fromValue(v));
     }
 
@@ -583,6 +584,8 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         }
         else
             fitToWindow();
+        deskewAngle = v.deskewAngle;
+        emit setDeskewWidget(deskewAngle);
     }
     else
     {

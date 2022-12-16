@@ -13,6 +13,7 @@ public:
     float scaleBase = 0.0;
     int horizontalScroll = 0;
     int verticalScroll = 0;
+    float deskewAngle = 0.0;
 };
 
 Q_DECLARE_METATYPE(ViewData)
