@@ -161,22 +161,10 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
             return false;
     }
 
-    // Set options based on file type
-    QImageWriter writer(fileName);
-    QString ext = QFileInfo(fileName).suffix();
-    if ((QString::compare(ext, "TIFF", Qt::CaseInsensitive) == 0) || 
-            (QString::compare(ext, "TIF", Qt::CaseInsensitive) == 0))
-    {
-        writer.setFormat("tif");
-        writer.setCompression(1);
-    }
-    else
-    {
-        writer.setFormat("png");
-    }
-
     // Save image to <fileName>
     PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+    QImageWriter writer(fileName);
+    writer.setCompression(100);     // TIF is LZW, no Group 4 option
     if (writer.write(image) == false)
         return false;
 
