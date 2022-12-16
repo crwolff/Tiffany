@@ -1315,7 +1315,7 @@ void Viewer::binarization(bool otsu)
     }
 
     // Convert back to QImage and reformat
-    tmpImage = OCV2QImage(mat);
+    tmpImage = OCV2QImage(mat, currPage);
     PageData monoImage = tmpImage.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::ThresholdDither|Qt::AvoidDither);
     monoImage.copyOtherData(currPage);
     currPage = monoImage;
