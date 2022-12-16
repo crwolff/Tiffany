@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QImage>
+#include <QImageWriter>
 #include <QMessageBox>
 #include <QPainter>
 #include <QSettings>
@@ -43,7 +44,7 @@ void Bookmarks::readFiles(QString cmd)
     int firstIdx = rows[0];
 
     // Popup file dialog
-    QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "Images (*.png)");
+    QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "Images (*.png *.tif *.tiff)");
     if (filenames.isEmpty())
         return;
 
@@ -160,9 +161,23 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
             return false;
     }
 
+    // Set options based on file type
+    QImageWriter writer(fileName);
+    QString ext = QFileInfo(fileName).suffix();
+    if ((QString::compare(ext, "TIFF", Qt::CaseInsensitive) == 0) || 
+            (QString::compare(ext, "TIF", Qt::CaseInsensitive) == 0))
+    {
+        writer.setFormat("tif");
+        writer.setCompression(1);
+    }
+    else
+    {
+        writer.setFormat("png");
+    }
+
     // Save image to <fileName>
     PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
-    if (image.save(fileName,"PNG") == false)
+    if (writer.write(image) == false)
         return false;
 
     // Clear file change marks
