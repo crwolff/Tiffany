@@ -37,6 +37,7 @@ private:
     void colorMagic();
     void fontSelect();
 
+    QAction *toolSizeButton;
     QLabel *statusLabel;
     QProgressBar *progressBar;
     SpinWidget *dropperThresholdWidget;

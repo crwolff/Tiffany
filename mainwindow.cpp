@@ -76,6 +76,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
     QObject::connect( ui->floodAct, &QAction::triggered, ui->viewer, &Viewer::floodMode );
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(64); });
     QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
@@ -130,6 +131,7 @@ void MainWindow::makeVisible(int mask)
     blurSpin->setVisible((mask & 8) != 0);
     floodThresholdSpin->setVisible((mask & 16) != 0);
     kernelSpin->setVisible((mask & 32) != 0);
+    toolSizeButton->setVisible((mask & 64) != 0);
 }
 
 //
@@ -192,24 +194,6 @@ void MainWindow::buildToolBar()
     pencilToolButton->setDefaultAction(ui->pencilAct);
     ui->toolBar->addWidget(pencilToolButton);
 
-    // Remaining tools
-    ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
-    deskewSpin = ui->toolBar->addWidget(deskewWidget);
-    deskewSpin->setVisible(false);
-    ui->toolBar->addAction(ui->dropperAct);
-    dropperThresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
-    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
-    dropperThresholdSpin->setVisible(false);
-    ui->toolBar->addAction(ui->floodAct);
-    floodThresholdWidget = new SpinWidget(0, 255, ui->viewer->floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
-    floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
-    floodThresholdSpin->setVisible(false);
-    ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
-    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
-    despeckleSpin->setVisible(false);
-
     // Line button
     QMenu *toolSizeMenu = new QMenu();
     toolSizeMenu->addAction(ui->pix1Act);
@@ -226,7 +210,26 @@ void MainWindow::buildToolBar()
         toolSizeToolButton->setDefaultAction(ui->pix4Act);
     else
         toolSizeToolButton->setDefaultAction(ui->pix1Act);
-    ui->toolBar->addWidget(toolSizeToolButton);
+    toolSizeButton = ui->toolBar->addWidget(toolSizeToolButton);
+    toolSizeButton->setVisible(false);
+
+    // Remaining tools
+    ui->toolBar->addAction(ui->dropperAct);
+    dropperThresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
+    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
+    dropperThresholdSpin->setVisible(false);
+    ui->toolBar->addAction(ui->floodAct);
+    floodThresholdWidget = new SpinWidget(0, 255, ui->viewer->floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
+    floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
+    floodThresholdSpin->setVisible(false);
+    ui->toolBar->addAction(ui->deskewAct);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
+    deskewSpin = ui->toolBar->addWidget(deskewWidget);
+    deskewSpin->setVisible(false);
+    ui->toolBar->addAction(ui->despeckleAct);
+    despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
+    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
+    despeckleSpin->setVisible(false);
 
     // Color button
     colorToolButton.setDefaultAction(ui->colorAct);
