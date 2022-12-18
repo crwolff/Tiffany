@@ -78,6 +78,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
     QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(64); });
     QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
+    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(64); });
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
 
