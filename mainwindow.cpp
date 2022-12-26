@@ -246,10 +246,10 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setMenu(reFormatMenu);
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
-    blurWidget = new SpinWidget(1, 9, ui->viewer->blurRadius, 2, "Blur Size", ui->toolBar);
+    blurWidget = new SpinWidget(1, 15, ui->viewer->blurRadius, 2, "Blur Size", ui->toolBar);
     blurSpin = ui->toolBar->addWidget(blurWidget);
     blurSpin->setVisible(false);
-    kernelWidget = new SpinWidget(1, 99, ui->viewer->kernelSize, 2, "Kernel Size", ui->toolBar);
+    kernelWidget = new SpinWidget(3, 149, ui->viewer->kernelSize, 2, "Kernel Size", ui->toolBar);
     kernelSpin = ui->toolBar->addWidget(kernelWidget);
     kernelSpin->setVisible(false);
 
