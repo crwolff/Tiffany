@@ -7,6 +7,7 @@
 #include <QFont>
 #include <QImage>
 #include <QListWidget>
+#include <QMutex>
 #include <QScrollArea>
 #include <QTimer>
 
@@ -60,6 +61,7 @@ public slots:
     void toBinary();
     void toAdaptive();
     void binarization(bool otsu);
+    void binThread(bool otsu);
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -86,6 +88,7 @@ protected:
     QSize sizeHint() const override;
 
 private:
+    QMutex mutex;
     void drawLine(QPoint start, QPoint finish, QColor color);
     void fillArea(QRect rect, bool outside);
     void applyMask(QImage &mask, bool flag);

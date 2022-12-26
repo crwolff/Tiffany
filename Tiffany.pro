@@ -26,7 +26,7 @@ RCC_DIR = ./.build
 UI_DIR = ./.build
 
 # Boilerplate
-QT += widgets gui
+QT += widgets gui concurrent
 
 # Input
 HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h 

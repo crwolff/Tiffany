@@ -11,6 +11,7 @@
 #include <QPainter>
 #include <QScrollBar>
 #include <QSettings>
+#include <QtConcurrent/QtConcurrent>
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
@@ -1269,6 +1270,22 @@ void Viewer::toAdaptive()
 //
 void Viewer::binarization(bool otsu)
 {
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, otsu);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+}
+
+//
+// Run this in a separate thread to keep from blocking the UI
+//
+void Viewer::binThread(bool otsu)
+{
+    QMutexLocker locker(&mutex);
+
     // Nothing to do
     if (currPage.isNull())
         return;
@@ -1303,7 +1320,6 @@ void Viewer::binarization(bool otsu)
         cv::GaussianBlur(mat, tmp, cv::Size(blurRadius, blurRadius), 0);
         mat = tmp;
     }
-    QCoreApplication::processEvents();
 
     // Otsu's threshold calculation
     if (otsu)
@@ -1318,7 +1334,6 @@ void Viewer::binarization(bool otsu)
         cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
         mat = tmp;
     }
-    QCoreApplication::processEvents();
 
     // Convert back to QImage and reformat
     tmpImage = OCV2QImage(mat, currPage);
@@ -1329,6 +1344,7 @@ void Viewer::binarization(bool otsu)
     // Record changes
     currPage.setChanges(currPage.changes() + 1);
     currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    locker.unlock();
     emit imageChangedSig();
     update();
 }
