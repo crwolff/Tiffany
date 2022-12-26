@@ -2,6 +2,7 @@
 #include "UndoBuffer.h"
 #include "ViewData.h"
 #include "QImage2OCV.h"
+#include <QApplication>
 #include <QDebug>
 #include <QInputDialog>
 #include <QLineEdit>
@@ -1302,6 +1303,7 @@ void Viewer::binarization(bool otsu)
         cv::GaussianBlur(mat, tmp, cv::Size(blurRadius, blurRadius), 0);
         mat = tmp;
     }
+    QCoreApplication::processEvents();
 
     // Otsu's threshold calculation
     if (otsu)
@@ -1316,6 +1318,7 @@ void Viewer::binarization(bool otsu)
         cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
         mat = tmp;
     }
+    QCoreApplication::processEvents();
 
     // Convert back to QImage and reformat
     tmpImage = OCV2QImage(mat, currPage);
