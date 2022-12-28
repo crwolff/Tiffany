@@ -38,10 +38,10 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     deskewAngle = settings.value("Viewer/deskewAngle", 0.0).toDouble();
     despeckleArea = settings.value("Viewer/despeckleArea", 20).toInt();
     brushSize = settings.value("Viewer/brushSize", 1.0).toDouble();
-    blurRadius = settings.value("Bookmarks/blurRadius", 5).toInt();
+    blurRadius = settings.value("Viewer/blurRadius", 5).toInt();
     if (blurRadius % 2 != 1)
         blurRadius++;
-    kernelSize = settings.value("Bookmarks/kernelSize", 23).toInt();
+    kernelSize = settings.value("Viewer/kernelSize", 23).toInt();
     if (kernelSize % 2 != 1)
         kernelSize++;
     QString font = settings.value("Viewer/font", "Courier New,20,-1,5,50,0,0,0,0,0").toString();
