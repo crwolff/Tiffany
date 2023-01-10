@@ -1004,11 +1004,26 @@ void Viewer::setDeskew(double angle)
 //
 void Viewer::deskew()
 {
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::deskewThread);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+}
+
+//
+// Run this in a separate thread to keep from blocking the UI
+//
+void Viewer::deskewThread()
+{
+    QMutexLocker locker(&mutex);
+
     if (currPage.isNull())
         return;
 
     // Identically sized image
-    deskewImg = QImage(currPage.size(), currPage.format());
     currMask = QImage();
 
     // Rotate page

@@ -53,6 +53,7 @@ public slots:
     void floodFill();
     void setDeskew(double val);
     void deskew();
+    void deskewThread();
     void setDespeckle(int val);
     void despeckle();
     void toGrayscale();
