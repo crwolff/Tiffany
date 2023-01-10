@@ -223,14 +223,14 @@ void MainWindow::buildToolBar()
     floodThresholdWidget = new SpinWidget(0, 255, ui->viewer->floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
-    ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
-    deskewSpin = ui->toolBar->addWidget(deskewWidget);
-    deskewSpin->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
     despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
     despeckleSpin->setVisible(false);
+    ui->toolBar->addAction(ui->deskewAct);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
+    deskewSpin = ui->toolBar->addWidget(deskewWidget);
+    deskewSpin->setVisible(false);
 
     // Color button
     colorToolButton.setDefaultAction(ui->colorAct);
