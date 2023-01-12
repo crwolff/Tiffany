@@ -844,6 +844,7 @@ void Viewer::colorSelect()
 
     if (currPage.format() == QImage::Format_RGB32)
     {
+        blinkTimer->stop();
         int red = qRed(pixel);
         int grn = qGreen(pixel);
         int blu = qBlue(pixel);
@@ -878,6 +879,7 @@ void Viewer::colorSelect()
     }
     else if (currPage.format() == QImage::Format_Grayscale8)
     {
+        blinkTimer->stop();
         int pix = qRed(pixel);
 
         // Identically sized grayscale image
@@ -923,6 +925,7 @@ void Viewer::setFloodThreshold(int val)
 //
 void Viewer::floodFill()
 {
+    blinkTimer->stop();
     if (currPage.isNull())
         return;
 
@@ -1062,6 +1065,28 @@ void Viewer::setDespeckle(int val)
 //
 void Viewer::despeckle()
 {
+    blinkTimer->stop();
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+
+    // Blink mask
+    blink = false;
+    blinkTimer->start(500);
+}
+
+//
+// Run this in a separate thread to keep from blocking the UI
+//
+void Viewer::despeckleThread()
+{
+    QMutexLocker locker(&mutex);
+
+    // Nothing to do
     if (currPage.isNull())
         return;
 
@@ -1116,10 +1141,6 @@ void Viewer::despeckle()
     }
     //qInfo() << cnt << "Blobs detected";
     currMask = OCV2QImage(mask);
-
-    // Blink mask
-    blink = false;
-    blinkTimer->start(500);
 }
 
 //
