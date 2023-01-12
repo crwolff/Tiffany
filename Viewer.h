@@ -58,6 +58,7 @@ public slots:
     void deskewThread();
     void setDespeckle(int val);
     void despeckle();
+    void despeckleThread();
     void toGrayscale();
     void setBlurRadius(int val);
     void setKernelSize(int val);
