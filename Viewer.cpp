@@ -61,6 +61,12 @@ Viewer::~Viewer()
     settings.setValue("kernelSize", kernelSize);
     settings.setValue("font", textFont.toString());
     settings.endGroup();
+
+    if (api != nullptr)
+    {
+        api->End();
+        delete api;
+    }
 }
 
 void Viewer::enterEvent(QEvent *event)
@@ -419,6 +425,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             currPage.setChanges(currPage.changes() + 1);
             currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
+        }
+
+        if (event->key() == Qt::Key_T)
+        {
+            regionOCR();
+            flag = true;
         }
     }
     else if (event->modifiers().testFlag(Qt::ShiftModifier) && !deskewImg.isNull())
@@ -1362,6 +1374,52 @@ void Viewer::binThread(bool otsu)
     locker.unlock();
     emit imageChangedSig();
     update();
+}
+
+//
+// OCR selected region
+//
+void Viewer::regionOCR()
+{
+    if (currPage.isNull())
+        return;
+    if (rubberBand->isHidden())
+    {
+        QMessageBox::information(this, "OCR", "Area must be selected");
+        return;
+    }
+
+    // Initialize the Tesseract API
+    if (api == nullptr)
+    {
+        api = new tesseract::TessBaseAPI();
+        if ((api == nullptr) || (api->Init(NULL, "eng")))
+        {
+            QMessageBox::information(this, "OCR", "Could not initialized OCR engine");
+            return;
+        }
+    }
+
+    // Get rectangle in image coordinates
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QRect box = transform.mapRect(rubberBand->geometry());
+
+    // Copy region of interest
+    QImage tmpImage = currPage.copy(box);
+
+    // Convert to white on black
+    cv::Mat mat, bw;
+    mat = QImage2OCV(tmpImage);
+    cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+    // OCR the selection
+    api->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    api->SetImage(bw.data, bw.cols, bw.rows, 1,bw.step);
+    int res = 0.5 + currPage.dotsPerMeterX() / 39.3701;
+    if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
+        api->SetSourceResolution(res);
+    qInfo() << api->GetUTF8Text();
 }
 
 //
