@@ -1,0 +1,24 @@
+## Tiffany and the GPLv2 ##
+
+Tiffany is free software; you can redistribute it and/or modify  
+it under the terms of the GNU General Public License version 2 (GPLv2)  
+as published by the Free Software Foundation.  
+
+This program is distributed in the hope that it will be useful,  
+but WITHOUT ANY WARRANTY; without even the implied warranty of  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+See the GNU General Public License for more details.
+
+- <http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>
+
+## Licenses of bundled content ##
+
+The Tiffany source code is released as a whole under the GPLv2.  
+The following refers to the licenses used by these resources,  
+when they were released independently from Tiffany.
+
+The SVG icons in `assets` were all originally released under the CC0 license.  
+Modified and newly created SVG icons are also released under the CC0 license.
+
+- <https://creativecommons.org/publicdomain/zero/1.0/>
+

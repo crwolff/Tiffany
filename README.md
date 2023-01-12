@@ -1,4 +1,5 @@
-# Tiffany
+# Tiffany [![Development build](https://github.com/crwolff/Tiffany/actions/workflows/build_all.yml/badge.svg)](https://github.com/crwolff/Tiffany/actions/workflows/build_all.yml)
+
 
 A Specialized tool for editting scanned documents.
 
