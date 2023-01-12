@@ -1,0 +1,56 @@
+name: Development build
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  BuildLinux:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt and dependencies
+        run: |
+          sudo apt install qtbase5-dev qtbase5-dev-tools libopencv-dev libtesseract-dev
+
+      - name: Build
+        run: |
+          export CC=gcc
+          qmake Tiffany.pro
+          make 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: assets
+          path: Tiffany
+          retention-days: 2
+
+  UpdateAssets:
+    if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
+    needs: [BuildLinux]
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@v2
+
+      - name: Upload latest pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            assets/Tiffany*
+            LICENSE
+
