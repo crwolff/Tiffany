@@ -1429,13 +1429,17 @@ void Viewer::regionOCR()
     // Copy region of interest
     QImage tmpImage = currPage.copy(box);
 
-    // Convert to white on black
+    // Convert to grayscale
+    if (tmpImage.format() != QImage::Format_Grayscale8)
+        tmpImage = tmpImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
     cv::Mat mat, bw;
     mat = QImage2OCV(tmpImage);
     cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     // OCR the selection
-    api->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    //api->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
     api->SetImage(bw.data, bw.cols, bw.rows, 1,bw.step);
     int res = 0.5 + currPage.dotsPerMeterX() / 39.3701;
     if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
