@@ -106,6 +106,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
             currColor = (leftMode == Pencil) ? foregroundColor : backgroundColor;
             pushImage();
             setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
+            drawDot(origin, currColor);
         }
         else if (leftMode == Select)
         {
@@ -762,6 +763,26 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
     p.setTransform(transform);
     p.setPen(QPen(color, int(brushSize * scale), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
+    p.end();
+    update();
+}
+
+//
+// Draw a dot in the foreground color
+//
+void Viewer::drawDot(QPoint loc, QColor color)
+{
+    if (currPage.isNull())
+        return;
+
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
+    QPainter p(&currPage);
+    p.setTransform(transform);
+    p.setBrush(color);
+    p.setRenderHint(QPainter::Antialiasing, false);
+    p.drawEllipse(loc, int(brushSize * scale/2.0), int(brushSize * scale/2.0));
     p.end();
     update();
 }
