@@ -92,6 +92,7 @@ protected:
 private:
     QMutex mutex;
     void drawLine(QPoint start, QPoint finish, QColor color);
+    void drawDot(QPoint loc, QColor color);
     void fillArea(QRect rect, bool outside);
     void applyMask(QImage &mask, bool flag);
     void applyDeskew();
