@@ -62,10 +62,10 @@ Viewer::~Viewer()
     settings.setValue("font", textFont.toString());
     settings.endGroup();
 
-    if (api != nullptr)
+    if (tessApi != nullptr)
     {
-        api->End();
-        delete api;
+        tessApi->End();
+        delete tessApi;
     }
 }
 
@@ -1411,15 +1411,22 @@ void Viewer::regionOCR()
     }
 
     // Initialize the Tesseract API
-    if (api == nullptr)
+    if (tessApi == nullptr)
     {
-        api = new tesseract::TessBaseAPI();
-        if ((api == nullptr) || (api->Init(NULL, "eng")))
+        tessApi = new tesseract::TessBaseAPI();
+        if ((tessApi == nullptr) || (tessApi->Init(NULL, "eng")))
         {
             QMessageBox::information(this, "OCR", "Could not initialized OCR engine");
             return;
         }
     }
+
+    // Initialize the clipboard
+    if (clipboard == nullptr)
+        clipboard = QGuiApplication::clipboard();
+
+    //
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
 
     // Get rectangle in image coordinates
     float scale = scaleBase * scaleFactor;
@@ -1439,12 +1446,13 @@ void Viewer::regionOCR()
     cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
     // OCR the selection
-    //api->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
-    api->SetImage(bw.data, bw.cols, bw.rows, 1,bw.step);
+    //tessApi->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    tessApi->SetImage(bw.data, bw.cols, bw.rows, 1,bw.step);
     int res = 0.5 + currPage.dotsPerMeterX() / 39.3701;
     if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
-        api->SetSourceResolution(res);
-    qInfo() << api->GetUTF8Text();
+        tessApi->SetSourceResolution(res);
+    clipboard->setText(tessApi->GetUTF8Text());
+    QGuiApplication::restoreOverrideCursor();
 }
 
 //

@@ -3,6 +3,7 @@
 
 #include "PageData.h"
 #include <QWidget>
+#include <QClipboard>
 #include <QColor>
 #include <QFont>
 #include <QImage>
@@ -135,7 +136,8 @@ private:
     bool shiftPencil = false;
     QPoint drawLoc;
     bool lastOtsu = false;
-    tesseract::TessBaseAPI *api = nullptr;
+    tesseract::TessBaseAPI *tessApi = nullptr;
+    QClipboard *clipboard = nullptr;
 
     enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
