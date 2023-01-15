@@ -61,6 +61,12 @@ Viewer::~Viewer()
     settings.setValue("kernelSize", kernelSize);
     settings.setValue("font", textFont.toString());
     settings.endGroup();
+
+    if (tessApi != nullptr)
+    {
+        tessApi->End();
+        delete tessApi;
+    }
 }
 
 void Viewer::enterEvent(QEvent *event)
@@ -420,6 +426,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             currPage.setChanges(currPage.changes() + 1);
             currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
+        }
+
+        if (event->key() == Qt::Key_T)
+        {
+            regionOCR();
+            flag = true;
         }
     }
     else if (event->modifiers().testFlag(Qt::ShiftModifier) && !deskewImg.isNull())
@@ -1404,6 +1416,64 @@ void Viewer::binThread(bool otsu)
     locker.unlock();
     emit imageChangedSig();
     update();
+}
+
+//
+// OCR selected region
+//
+void Viewer::regionOCR()
+{
+    if (currPage.isNull())
+        return;
+    if (rubberBand->isHidden())
+    {
+        QMessageBox::information(this, "OCR", "Area must be selected");
+        return;
+    }
+
+    // Initialize the Tesseract API
+    if (tessApi == nullptr)
+    {
+        tessApi = new tesseract::TessBaseAPI();
+        if ((tessApi == nullptr) || (tessApi->Init(NULL, "eng")))
+        {
+            QMessageBox::information(this, "OCR", "Could not initialized OCR engine");
+            return;
+        }
+    }
+
+    // Initialize the clipboard
+    if (clipboard == nullptr)
+        clipboard = QGuiApplication::clipboard();
+
+    //
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+
+    // Get rectangle in image coordinates
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QRect box = transform.mapRect(rubberBand->geometry());
+
+    // Copy region of interest
+    QImage tmpImage = currPage.copy(box);
+
+    // Convert to grayscale
+    if (tmpImage.format() != QImage::Format_Grayscale8)
+        tmpImage = tmpImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat, bw;
+    mat = QImage2OCV(tmpImage);
+    cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+    // OCR the selection
+    //tessApi->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    tessApi->SetImage(bw.data, bw.cols, bw.rows, 1,bw.step);
+    int res = 0.5 + currPage.dotsPerMeterX() / 39.3701;
+    if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
+        tessApi->SetSourceResolution(res);
+    clipboard->setText(tessApi->GetUTF8Text());
+    QGuiApplication::restoreOverrideCursor();
 }
 
 //

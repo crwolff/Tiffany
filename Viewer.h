@@ -3,6 +3,7 @@
 
 #include "PageData.h"
 #include <QWidget>
+#include <QClipboard>
 #include <QColor>
 #include <QFont>
 #include <QImage>
@@ -10,6 +11,8 @@
 #include <QMutex>
 #include <QScrollArea>
 #include <QTimer>
+#include <tesseract/baseapi.h>
+#include <leptonica/allheaders.h>
 
 class Viewer : public QWidget
 {
@@ -101,6 +104,7 @@ private:
     void pasteSelection(bool ctrl);
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
+    void regionOCR();
     void pushImage();
     void updateScrollBars();
     void adjustScrollBars(float factor);
@@ -133,6 +137,8 @@ private:
     bool shiftPencil = false;
     QPoint drawLoc;
     bool lastOtsu = false;
+    tesseract::TessBaseAPI *tessApi = nullptr;
+    QClipboard *clipboard = nullptr;
 
     enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
