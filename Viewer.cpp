@@ -267,6 +267,22 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             despeckle();
             setCursor(Qt::ArrowCursor);
         }
+        else if (warpCount > 0)
+        {
+            float scale = scaleBase * scaleFactor;
+            QTransform transform = QTransform().scale(scale, scale).inverted();
+            QPointF tmp = transform.map(QPointF(event->pos()));
+            warpCorner[warpCount-1].x = tmp.x();
+            warpCorner[warpCount-1].y = tmp.y();
+            warpCount++;
+            if (warpCount > 4)
+            {
+                warpCount = 0;
+                pushImage();
+                doWarp();
+                setCursor(Qt::ArrowCursor);
+            }
+        }
         if (flag)
         {
             currPage.setChanges(currPage.changes() + 1);
@@ -431,6 +447,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         if (event->key() == Qt::Key_T)
         {
             regionOCR();
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_W)
+        {
+            setCursor(Qt::CrossCursor);
+            warpCount = 1;
             flag = true;
         }
     }
@@ -1473,6 +1495,85 @@ void Viewer::regionOCR()
     if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
         tessApi->SetSourceResolution(res);
     clipboard->setText(tessApi->GetUTF8Text());
+    QGuiApplication::restoreOverrideCursor();
+}
+
+//
+// Warp image so warpCorner[] form a rectangle
+//
+void Viewer::doWarp()
+{
+    if (currPage.isNull())
+        return;
+
+    if (currPage.format() == QImage::Format_Mono)
+    {
+        QMessageBox::information(this, "Dewarp", "Only works on RGB and grayscale images");
+        return;
+    }
+
+    // Sort points so 0 = top left, 1 = top right, 2 = bottom left, 3 = bottom right
+    float cx = round((warpCorner[0].x + warpCorner[1].x + warpCorner[2].x + warpCorner[3].x) / 4.0);
+    float cy = round((warpCorner[0].y + warpCorner[1].y + warpCorner[2].y + warpCorner[3].y) / 4.0);
+    int flag = 0;
+    for(int idx=0;idx<4;idx++)
+    {
+       if ((warpCorner[idx].x < cx) & (warpCorner[idx].y < cy))
+       {
+           warpBefore[0] = warpCorner[idx];
+           flag |= 1;
+       }
+       else if ((warpCorner[idx].x > cx) & (warpCorner[idx].y < cy))
+       {
+           warpBefore[1] = warpCorner[idx];
+           flag |= 2;
+       }
+       else if ((warpCorner[idx].x < cx) & (warpCorner[idx].y > cy))
+       {
+           warpBefore[2] = warpCorner[idx];
+           flag |= 4;
+       }
+       else if ((warpCorner[idx].x > cx) & (warpCorner[idx].y > cy))
+       {
+           warpBefore[3] = warpCorner[idx];
+           flag |= 8;
+       }
+    }
+    if (flag != 15)
+    {
+        QMessageBox::information(this, "Dewarp", "Points too close together. Couldn't find centroid");
+        return;
+    }
+
+    // Convert to OCV
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    pushImage();
+    cv::Mat mat = QImage2OCV(currPage);
+
+    // Compute perspective transform
+    float left = round((warpBefore[0].x + warpBefore[2].x) / 2.0);
+    float right = round((warpBefore[1].x + warpBefore[3].x) / 2.0);
+    float top = round((warpBefore[0].y + warpBefore[1].y) / 2.0);
+    float bottom = round((warpBefore[2].y + warpBefore[3].y) / 2.0);
+    warpAfter[0] = cv::Point2f(left, top);
+    warpAfter[1] = cv::Point2f(right, top);
+    warpAfter[2] = cv::Point2f(left, bottom);
+    warpAfter[3] = cv::Point2f(right, bottom);
+    cv::Mat transform = getPerspectiveTransform( warpBefore, warpAfter );
+
+    // Warp image
+    cv::Size rect = cv::Size(currPage.width(), currPage.height());
+    cv::Mat warpedImage;
+    cv::warpPerspective( mat, warpedImage, transform, rect );
+
+    // Convert back
+    currPage = OCV2QImage(warpedImage, currPage);
+
+    // Record changes
+    currPage.setChanges(currPage.changes() + 1);
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
     QGuiApplication::restoreOverrideCursor();
 }
 

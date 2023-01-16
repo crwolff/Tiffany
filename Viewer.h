@@ -11,6 +11,7 @@
 #include <QMutex>
 #include <QScrollArea>
 #include <QTimer>
+#include <opencv2/core/types.hpp>
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 
@@ -105,6 +106,7 @@ private:
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
     void regionOCR();
+    void doWarp();
     void pushImage();
     void updateScrollBars();
     void adjustScrollBars(float factor);
@@ -139,6 +141,10 @@ private:
     bool lastOtsu = false;
     tesseract::TessBaseAPI *tessApi = nullptr;
     QClipboard *clipboard = nullptr;
+    int warpCount = 0;
+    std::vector<cv::Point2f> warpCorner = std::vector<cv::Point2f>(4,cv::Point2f());
+    std::vector<cv::Point2f> warpBefore = std::vector<cv::Point2f>(4,cv::Point2f());
+    std::vector<cv::Point2f> warpAfter = std::vector<cv::Point2f>(4,cv::Point2f());
 
     enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
     enum RightMode { Idle, Zoom, Pan };
