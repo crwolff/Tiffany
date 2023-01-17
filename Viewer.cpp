@@ -215,6 +215,13 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         flag = true;
     }
 
+    // Marking corners for warping
+    if (warpCount > 0)
+    {
+        drawLoc = event->pos();
+        update();
+    }
+
     // Event was handled
     if (flag)
         event->accept();
@@ -278,6 +285,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             if (warpCount > 4)
             {
                 warpCount = 0;
+                setMouseTracking(false);
                 pushImage();
                 doWarp();
                 setCursor(Qt::ArrowCursor);
@@ -453,6 +461,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         {
             setCursor(Qt::CrossCursor);
             warpCount = 1;
+            setMouseTracking(true);
             flag = true;
         }
     }
@@ -565,6 +574,16 @@ void Viewer::paintEvent(QPaintEvent *)
             QPointF finish = transform.inverted().map(drawLoc);
             p.setPen(QPen(currColor, brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             p.drawLine(start, finish);
+        }
+        else if (warpCount > 1)
+        {
+            p.setPen(QPen(Qt::green, 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            QPointF start = transform.inverted().map(drawLoc);
+            for(int idx=0;idx < warpCount-1;idx++)
+            {
+                QPointF finish = QPointF(warpCorner[idx].x, warpCorner[idx].y);
+                p.drawLine(start, finish);
+            }
         }
     }
     else
