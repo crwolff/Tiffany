@@ -349,9 +349,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_Escape)
     {
+        setCursor(Qt::ArrowCursor);
         currMask = QImage();
         deskewImg = QImage();
         pasting = false;
+        warpCount = 0;
         update();
         flag = true;
     }
@@ -1583,7 +1585,7 @@ void Viewer::doWarp()
     // Warp image
     cv::Size rect = cv::Size(currPage.width(), currPage.height());
     cv::Mat warpedImage;
-    cv::warpPerspective( mat, warpedImage, transform, rect );
+    cv::warpPerspective( mat, warpedImage, transform, rect, cv::INTER_LANCZOS4, cv::BORDER_REPLICATE );
 
     // Convert back
     currPage = OCV2QImage(warpedImage, currPage);
