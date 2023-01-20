@@ -825,6 +825,7 @@ void Viewer::drawDot(QPoint loc, QColor color)
     p.setTransform(transform);
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing, false);
+    p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawEllipse(loc, int(brushSize * scale/2.0), int(brushSize * scale/2.0));
     p.end();
     update();
