@@ -72,19 +72,19 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
 
     // Tools menu
-    QObject::connect( ui->pointerAct, &QAction::triggered, ui->viewer, &Viewer::pointerMode );
-    QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
-    QObject::connect( ui->floodAct, &QAction::triggered, ui->viewer, &Viewer::floodMode );
-    QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
-    QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
-    QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
-    QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Pencil); });
+    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Eraser); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
 
     // Stroke menu
-    QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
-    QObject::connect( ui->pix4Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_4 );
-    QObject::connect( ui->pix8Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_8 );
-    QObject::connect( ui->pix12Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_12 );
+    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(1.0); });
+    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(4.0); });
+    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(8.0); });
+    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(12.0); });
 
     // Toolbar
     QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );

@@ -686,109 +686,29 @@ QSize Viewer::sizeHint() const
 //
 // Select pointer tool
 //
-void Viewer::pointerMode()
+void Viewer::setTool(LeftMode tool)
 {
-    leftMode = Select;
+    leftMode = tool;
     currMask = QImage();
     deskewImg = QImage();
+    if ((tool == Pencil) || (tool == Eraser))
+        pencil180 = false;
+    else if (tool == Deskew)
+    {
+        deskew();
+        gridOffsetX = 0;
+        gridOffsetY = 0;
+    }
+    else if (tool == Despeckle)
+        despeckle();
 }
 
 //
-// Select color selection tool
+// Select brush
 //
-void Viewer::dropperMode()
+void Viewer::setBrush(qreal sz)
 {
-    leftMode = ColorSelect;
-    currMask = QImage();
-    deskewImg = QImage();
-}
-
-//
-// Select flood fill tool
-//
-void Viewer::floodMode()
-{
-    leftMode = FloodFill;
-    currMask = QImage();
-    deskewImg = QImage();
-}
-
-//
-// Select draw line tool
-//
-void Viewer::pencilMode()
-{
-    leftMode = Pencil;
-    pencil180 = false;
-    currMask = QImage();
-    deskewImg = QImage();
-}
-
-//
-// Select erase line tool
-//
-void Viewer::eraserMode()
-{
-    leftMode = Eraser;
-    pencil180 = false;
-    currMask = QImage();
-    deskewImg = QImage();
-}
-
-//
-// Select deskew mode
-//
-void Viewer::deskewMode()
-{
-    leftMode = Deskew;
-    currMask = QImage();
-    deskewImg = QImage();
-    deskew();
-    gridOffsetX = 0;
-    gridOffsetY = 0;
-}
-
-//
-// Select despeckle mode
-//
-void Viewer::despeckleMode()
-{
-    leftMode = Despeckle;
-    currMask = QImage();
-    deskewImg = QImage();
-    despeckle();
-}
-
-//
-// Select narrow brush
-//
-void Viewer::setBrush_1()
-{
-    brushSize = 1;
-}
-
-//
-// Select medium brush
-//
-void Viewer::setBrush_4()
-{
-    brushSize = 4;
-}
-
-//
-// Select wide brush
-//
-void Viewer::setBrush_8()
-{
-    brushSize = 8;
-}
-
-//
-// Select extra-wide brush
-//
-void Viewer::setBrush_12()
-{
-    brushSize = 12;
+    brushSize = sz;
 }
 
 //

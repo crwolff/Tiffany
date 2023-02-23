@@ -34,22 +34,15 @@ public:
     int blurRadius;
     int kernelSize;
     QFont textFont;
+    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
+    enum RightMode { Idle, Zoom, Pan };
 
 public slots:
     void blinker();
     void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
     void updateViewer();
-    void pointerMode();
-    void dropperMode();
-    void floodMode();
-    void pencilMode();
-    void eraserMode();
-    void deskewMode();
-    void despeckleMode();
-    void setBrush_1();
-    void setBrush_4();
-    void setBrush_8();
-    void setBrush_12();
+    void setTool(LeftMode tool);
+    void setBrush(qreal sz);
     void blankPage();
     void setDropperThreshold(int val);
     void colorSelect();
@@ -146,8 +139,6 @@ private:
     std::vector<cv::Point2f> warpBefore = std::vector<cv::Point2f>(4,cv::Point2f());
     std::vector<cv::Point2f> warpAfter = std::vector<cv::Point2f>(4,cv::Point2f());
 
-    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
-    enum RightMode { Idle, Zoom, Pan };
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;
     int gridOffsetX = 0;
