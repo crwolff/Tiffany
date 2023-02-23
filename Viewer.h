@@ -59,8 +59,8 @@ public slots:
     void setKernelSize(int val);
     void toBinary();
     void toAdaptive();
-    void binarization(bool otsu);
-    void binThread(bool otsu);
+    void binarization(bool adaptive);
+    void binThread(bool adaptive);
     void undoEdit();
     void redoEdit();
     void zoomIn();
@@ -131,7 +131,7 @@ private:
     QColor currColor = Qt::black;
     bool shiftPencil = false;
     QPoint drawLoc;
-    bool lastOtsu = false;
+    bool binMode = false;
     tesseract::TessBaseAPI *tessApi = nullptr;
     QClipboard *clipboard = nullptr;
     int warpCount = 0;

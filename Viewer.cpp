@@ -1270,7 +1270,7 @@ void Viewer::setBlurRadius(int val)
     // Even values crash openCV
     if (blurRadius % 2 != 1)
         blurRadius++;
-    binarization(lastOtsu);
+    binarization(binMode);
 }
 
 //
@@ -1283,27 +1283,27 @@ void Viewer::setKernelSize(int val)
     // Even values crash openCV
     if (kernelSize % 2 != 1)
         kernelSize++;
-    binarization(lastOtsu);
+    binarization(binMode);
 }
 
 void Viewer::toBinary()
 {
-    lastOtsu = true;
-    binarization(true);
+    binMode = false;
+    binarization(binMode);
 }
 
 void Viewer::toAdaptive()
 {
-    lastOtsu = false;
-    binarization(false);
+    binMode = true;
+    binarization(binMode);
 }
 
 //
 // Convert to mono
 //
-void Viewer::binarization(bool otsu)
+void Viewer::binarization(bool adaptive)
 {
-    QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, otsu);
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, adaptive);
     while (!future.isFinished())
     {
         QApplication::processEvents();
@@ -1315,7 +1315,7 @@ void Viewer::binarization(bool otsu)
 //
 // Run this in a separate thread to keep from blocking the UI
 //
-void Viewer::binThread(bool otsu)
+void Viewer::binThread(bool adaptive)
 {
     QMutexLocker locker(&mutex);
 
@@ -1354,17 +1354,16 @@ void Viewer::binThread(bool otsu)
         mat = tmp;
     }
 
-    // Otsu's threshold calculation
-    if (otsu)
-    {
-        cv::Mat tmp;
-        cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-        mat = tmp;
-    }
-    else    // Adaptive threshold - this hollows out diodes, etc
+    if (adaptive)   // Adaptive threshold - this hollows out diodes, etc
     {
         cv::Mat tmp;
         cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
+        mat = tmp;
+    }
+    else            // Otsu's global threshold calculation
+    {
+        cv::Mat tmp;
+        cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
         mat = tmp;
     }
 
