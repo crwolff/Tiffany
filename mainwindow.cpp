@@ -76,16 +76,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->dropperAct, &QAction::triggered, ui->viewer, &Viewer::dropperMode );
     QObject::connect( ui->floodAct, &QAction::triggered, ui->viewer, &Viewer::floodMode );
     QObject::connect( ui->pencilAct, &QAction::triggered, ui->viewer, &Viewer::pencilMode );
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(64); });
     QObject::connect( ui->eraserAct, &QAction::triggered, ui->viewer, &Viewer::eraserMode );
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(64); });
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->viewer, &Viewer::deskewMode );
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->viewer, &Viewer::despeckleMode );
-
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
-    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeVisible(16); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(2); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(4); });
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, ui->viewer, &Viewer::setBrush_1 );
@@ -100,8 +93,16 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
-    QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(8); });
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(8+32); });
+
+    // Toggle spinbox depending on active tool
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeVisible(2); });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(4); });
+    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(4); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(8); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(16); });
+    QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(32); });
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(32+64); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -127,12 +128,12 @@ void MainWindow::connectSignalSlots()
 void MainWindow::makeVisible(int mask)
 {
     dropperThresholdSpin->setVisible((mask & 1) != 0);
-    deskewSpin->setVisible((mask & 2) != 0);
-    despeckleSpin->setVisible((mask & 4) != 0);
-    blurSpin->setVisible((mask & 8) != 0);
-    floodThresholdSpin->setVisible((mask & 16) != 0);
-    kernelSpin->setVisible((mask & 32) != 0);
-    toolSizeButton->setVisible((mask & 64) != 0);
+    floodThresholdSpin->setVisible((mask & 2) != 0);
+    toolSizeButton->setVisible((mask & 4) != 0);
+    deskewSpin->setVisible((mask & 8) != 0);
+    despeckleSpin->setVisible((mask & 16) != 0);
+    blurSpin->setVisible((mask & 32) != 0);
+    kernelSpin->setVisible((mask & 64) != 0);
 }
 
 //
