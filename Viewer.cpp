@@ -1303,6 +1303,14 @@ void Viewer::toAdaptive()
 //
 void Viewer::binarization(bool adaptive)
 {
+    // Nothing to do
+    if (currPage.isNull())
+        return;
+
+    // Don't start multiple threads
+    QMutexLocker locker(&mutex);
+
+    // Run the conversion
     QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, adaptive);
     while (!future.isFinished())
     {
@@ -1310,6 +1318,10 @@ void Viewer::binarization(bool adaptive)
         QThread::msleep(1); //yield
     }
     future.waitForFinished();
+
+    // Notify viewers
+    emit imageChangedSig();
+    update();
 }
 
 //
@@ -1317,26 +1329,19 @@ void Viewer::binarization(bool adaptive)
 //
 void Viewer::binThread(bool adaptive)
 {
-    QMutexLocker locker(&mutex);
-
-    // Nothing to do
-    if (currPage.isNull())
-        return;
-
     // If the last edit was binarization, rollback change and rerun
     UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    if ((currPage.format() == QImage::Format_Mono) && (ub.peek(currPage).format() != QImage::Format_Mono))
-    {
-        currPage = ub.undo(currPage);
-        currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-    }
-
-    // Already mono
     if (currPage.format() == QImage::Format_Mono)
-        return;
+    {
+        if (!ub.peek().isNull() && (ub.peek().format() != QImage::Format_Mono))
+            currPage = ub.peek();
+        else
+            pushImage();
+    }
+    else
+        pushImage();
 
     // Convert to grayscale
-    pushImage();
     PageData tmpImage = currPage;
 
     // Convert color images to grayscale first
@@ -1376,9 +1381,6 @@ void Viewer::binThread(bool adaptive)
     // Record changes
     currPage.setChanges(currPage.changes() + 1);
     currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
-    locker.unlock();
-    emit imageChangedSig();
-    update();
 }
 
 //

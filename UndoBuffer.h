@@ -64,12 +64,12 @@ public:
     }
 
     // Peek at the last page saved
-    const PageData peek(PageData &page)
+    const PageData peek()
     {
         if (m_undoState.count() > 0)
             return m_undoState.first();
         else
-            return page;
+            return PageData();
     }
 
 private:
