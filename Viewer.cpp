@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Viewer.h"
 #include "UndoBuffer.h"
 #include "ViewData.h"
@@ -10,7 +11,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
-#include <QSettings>
 #include <QtConcurrent/QtConcurrent>
 
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
@@ -30,38 +30,10 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     DropperCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
     DespeckleCursor = QCursor(p, 15, 15);
-
-    // Load settings file
-    QSettings settings;
-    dropperThreshold = settings.value("Viewer/dropperThreshold", 20).toInt();
-    floodThreshold = settings.value("Viewer/floodThreshold", 50).toInt();
-    deskewAngle = settings.value("Viewer/deskewAngle", 0.0).toDouble();
-    despeckleArea = settings.value("Viewer/despeckleArea", 20).toInt();
-    brushSize = settings.value("Viewer/brushSize", 1.0).toDouble();
-    blurRadius = settings.value("Viewer/blurRadius", 5).toInt();
-    if (blurRadius % 2 != 1)
-        blurRadius++;
-    kernelSize = settings.value("Viewer/kernelSize", 23).toInt();
-    if (kernelSize % 2 != 1)
-        kernelSize++;
-    QString font = settings.value("Viewer/font", "Courier New,20,-1,5,50,0,0,0,0,0").toString();
-    textFont.fromString(font);
 }
 
 Viewer::~Viewer()
 {
-    QSettings settings;
-    settings.beginGroup("Viewer");
-    settings.setValue("dropperThreshold", dropperThreshold);
-    settings.setValue("floodThreshold", floodThreshold);
-    settings.setValue("deskewAngle", deskewAngle);
-    settings.setValue("despeckleArea", despeckleArea);
-    settings.setValue("brushSize", brushSize);
-    settings.setValue("blurRadius", blurRadius);
-    settings.setValue("kernelSize", kernelSize);
-    settings.setValue("font", textFont.toString());
-    settings.endGroup();
-
     if (tessApi != nullptr)
     {
         tessApi->End();
@@ -574,7 +546,7 @@ void Viewer::paintEvent(QPaintEvent *)
         {
             QPointF start = transform.inverted().map(origin);
             QPointF finish = transform.inverted().map(drawLoc);
-            p.setPen(QPen(currColor, brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            p.setPen(QPen(currColor, Config::brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             p.drawLine(start, finish);
         }
         else if (warpCount > 1)
@@ -620,7 +592,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         v.scaleFactor = scaleFactor;
         v.horizontalScroll = scrollArea->horizontalScrollBar()->value();
         v.verticalScroll = scrollArea->verticalScrollBar()->value();
-        v.deskewAngle = deskewAngle;
+        v.deskewAngle = Config::deskewAngle;
         currListItem->setData(Qt::UserRole+2, QVariant::fromValue(v));
     }
 
@@ -642,8 +614,8 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
         }
         else
             fitToWindow();
-        deskewAngle = v.deskewAngle;
-        emit setDeskewWidget(deskewAngle);
+        Config::deskewAngle = v.deskewAngle;
+        emit setDeskewWidget(Config::deskewAngle);
     }
     else
     {
@@ -704,14 +676,6 @@ void Viewer::setTool(LeftMode tool)
 }
 
 //
-// Select brush
-//
-void Viewer::setBrush(qreal sz)
-{
-    brushSize = sz;
-}
-
-//
 // Draw a line in the foreground color
 //
 void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
@@ -724,7 +688,7 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
 
     QPainter p(&currPage);
     p.setTransform(transform);
-    p.setPen(QPen(color, int(brushSize * scale), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.setPen(QPen(color, int(Config::brushSize * scale), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
     update();
@@ -746,7 +710,7 @@ void Viewer::drawDot(QPoint loc, QColor color)
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    p.drawEllipse(loc, int(brushSize * scale/2.0), int(brushSize * scale/2.0));
+    p.drawEllipse(loc, int(Config::brushSize * scale/2.0), int(Config::brushSize * scale/2.0));
     p.end();
     update();
 }
@@ -808,7 +772,7 @@ void Viewer::blankPage()
         QPainter p(&currPage);
         p.fillRect(currPage.rect(), backgroundColor);
         p.setPen(foregroundColor);
-        p.setFont(textFont);
+        p.setFont(Config::textFont);
         p.drawText(currPage.rect(), Qt::AlignCenter, text);
         p.end();
         currPage.setChanges(currPage.changes() + 1);
@@ -823,7 +787,7 @@ void Viewer::blankPage()
 //
 void Viewer::setDropperThreshold(int val)
 {
-    dropperThreshold = val;
+    Config::dropperThreshold = val;
     if (leftMode == ColorSelect)
         colorSelect();
 }
@@ -868,7 +832,7 @@ void Viewer::colorSelect()
                 tmp = abs(blu - qBlue(val));
                 if (tmp > max)
                     max = tmp;
-                *maskPtr++ = (val == blank) || (max > dropperThreshold) ? white : black;
+                *maskPtr++ = (val == blank) || (max > Config::dropperThreshold) ? white : black;
             }
         }
         blink = false;
@@ -893,7 +857,7 @@ void Viewer::colorSelect()
             {
                 int val = *srcPtr++;
                 int max = abs(pix - val);
-                *maskPtr++ = (val == 255) || (max > dropperThreshold) ? white : black;
+                *maskPtr++ = (val == 255) || (max > Config::dropperThreshold) ? white : black;
             }
         }
         blink = false;
@@ -912,7 +876,7 @@ void Viewer::colorSelect()
 //
 void Viewer::setFloodThreshold(int val)
 {
-    floodThreshold = val;
+    Config::floodThreshold = val;
     if (leftMode == FloodFill)
         floodFill();
 }
@@ -944,7 +908,7 @@ void Viewer::floodFill()
     // Fill adjacent pixels
     cv::Point loc(floodLoc.x(), floodLoc.y());
     cv::Rect region;
-    cv::Scalar thresh(floodThreshold, floodThreshold, floodThreshold);
+    cv::Scalar thresh(Config::floodThreshold, Config::floodThreshold, Config::floodThreshold);
     int flags = 8 | (255 << 8 ) | cv::FLOODFILL_FIXED_RANGE | cv::FLOODFILL_MASK_ONLY;
     cv::floodFill(orig, floodMask, loc, 0, &region, thresh, thresh, flags);
 
@@ -994,7 +958,7 @@ void Viewer::applyMask(QImage &mask, bool flag)
 //
 void Viewer::setDeskew(double angle)
 {
-    deskewAngle = angle;
+    Config::deskewAngle = angle;
     if (leftMode == Deskew)
         deskew();
 }
@@ -1027,7 +991,7 @@ void Viewer::deskewThread()
     currMask = QImage();
 
     // Rotate page
-    QTransform tmat = QTransform().rotate(deskewAngle);
+    QTransform tmat = QTransform().rotate(Config::deskewAngle);
     deskewImg = currPage.transformed(tmat, Qt::SmoothTransformation);
     update();
 }
@@ -1052,7 +1016,7 @@ void Viewer::applyDeskew()
 //
 void Viewer::setDespeckle(int val)
 {
-    despeckleArea = val;
+    Config::despeckleArea = val;
     if (leftMode == Despeckle)
         despeckle();
 }
@@ -1114,7 +1078,7 @@ void Viewer::despeckleThread()
     for(int idx=1; idx<nLabels; idx++)
     {
         // Check if this blob is small enough
-        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= despeckleArea)
+        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= Config::despeckleArea)
         {
             int top = stats.at<int>(idx, cv::CC_STAT_TOP);
             int bot = stats.at<int>(idx, cv::CC_STAT_TOP) + stats.at<int>(idx, cv::CC_STAT_HEIGHT);
@@ -1265,11 +1229,11 @@ void Viewer::toGrayscale()
 //
 void Viewer::setBlurRadius(int val)
 {
-    blurRadius = val;
+    Config::blurRadius = val;
 
     // Even values crash openCV
-    if (blurRadius % 2 != 1)
-        blurRadius++;
+    if (Config::blurRadius % 2 != 1)
+        Config::blurRadius++;
     binarization(binMode);
 }
 
@@ -1278,11 +1242,11 @@ void Viewer::setBlurRadius(int val)
 //
 void Viewer::setKernelSize(int val)
 {
-    kernelSize = val;
+    Config::kernelSize = val;
 
     // Even values crash openCV
-    if (kernelSize % 2 != 1)
-        kernelSize++;
+    if (Config::kernelSize % 2 != 1)
+        Config::kernelSize++;
     binarization(binMode);
 }
 
@@ -1355,14 +1319,14 @@ void Viewer::binThread(bool adaptive)
     if (true)
     {
         cv::Mat tmp;
-        cv::GaussianBlur(mat, tmp, cv::Size(blurRadius, blurRadius), 0);
+        cv::GaussianBlur(mat, tmp, cv::Size(Config::blurRadius, Config::blurRadius), 0);
         mat = tmp;
     }
 
     if (adaptive)   // Adaptive threshold - this hollows out diodes, etc
     {
         cv::Mat tmp;
-        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernelSize, 2);
+        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, Config::kernelSize, 2);
         mat = tmp;
     }
     else            // Otsu's global threshold calculation

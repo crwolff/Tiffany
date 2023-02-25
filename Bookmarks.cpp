@@ -9,7 +9,6 @@
 #include <QImageWriter>
 #include <QMessageBox>
 #include <QPainter>
-#include <QSettings>
 #include <QTransform>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)

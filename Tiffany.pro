@@ -30,10 +30,10 @@ QT += widgets gui concurrent
 
 # Input
 HEADERS += mainwindow.h Bookmarks.h Viewer.h ColorQToolButton.h PopupQToolButton.h PageData.h UndoBuffer.h
-HEADERS += QImage2OCV.h SpinWidget.h DoubleSpinWidget.h ViewData.h
+HEADERS += QImage2OCV.h SpinWidget.h DoubleSpinWidget.h ViewData.h Config.h
 FORMS += mainWin.ui
 SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp ColorQToolButton.cpp PopupQToolButton.cpp QImage2OCV.cpp
-SOURCES += SpinWidget.cpp DoubleSpinWidget.cpp
+SOURCES += SpinWidget.cpp DoubleSpinWidget.cpp Config.cpp
 RESOURCES += rsrc.qrc
 
 # OpenCV

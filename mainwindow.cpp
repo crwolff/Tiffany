@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "mainwindow.h"
 #include "ui_mainWin.h"
 #include "PopupQToolButton.h"
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    Config::LoadConfig();
     ui->setupUi(this);
     buildToolBar();
     connectSignalSlots();
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 //
 MainWindow::~MainWindow()
 {
+    Config::SaveConfig();
     delete ui;
 }
 
@@ -81,10 +84,10 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
 
     // Stroke menu
-    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(1.0); });
-    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(4.0); });
-    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(8.0); });
-    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { this->ui->viewer->setBrush(12.0); });
+    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { Config::brushSize = 1; });
+    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { Config::brushSize = 4; });
+    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { Config::brushSize = 8; });
+    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { Config::brushSize = 12; });
 
     // Toolbar
     QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
@@ -204,11 +207,11 @@ void MainWindow::buildToolBar()
     toolSizeMenu->addAction(ui->pix12Act);
     PopupQToolButton *toolSizeToolButton = new PopupQToolButton();
     toolSizeToolButton->setMenu(toolSizeMenu);
-    if (ui->viewer->brushSize == 12.0)
+    if (Config::brushSize == 12)
         toolSizeToolButton->setDefaultAction(ui->pix12Act);
-    else if (ui->viewer->brushSize == 8.0)
+    else if (Config::brushSize == 8)
         toolSizeToolButton->setDefaultAction(ui->pix8Act);
-    else if (ui->viewer->brushSize == 4.0)
+    else if (Config::brushSize == 4)
         toolSizeToolButton->setDefaultAction(ui->pix4Act);
     else
         toolSizeToolButton->setDefaultAction(ui->pix1Act);
@@ -217,19 +220,19 @@ void MainWindow::buildToolBar()
 
     // Remaining tools
     ui->toolBar->addAction(ui->dropperAct);
-    dropperThresholdWidget = new SpinWidget(0, 255, ui->viewer->dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
+    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
     dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
     dropperThresholdSpin->setVisible(false);
     ui->toolBar->addAction(ui->floodAct);
-    floodThresholdWidget = new SpinWidget(0, 255, ui->viewer->floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
+    floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
     ui->toolBar->addAction(ui->despeckleAct);
-    despeckleWidget = new SpinWidget(1, 100, ui->viewer->despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
     despeckleSpin->setVisible(false);
     ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, ui->viewer->deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
     deskewSpin = ui->toolBar->addWidget(deskewWidget);
     deskewSpin->setVisible(false);
 
@@ -247,10 +250,10 @@ void MainWindow::buildToolBar()
     reFormatToolButton->setMenu(reFormatMenu);
     reFormatToolButton->setDefaultAction(ui->grayscaleAct);
     ui->toolBar->addWidget(reFormatToolButton);
-    blurWidget = new SpinWidget(1, 15, ui->viewer->blurRadius, 2, "Blur Size", ui->toolBar);
+    blurWidget = new SpinWidget(1, 15, Config::blurRadius, 2, "Blur Size", ui->toolBar);
     blurSpin = ui->toolBar->addWidget(blurWidget);
     blurSpin->setVisible(false);
-    kernelWidget = new SpinWidget(3, 149, ui->viewer->kernelSize, 2, "Kernel Size", ui->toolBar);
+    kernelWidget = new SpinWidget(3, 149, Config::kernelSize, 2, "Kernel Size", ui->toolBar);
     kernelSpin = ui->toolBar->addWidget(kernelWidget);
     kernelSpin->setVisible(false);
 
@@ -297,9 +300,9 @@ void MainWindow::colorMagic()
 void MainWindow::fontSelect()
 {
     bool ok;
-    QFont font = QFontDialog::getFont(&ok, ui->viewer->textFont, this);
+    QFont font = QFontDialog::getFont(&ok, Config::textFont, this);
     if (ok)
-        ui->viewer->textFont = font;
+        Config::textFont = font;
 }
 
 //
