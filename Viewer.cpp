@@ -1271,9 +1271,6 @@ void Viewer::binarization(bool adaptive)
     if (currPage.isNull())
         return;
 
-    // Don't start multiple threads
-    QMutexLocker locker(&mutex);
-
     // Run the conversion
     QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, adaptive);
     while (!future.isFinished())
@@ -1293,6 +1290,9 @@ void Viewer::binarization(bool adaptive)
 //
 void Viewer::binThread(bool adaptive)
 {
+    // Don't start multiple threads
+    QMutexLocker locker(&mutex);
+
     // If the last edit was binarization, rollback change and rerun
     UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
     if (currPage.format() == QImage::Format_Mono)
