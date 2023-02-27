@@ -51,7 +51,7 @@ public slots:
     void toBinary();
     void toAdaptive();
     void binarization(bool adaptive);
-    void binThread(bool adaptive);
+    void binThread(QListWidgetItem *listItem, int blur, int kernel, bool adaptive);
     void undoEdit();
     void redoEdit();
     void zoomIn();

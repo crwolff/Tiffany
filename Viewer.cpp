@@ -1272,7 +1272,8 @@ void Viewer::binarization(bool adaptive)
         return;
 
     // Run the conversion
-    QFuture<void> future = QtConcurrent::run(this, &Viewer::binThread, adaptive);
+    QFuture<void> future = QtConcurrent::run(this, 
+            &Viewer::binThread, currListItem, Config::blurRadius, Config::kernelSize, adaptive);
     while (!future.isFinished())
     {
         QApplication::processEvents();
@@ -1281,6 +1282,7 @@ void Viewer::binarization(bool adaptive)
     future.waitForFinished();
 
     // Notify viewers
+    currPage = currListItem->data(Qt::UserRole).value<PageData>();
     emit imageChangedSig();
     update();
 }
@@ -1288,17 +1290,18 @@ void Viewer::binarization(bool adaptive)
 //
 // Run this in a separate thread to keep from blocking the UI
 //
-void Viewer::binThread(bool adaptive)
+void Viewer::binThread(QListWidgetItem *listItem, int blur, int kernel, bool adaptive)
 {
     // Don't start multiple threads
     QMutexLocker locker(&mutex);
 
     // If the last edit was binarization, rollback change and rerun
-    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    if (currPage.format() == QImage::Format_Mono)
+    PageData page = listItem->data(Qt::UserRole).value<PageData>();
+    UndoBuffer ub = listItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    if (page.format() == QImage::Format_Mono)
     {
         if (!ub.peek().isNull() && (ub.peek().format() != QImage::Format_Mono))
-            currPage = ub.peek();
+            page = ub.peek();
         else
             pushImage();
     }
@@ -1306,11 +1309,9 @@ void Viewer::binThread(bool adaptive)
         pushImage();
 
     // Convert to grayscale
-    PageData tmpImage = currPage;
-
-    // Convert color images to grayscale first
-    if (currPage.format() != QImage::Format_Grayscale8)
-        tmpImage = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    PageData tmpImage = page;
+    if (tmpImage.format() != QImage::Format_Grayscale8)
+        tmpImage = tmpImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
 
     // Convert to OpenCV
     cv::Mat mat = QImage2OCV(tmpImage);
@@ -1319,14 +1320,14 @@ void Viewer::binThread(bool adaptive)
     if (true)
     {
         cv::Mat tmp;
-        cv::GaussianBlur(mat, tmp, cv::Size(Config::blurRadius, Config::blurRadius), 0);
+        cv::GaussianBlur(mat, tmp, cv::Size(blur, blur), 0);
         mat = tmp;
     }
 
     if (adaptive)   // Adaptive threshold - this hollows out diodes, etc
     {
         cv::Mat tmp;
-        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, Config::kernelSize, 2);
+        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernel, 2);
         mat = tmp;
     }
     else            // Otsu's global threshold calculation
@@ -1337,14 +1338,13 @@ void Viewer::binThread(bool adaptive)
     }
 
     // Convert back to QImage and reformat
-    tmpImage = OCV2QImage(mat, currPage);
+    tmpImage = OCV2QImage(mat, page);
     PageData monoImage = tmpImage.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::ThresholdDither|Qt::AvoidDither);
-    monoImage.copyOtherData(currPage);
-    currPage = monoImage;
+    monoImage.copyOtherData(page);
 
     // Record changes
-    currPage.setChanges(currPage.changes() + 1);
-    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    monoImage.setChanges(monoImage.changes() + 1);
+    listItem->setData(Qt::UserRole, QVariant::fromValue(monoImage));
 }
 
 //
