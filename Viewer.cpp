@@ -71,12 +71,12 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         origin = event->pos();
         if (pasting)
         {
-            pushImage();
+            pushImage(currListItem, currPage);
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             currColor = (leftMode == Pencil) ? foregroundColor : backgroundColor;
-            pushImage();
+            pushImage(currListItem, currPage);
             setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
             drawDot(origin, currColor);
         }
@@ -258,7 +258,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             {
                 warpCount = 0;
                 setMouseTracking(false);
-                pushImage();
+                pushImage(currListItem, currPage);
                 doWarp();
                 setCursor(Qt::ArrowCursor);
             }
@@ -732,7 +732,7 @@ void Viewer::fillArea(QRect rect, bool outside)
     float scale = scaleBase * scaleFactor;
     QTransform transform = QTransform().scale(scale, scale).inverted();
 
-    pushImage();
+    pushImage(currListItem, currPage);
     QPainter p(&currPage);
     if (outside)
     {
@@ -768,7 +768,7 @@ void Viewer::blankPage()
                                          "BLANK", &ok);
     if (ok)
     {
-        pushImage();
+        pushImage(currListItem, currPage);
         QPainter p(&currPage);
         p.fillRect(currPage.rect(), backgroundColor);
         p.setPen(foregroundColor);
@@ -944,7 +944,7 @@ void Viewer::floodFill()
 void Viewer::applyMask(QImage &mask, bool flag)
 {
     // Paint the copied section
-    pushImage();
+    pushImage(currListItem, currPage);
     QPainter p(&currPage);
     if (!flag)
         mask.invertPixels(QImage::InvertRgb);
@@ -1003,7 +1003,7 @@ void Viewer::applyDeskew()
 {
     // Paint the deskew image rotated about the center
     // Note: This code is identical to paintEvent
-    pushImage();
+    pushImage(currListItem, currPage);
     QPainter p(&currPage);
     QRect rect(deskewImg.rect());
     rect.moveCenter(currPage.rect().center());
@@ -1212,7 +1212,7 @@ void Viewer::toGrayscale()
         return;
 
     // Convert to grayscale
-    pushImage();
+    pushImage(currListItem, currPage);
     PageData tmpImage = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
     tmpImage.copyOtherData(currPage);
     currPage = tmpImage;
@@ -1298,15 +1298,10 @@ void Viewer::binThread(QListWidgetItem *listItem, int blur, int kernel, bool ada
     // If the last edit was binarization, rollback change and rerun
     PageData page = listItem->data(Qt::UserRole).value<PageData>();
     UndoBuffer ub = listItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    if (page.format() == QImage::Format_Mono)
-    {
-        if (!ub.peek().isNull() && (ub.peek().format() != QImage::Format_Mono))
-            page = ub.peek();
-        else
-            pushImage();
-    }
-    else
-        pushImage();
+    if ((page.format() == QImage::Format_Mono) && !ub.peek().isNull() && (ub.peek().format() != QImage::Format_Mono))
+        page = ub.undo(page);
+    ub.push(page);
+    listItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 
     // Convert to grayscale
     PageData tmpImage = page;
@@ -1454,7 +1449,7 @@ void Viewer::doWarp()
 
     // Convert to OCV
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    pushImage();
+    pushImage(currListItem, currPage);
     cv::Mat mat = QImage2OCV(currPage);
 
     // Compute perspective transform
@@ -1487,14 +1482,14 @@ void Viewer::doWarp()
 //
 // Save current image to undo buffer
 //
-void Viewer::pushImage()
+void Viewer::pushImage(QListWidgetItem *listItem, PageData &page)
 {
-    if (currPage.isNull())
+    if (page.isNull())
         return;
 
-    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
-    ub.push(currPage);
-    currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+    UndoBuffer ub = listItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    ub.push(page);
+    listItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
 }
 
 //

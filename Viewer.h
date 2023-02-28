@@ -91,7 +91,7 @@ private:
     void zoomWheel(QPoint pos, float factor);
     void regionOCR();
     void doWarp();
-    void pushImage();
+    void pushImage(QListWidgetItem *listItem, PageData &page);
     void updateScrollBars();
     void adjustScrollBars(float factor);
     bool measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
