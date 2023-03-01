@@ -410,7 +410,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         else if (event->key() == Qt::Key_S)
         {
             if (currMask.isNull())
-                fillArea(rubberBand->geometry(), true);
+            {
+                if (event->modifiers().testFlag(Qt::ShiftModifier))
+                    cropArea(rubberBand->geometry());
+                else
+                    fillArea(rubberBand->geometry(), true);
+            }
             else
             {
                 blinkTimer->stop();
@@ -713,6 +718,31 @@ void Viewer::drawDot(QPoint loc, QColor color)
     p.drawEllipse(loc, int(Config::brushSize * scale/2.0), int(Config::brushSize * scale/2.0));
     p.end();
     update();
+}
+
+//
+// Crop to rectangle
+//
+void Viewer::cropArea(QRect rect)
+{
+    if (currPage.isNull())
+        return;
+    if (rubberBand->isHidden())
+    {
+        QMessageBox::information(this, "Crop", "Area must be selected");
+        return;
+    }
+    rubberBand->hide();
+
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
+    pushImage(currListItem, currPage);
+    QRect box = transform.mapRect(rect);
+    PageData newPage = currPage.copy(box);
+    newPage.copyOtherData(currPage);
+    currPage = newPage;
+    fitToWindow();
 }
 
 //
