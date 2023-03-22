@@ -1101,9 +1101,9 @@ void Viewer::despeckleThread()
     int nLabels = cv::connectedComponentsWithStats(bw, labelImg, stats, centroids, 4, CV_32S);
 
     // Build mask of blobs smaller than limit
-    cv::Vec4b white = cv::Vec4b(255,255,255,0);  // Transparent white
-    cv::Vec4b black = cv::Vec4b(0,0,0,255);      // Opaque black
-    cv::Mat mask(labelImg.size(), CV_8UC4, white);
+    currMask = QImage(labelImg.cols, labelImg.rows, QImage::Format_ARGB32);
+    currMask.fill(qRgba(0,0,0,0));
+    QRgb black = qRgba(0,0,0,255);      // Opaque black
     int cnt = 0;
     for(int idx=1; idx<nLabels; idx++)
     {
@@ -1118,11 +1118,12 @@ void Viewer::despeckleThread()
             // Sweep the enclosing rectangle, setting pixels in the mask
             for (int row=top; row<bot; row++)
             {
+                QRgb *line = reinterpret_cast<QRgb*>(currMask.scanLine(row));
                 for (int col=left; col<right; col++)
                 {
                     if (labelImg.at<int>(row,col) == idx)
                     {
-                        cv::Vec4b &pixel = mask.at<cv::Vec4b>(row,col);
+                        QRgb &pixel = line[col];
                         pixel = black;
                     }
                 }
@@ -1131,7 +1132,6 @@ void Viewer::despeckleThread()
         }
     }
     //qInfo() << cnt << "Blobs detected";
-    currMask = OCV2QImage(mask);
 }
 
 //
