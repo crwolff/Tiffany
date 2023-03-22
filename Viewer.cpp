@@ -322,7 +322,8 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Escape)
     {
         setCursor(Qt::ArrowCursor);
-        currMask = QImage();
+        fgMask = QImage();
+        bgMask = QImage();
         deskewImg = QImage();
         pasting = false;
         warpCount = 0;
@@ -397,19 +398,20 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         if (event->key() == Qt::Key_X)
         {
-            if (currMask.isNull())
+            if (fgMask.isNull() || bgMask.isNull())
                 fillArea(rubberBand->geometry(), false);
             else
             {
                 blinkTimer->stop();
-                applyMask(currMask, false);
-                currMask = QImage();
+                applyMask(bgMask);
+                fgMask = QImage();
+                bgMask = QImage();
             }
             flag = true;
         }
         else if (event->key() == Qt::Key_S)
         {
-            if (currMask.isNull())
+            if (fgMask.isNull() || bgMask.isNull())
             {
                 if (event->modifiers().testFlag(Qt::ShiftModifier))
                     cropArea(rubberBand->geometry());
@@ -419,8 +421,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
             {
                 blinkTimer->stop();
-                applyMask(currMask, true);
-                currMask = QImage();
+                applyMask(fgMask);
+                fgMask = QImage();
+                bgMask = QImage();
             }
             flag = true;
         }
@@ -525,12 +528,9 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setOpacity(0.3);
             p.drawImage(loc, copyImage);
         }
-        else if (!currMask.isNull())
+        else if (!fgMask.isNull() && !bgMask.isNull())
         {
-            QImage tmp = currMask;
-            if (blink)
-                tmp.invertPixels(QImage::InvertRgb);
-            p.drawImage(QPoint(0,0), tmp);
+            p.drawImage(QPoint(0,0), blink ? fgMask : bgMask);
         }
         else if (!deskewImg.isNull())
         {
@@ -575,7 +575,7 @@ void Viewer::paintEvent(QPaintEvent *)
 //
 void Viewer::blinker()
 {
-    if (currPage.isNull() || currMask.isNull())
+    if (currPage.isNull() || fgMask.isNull() || bgMask.isNull())
     {
         blinkTimer->stop();
         return;
@@ -640,7 +640,8 @@ void Viewer::updateViewer()
 
     // Reload image from list
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
-    currMask = QImage();
+    fgMask = QImage();
+    bgMask = QImage();
     deskewImg = QImage();
 
     // Turn off active operations
@@ -666,7 +667,8 @@ QSize Viewer::sizeHint() const
 void Viewer::setTool(LeftMode tool)
 {
     leftMode = tool;
-    currMask = QImage();
+    fgMask = QImage();
+    bgMask = QImage();
     deskewImg = QImage();
     if ((tool == Pencil) || (tool == Eraser))
         pencil180 = false;
@@ -829,6 +831,7 @@ void Viewer::colorSelect()
 {
     if (currPage.isNull())
         return;
+    deskewImg = QImage();
 
     // Get pixel under cursor
     QRgb pixel = currPage.pixel(dropperLoc.x(), dropperLoc.y());
@@ -840,18 +843,17 @@ void Viewer::colorSelect()
         int grn = qGreen(pixel);
         int blu = qBlue(pixel);
 
-        // Identically sized grayscale image
-        currMask = QImage(currPage.size(), QImage::Format_ARGB32);
-        deskewImg = QImage();
+        // Masks to paint on
+        fgMask = QImage(currPage.size(), QImage::Format_ARGB32);
+        bgMask = QImage(currPage.size(), QImage::Format_ARGB32);
 
         // Scan through page seeking matches
-        QRgb blank = qRgba(255,255,255,255);// Don't match white pixels
-        QRgb white = qRgba(255,255,255,0);  // Transparent white
-        QRgb black = qRgba(0,0,0,255);      // Opaque black
+        QRgb transparent = qRgba(0,0,0,0);
         for(int i=0; i<currPage.height(); i++)
         {
             QRgb *srcPtr = (QRgb *)currPage.scanLine(i);
-            QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+            QRgb *fgMaskPtr = reinterpret_cast<QRgb*>(fgMask.scanLine(i));
+            QRgb *bgMaskPtr = reinterpret_cast<QRgb*>(bgMask.scanLine(i));
             for(int j=0; j<currPage.width(); j++)
             {
                 QRgb val = *srcPtr++;
@@ -862,7 +864,16 @@ void Viewer::colorSelect()
                 tmp = abs(blu - qBlue(val));
                 if (tmp > max)
                     max = tmp;
-                *maskPtr++ = (val == blank) || (max > Config::dropperThreshold) ? white : black;
+                if (max > Config::dropperThreshold)
+                {
+                    *fgMaskPtr++ = transparent;
+                    *bgMaskPtr++ = transparent;
+                }
+                else
+                {
+                    *fgMaskPtr++ = foregroundColor.rgb();
+                    *bgMaskPtr++ = backgroundColor.rgb();
+                }
             }
         }
         blink = false;
@@ -873,21 +884,31 @@ void Viewer::colorSelect()
         blinkTimer->stop();
         int pix = qRed(pixel);
 
-        // Identically sized grayscale image
-        currMask = QImage(currPage.size(), QImage::Format_ARGB32);
+        // Masks to paint on
+        fgMask = QImage(currPage.size(), QImage::Format_ARGB32);
+        bgMask = QImage(currPage.size(), QImage::Format_ARGB32);
 
         // Scan through page seeking matches
-        QRgb white = qRgba(255,255,255,0);  // Transparent white
-        QRgb black = qRgba(0,0,0,255);      // Opaque black
+        QRgb transparent = qRgba(0,0,0,0);
         for(int i=0; i<currPage.height(); i++)
         {
             uchar *srcPtr = currPage.scanLine(i);
-            QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+            QRgb *fgMaskPtr = reinterpret_cast<QRgb*>(fgMask.scanLine(i));
+            QRgb *bgMaskPtr = reinterpret_cast<QRgb*>(bgMask.scanLine(i));
             for(int j=0; j<currPage.width(); j++)
             {
                 int val = *srcPtr++;
                 int max = abs(pix - val);
-                *maskPtr++ = (val == 255) || (max > Config::dropperThreshold) ? white : black;
+                if (max > Config::dropperThreshold)
+                {
+                    *fgMaskPtr++ = transparent;
+                    *bgMaskPtr++ = transparent;
+                }
+                else
+                {
+                    *fgMaskPtr++ = foregroundColor.rgb();
+                    *bgMaskPtr++ = backgroundColor.rgb();
+                }
             }
         }
         blink = false;
@@ -946,18 +967,30 @@ void Viewer::floodFill()
     QImage tmp = OCV2QImage(floodMask);
     tmp = tmp.copy(1, 1, tmp.width() - 2, tmp.height() - 2);
 
-    // Identically sized image
-    currMask = QImage(tmpPage.size(), QImage::Format_ARGB32);
+    // Masks to paint on
+    fgMask = QImage(currPage.size(), QImage::Format_ARGB32);
+    bgMask = QImage(currPage.size(), QImage::Format_ARGB32);
 
     // Scan through page seeking matches
-    QRgb white = qRgba(255,255,255,0);  // Transparent white
-    QRgb black = qRgba(0,0,0,255);      // Opaque black
+    QRgb transparent = qRgba(0,0,0,0);
     for(int i=0; i<tmp.height(); i++)
     {
         uchar *srcPtr = tmp.scanLine(i);
-        QRgb *maskPtr = (QRgb *)currMask.scanLine(i);
+        QRgb *fgMaskPtr = reinterpret_cast<QRgb*>(fgMask.scanLine(i));
+        QRgb *bgMaskPtr = reinterpret_cast<QRgb*>(bgMask.scanLine(i));
         for(int j=0; j<tmp.width(); j++)
-            *maskPtr++ = (*srcPtr++ > 128) ? black : white;
+        {
+            if (*srcPtr++ > 128)
+            {
+                *fgMaskPtr++ = foregroundColor.rgb();
+                *bgMaskPtr++ = backgroundColor.rgb();
+            }
+            else
+            {
+                *fgMaskPtr++ = transparent;
+                *bgMaskPtr++ = transparent;
+            }
+        }
     }
 
     // Highlight changes
@@ -971,13 +1004,11 @@ void Viewer::floodFill()
 //
 // Apply the mask to the current image
 //
-void Viewer::applyMask(QImage &mask, bool flag)
+void Viewer::applyMask(QImage &mask)
 {
     // Paint the copied section
     pushImage(currListItem, currPage);
     QPainter p(&currPage);
-    if (!flag)
-        mask.invertPixels(QImage::InvertRgb);
     p.drawImage(QPoint(0,0), mask);
     p.end();
     update();
@@ -1017,8 +1048,9 @@ void Viewer::deskewThread()
     if (currPage.isNull())
         return;
 
-    // Identically sized image
-    currMask = QImage();
+    // Blank these out
+    fgMask = QImage();
+    bgMask = QImage();
 
     // Rotate page
     QTransform tmat = QTransform().rotate(Config::deskewAngle);
@@ -1093,7 +1125,6 @@ void Viewer::despeckleThread()
 
     // Make B&W with background black
     cv::Mat bw;
-    //cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
     cv::threshold(mat, bw, 250, 255, cv::THRESH_BINARY_INV);
 
     // Find blobs
@@ -1101,9 +1132,10 @@ void Viewer::despeckleThread()
     int nLabels = cv::connectedComponentsWithStats(bw, labelImg, stats, centroids, 4, CV_32S);
 
     // Build mask of blobs smaller than limit
-    currMask = QImage(labelImg.cols, labelImg.rows, QImage::Format_ARGB32);
-    currMask.fill(qRgba(0,0,0,0));
-    QRgb black = qRgba(0,0,0,255);      // Opaque black
+    fgMask = QImage(labelImg.cols, labelImg.rows, QImage::Format_ARGB32);
+    bgMask = QImage(labelImg.cols, labelImg.rows, QImage::Format_ARGB32);
+    fgMask.fill(qRgba(0,0,0,0));
+    bgMask.fill(qRgba(0,0,0,0));
     int cnt = 0;
     for(int idx=1; idx<nLabels; idx++)
     {
@@ -1118,13 +1150,14 @@ void Viewer::despeckleThread()
             // Sweep the enclosing rectangle, setting pixels in the mask
             for (int row=top; row<bot; row++)
             {
-                QRgb *line = reinterpret_cast<QRgb*>(currMask.scanLine(row));
+                QRgb *fgMaskPtr = reinterpret_cast<QRgb*>(fgMask.scanLine(row));
+                QRgb *bgMaskPtr = reinterpret_cast<QRgb*>(bgMask.scanLine(row));
                 for (int col=left; col<right; col++)
                 {
                     if (labelImg.at<int>(row,col) == idx)
                     {
-                        QRgb &pixel = line[col];
-                        pixel = black;
+                        fgMaskPtr[col] = foregroundColor.rgb();
+                        bgMaskPtr[col] = backgroundColor.rgb();
                     }
                 }
             }

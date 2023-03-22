@@ -83,7 +83,7 @@ private:
     void drawDot(QPoint loc, QColor color);
     void cropArea(QRect rect);
     void fillArea(QRect rect, bool outside);
-    void applyMask(QImage &mask, bool flag);
+    void applyMask(QImage &mask);
     void applyDeskew();
     void copySelection();
     QPointF pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc);
@@ -99,7 +99,8 @@ private:
 
     QListWidgetItem *currListItem = NULL;
     PageData currPage;
-    QImage currMask;
+    QImage fgMask;
+    QImage bgMask;
     QImage deskewImg;
     bool blink = false;
     float scaleFactor = 1.0;
