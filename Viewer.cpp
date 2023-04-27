@@ -441,6 +441,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         else if (event->key() == Qt::Key_W)
         {
+            leftMode = Select;
+            blinkTimer->stop();
+            fgMask = QImage();
+            bgMask = QImage();
+            deskewImg = QImage();
             setCursor(Qt::CrossCursor);
             warpCount = 1;
             setMouseTracking(true);
