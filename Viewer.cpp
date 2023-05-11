@@ -841,7 +841,7 @@ void Viewer::colorSelect()
     // Get pixel under cursor
     QRgb pixel = currPage.pixel(dropperLoc.x(), dropperLoc.y());
 
-    if (currPage.format() == QImage::Format_RGB32)
+    if ((currPage.format() == QImage::Format_RGB32) || (currPage.format() == QImage::Format_ARGB32))
     {
         blinkTimer->stop();
         int red = qRed(pixel);
@@ -955,7 +955,7 @@ void Viewer::floodFill()
 
     // Convert to OpenCV
     cv::Mat orig = QImage2OCV(tmpPage);
-    if (tmpPage.format() == QImage::Format_RGB32)
+    if ((tmpPage.format() == QImage::Format_RGB32) || (tmpPage.format() == QImage::Format_ARGB32))
         cv::cvtColor(orig, orig, cv::COLOR_RGBA2RGB);   // floodfill doesn't work with alpha channel
 
     // Make all zero mask
@@ -1120,7 +1120,7 @@ void Viewer::despeckleThread()
 
     // Convert to grayscale
     QImage img;
-    if ((currPage.format() == QImage::Format_RGB32) || (currPage.format() == QImage::Format_Mono))
+    if ((currPage.format() == QImage::Format_RGB32) || (currPage.format() == QImage::Format_ARGB32) || (currPage.format() == QImage::Format_Mono))
         img = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
     else
         img = currPage;
