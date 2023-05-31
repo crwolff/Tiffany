@@ -324,6 +324,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         setCursor(Qt::ArrowCursor);
         fgMask = QImage();
         bgMask = QImage();
+        emit statusSig("");
         deskewImg = QImage();
         pasting = false;
         warpCount = 0;
@@ -445,6 +446,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             blinkTimer->stop();
             fgMask = QImage();
             bgMask = QImage();
+            emit statusSig("");
             deskewImg = QImage();
             setCursor(Qt::CrossCursor);
             warpCount = 1;
@@ -647,6 +649,7 @@ void Viewer::updateViewer()
     currPage = currListItem->data(Qt::UserRole).value<PageData>();
     fgMask = QImage();
     bgMask = QImage();
+    emit statusSig("");
     deskewImg = QImage();
 
     // Turn off active operations
@@ -674,6 +677,7 @@ void Viewer::setTool(LeftMode tool)
     leftMode = tool;
     fgMask = QImage();
     bgMask = QImage();
+    emit statusSig("");
     deskewImg = QImage();
     if ((tool == Pencil) || (tool == Eraser))
         pencil180 = false;
@@ -1016,6 +1020,7 @@ void Viewer::applyMask(QImage &mask)
     QPainter p(&currPage);
     p.drawImage(QPoint(0,0), mask);
     p.end();
+    emit statusSig("");
     update();
 }
 
@@ -1056,6 +1061,7 @@ void Viewer::deskewThread()
     // Blank these out
     fgMask = QImage();
     bgMask = QImage();
+    emit statusSig("");
 
     // Rotate page
     QTransform tmat = QTransform().rotate(Config::deskewAngle);
@@ -1169,7 +1175,7 @@ void Viewer::despeckleThread()
             cnt++;
         }
     }
-    //qInfo() << cnt << "Blobs detected";
+    emit statusSig(QStringLiteral("%1 blobs").arg(cnt));
 }
 
 //

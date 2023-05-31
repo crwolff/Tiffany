@@ -62,6 +62,7 @@ public slots:
     void fillWindow();
 
 signals:
+    void statusSig(QString descr);
     void zoomSig(float scale);
     void imageChangedSig();
     void setDeskewWidget(float val);

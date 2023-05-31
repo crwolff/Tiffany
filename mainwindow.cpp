@@ -115,6 +115,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
     QObject::connect( ui->bookmarks, &Bookmarks::updateViewerSig, ui->viewer, &Viewer::updateViewer );
+    QObject::connect( ui->viewer, &Viewer::statusSig, this, &MainWindow::setStatus );
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
     QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
@@ -328,6 +329,17 @@ void MainWindow::updateProgress(QString descr, int val)
     {
         progressBar->setValue(val);
     }
+}
+
+//
+// Set status label to convey small informations
+//
+void MainWindow::setStatus(QString descr)
+{
+    if (descr != "")
+        statusLabel->setText(descr);
+    else
+        statusLabel->setText("Ready");
 }
 
 //

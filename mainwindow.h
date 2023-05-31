@@ -25,6 +25,7 @@ public:
 
 public slots:
     void updateProgress(QString descr, int val);
+    void setStatus(QString descr);
     void updateActions(float scale);
     void about();
     void closeEvent (QCloseEvent *event);
