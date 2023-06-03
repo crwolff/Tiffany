@@ -1,9 +1,6 @@
 #include "Config.h"
 #include "mainwindow.h"
 #include "ui_mainWin.h"
-#include "PopupQToolButton.h"
-#include "DoubleSpinWidget.h"
-#include "SpinWidget.h"
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QDebug>
