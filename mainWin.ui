@@ -501,6 +501,18 @@
     <string>Convert to binary (Adaptive)</string>
    </property>
   </action>
+  <action name="ditheredBinaryAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/d_binary.svg</normaloff>:/images/assets/d_binary.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Dithered Binary</string>
+   </property>
+   <property name="toolTip">
+    <string>Convert to binary (Dithered)</string>
+   </property>
+  </action>
   <action name="blankAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">

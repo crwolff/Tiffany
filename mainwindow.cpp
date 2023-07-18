@@ -93,6 +93,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
+    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toDithered );
 
     // Toggle spinbox depending on active tool
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
@@ -103,6 +104,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(16); });
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(32); });
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(32+64); });
+    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, [this]() { this->makeVisible(0); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -243,6 +245,7 @@ void MainWindow::buildToolBar()
     QMenu *reFormatMenu = new QMenu();
     reFormatMenu->addAction(ui->binaryAct);
     reFormatMenu->addAction(ui->adaptiveBinaryAct);
+    reFormatMenu->addAction(ui->ditheredBinaryAct);
     reFormatMenu->addAction(ui->grayscaleAct);
     PopupQToolButton *reFormatToolButton = new PopupQToolButton();
     reFormatToolButton->setMenu(reFormatMenu);

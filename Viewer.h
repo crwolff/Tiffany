@@ -50,6 +50,7 @@ public slots:
     void setKernelSize(int val);
     void toBinary();
     void toAdaptive();
+    void toDithered();
     void binarization(bool adaptive);
     void binThread(QListWidgetItem *listItem, int blur, int kernel, bool adaptive);
     void undoEdit();

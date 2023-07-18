@@ -1417,6 +1417,34 @@ void Viewer::binThread(QListWidgetItem *listItem, int blur, int kernel, bool ada
 }
 
 //
+// Convert current image to dithered binary
+//
+void Viewer::toDithered()
+{
+    // Nothing to do
+    if (currPage.isNull())
+        return;
+
+    // If the last edit was binarization, rollback change and rerun
+    UndoBuffer ub = currListItem->data(Qt::UserRole+1).value<UndoBuffer>();
+    if ((currPage.format() == QImage::Format_Mono) && !ub.peek().isNull() && (ub.peek().format() != QImage::Format_Mono))
+        currPage = ub.undo(currPage);
+    ub.push(currPage);
+    currListItem->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+
+    // Convert to grayscale
+    PageData tmpImage = currPage.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::DiffuseDither);
+    tmpImage.copyOtherData(currPage);
+    currPage = tmpImage;
+
+    // Record changes
+    currPage.setChanges(currPage.changes() + 1);
+    currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit imageChangedSig();
+    update();
+}
+
+//
 // OCR selected region
 //
 void Viewer::regionOCR()
