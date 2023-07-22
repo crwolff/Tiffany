@@ -6,7 +6,7 @@
 #include <QMetaType>
 #include <QDebug>
 
-#define MAX_UNDO 5
+#define MAX_UNDO 8
 
 class UndoBuffer
 {
