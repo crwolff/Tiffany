@@ -26,7 +26,7 @@ public:
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle };
+    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle, Devoid };
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
@@ -44,7 +44,8 @@ public slots:
     void deskewThread();
     void setDespeckle(int val);
     void despeckle();
-    void despeckleThread();
+    void devoid();
+    void despeckleThread(PageData page, int size);
     void toGrayscale();
     void setBlurRadius(int val);
     void setKernelSize(int val);

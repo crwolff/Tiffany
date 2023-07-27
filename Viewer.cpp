@@ -89,7 +89,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             setCursor(DropperCursor);
         }
-        else if (leftMode == Despeckle)
+        else if ((leftMode == Despeckle) || (leftMode == Devoid))
         {
             setCursor(DespeckleCursor);
         }
@@ -241,7 +241,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             floodLoc = transform.map(QPointF(event->pos()));
             floodFill();
         }
-        else if (leftMode == Despeckle)
+        else if ((leftMode == Despeckle) || (leftMode == Devoid))
         {
             despeckle();
             setCursor(Qt::ArrowCursor);
@@ -404,7 +404,10 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
             {
                 blinkTimer->stop();
-                applyMask(bgMask);
+                if (leftMode == Devoid)
+                    applyMask(fgMask);
+                else
+                    applyMask(bgMask);
                 fgMask = QImage();
                 bgMask = QImage();
             }
@@ -422,7 +425,10 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
             {
                 blinkTimer->stop();
-                applyMask(fgMask);
+                if (leftMode == Devoid)
+                    applyMask(bgMask);
+                else
+                    applyMask(fgMask);
                 fgMask = QImage();
                 bgMask = QImage();
             }
@@ -689,6 +695,8 @@ void Viewer::setTool(LeftMode tool)
     }
     else if (tool == Despeckle)
         despeckle();
+    else if (tool == Devoid)
+        devoid();
 }
 
 //
@@ -1092,6 +1100,8 @@ void Viewer::setDespeckle(int val)
     Config::despeckleArea = val;
     if (leftMode == Despeckle)
         despeckle();
+    else if (leftMode == Devoid)
+        devoid();
 }
 
 //
@@ -1100,7 +1110,29 @@ void Viewer::setDespeckle(int val)
 void Viewer::despeckle()
 {
     blinkTimer->stop();
-    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread);
+
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread, currPage, Config::despeckleArea);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+
+    // Blink mask
+    blink = false;
+    blinkTimer->start(500);
+}
+
+//
+// Calculate the void mask
+//
+void Viewer::devoid()
+{
+    blinkTimer->stop();
+    PageData invPage = currPage;
+    invPage.invertPixels(QImage::InvertRgb);
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread, invPage, Config::despeckleArea);
     while (!future.isFinished())
     {
         QApplication::processEvents();
@@ -1116,20 +1148,20 @@ void Viewer::despeckle()
 //
 // Run this in a separate thread to keep from blocking the UI
 //
-void Viewer::despeckleThread()
+void Viewer::despeckleThread(PageData page, int size)
 {
     QMutexLocker locker(&mutex);
 
     // Nothing to do
-    if (currPage.isNull())
+    if (page.isNull())
         return;
 
     // Convert to grayscale
     QImage img;
-    if ((currPage.format() == QImage::Format_RGB32) || (currPage.format() == QImage::Format_ARGB32) || (currPage.format() == QImage::Format_Mono))
-        img = currPage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    if ((page.format() == QImage::Format_RGB32) || (page.format() == QImage::Format_ARGB32) || (page.format() == QImage::Format_Mono))
+        img = page.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
     else
-        img = currPage;
+        img = page;
 
     // Convert to OpenCV
     cv::Mat mat = QImage2OCV(img);
@@ -1151,7 +1183,7 @@ void Viewer::despeckleThread()
     for(int idx=1; idx<nLabels; idx++)
     {
         // Check if this blob is small enough
-        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= Config::despeckleArea)
+        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= size)
         {
             int top = stats.at<int>(idx, cv::CC_STAT_TOP);
             int bot = stats.at<int>(idx, cv::CC_STAT_TOP) + stats.at<int>(idx, cv::CC_STAT_HEIGHT);

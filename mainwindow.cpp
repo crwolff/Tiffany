@@ -79,6 +79,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Eraser); });
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Devoid); });
 
     // Stroke menu
     QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { Config::brushSize = 1; });
@@ -102,6 +103,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(4); });
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(8); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(16); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeVisible(16); });
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(32); });
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(32+64); });
     QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, [this]() { this->makeVisible(0); });
@@ -218,19 +220,31 @@ void MainWindow::buildToolBar()
     toolSizeButton = ui->toolBar->addWidget(toolSizeToolButton);
     toolSizeButton->setVisible(false);
 
-    // Remaining tools
+    // Dropper button
     ui->toolBar->addAction(ui->dropperAct);
     dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper\nThreshold", ui->toolBar);
     dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
     dropperThresholdSpin->setVisible(false);
+
+    // Flood button
     ui->toolBar->addAction(ui->floodAct);
     floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood\nThreshold", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
-    ui->toolBar->addAction(ui->despeckleAct);
+
+    // Despeckle button
+    QMenu *despeckleMenu = new QMenu();
+    despeckleMenu->addAction(ui->despeckleAct);
+    despeckleMenu->addAction(ui->devoidAct);
+    PopupQToolButton *despeckleToolButton = new PopupQToolButton();
+    despeckleToolButton->setMenu(despeckleMenu);
+    despeckleToolButton->setDefaultAction(ui->despeckleAct);
+    ui->toolBar->addWidget(despeckleToolButton);
     despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
     despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
     despeckleSpin->setVisible(false);
+
+    // Deskew button
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew\nAngle", ui->toolBar);
     deskewSpin = ui->toolBar->addWidget(deskewWidget);

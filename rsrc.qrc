@@ -39,6 +39,7 @@
     <file>assets/dropper.svg</file>
     <file>assets/flood.svg</file>
     <file>assets/despeckle.svg</file>
+    <file>assets/devoid.svg</file>
     <file>assets/mirror_horiz.svg</file>
     <file>assets/mirror_vert.svg</file>
   </qresource>

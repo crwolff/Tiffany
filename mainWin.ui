@@ -129,6 +129,7 @@
     <addaction name="eraserAct"/>
     <addaction name="deskewAct"/>
     <addaction name="despeckleAct"/>
+    <addaction name="devoidAct"/>
    </widget>
    <widget class="QMenu" name="menu_Stroke">
     <property name="title">
@@ -294,6 +295,15 @@
    </property>
    <property name="text">
     <string>Despeckle</string>
+   </property>
+  </action>
+  <action name="devoidAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/devoid.svg</normaloff>:/images/assets/devoid.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Devoid</string>
    </property>
   </action>
   <action name="zoomInAct">
