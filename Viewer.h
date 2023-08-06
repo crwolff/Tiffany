@@ -43,6 +43,7 @@ public slots:
     void deskew();
     void deskewThread();
     void setDespeckle(int val);
+    void setDevoid(int val);
     void despeckle();
     void devoid();
     void despeckleThread(PageData page, int size);

@@ -103,10 +103,10 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(4); });
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(8); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(16); });
-    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeVisible(16); });
     QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(32); });
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(32+64); });
     QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, [this]() { this->makeVisible(0); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeVisible(128); });
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -125,6 +125,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
     QObject::connect( ui->viewer, &Viewer::setDeskewWidget, deskewWidget->spinBox, &QDoubleSpinBox::setValue);
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
+    QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDevoid);
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setBlurRadius);
     QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setKernelSize);
 }
@@ -139,6 +140,7 @@ void MainWindow::makeVisible(int mask)
     despeckleSpin->setVisible((mask & 16) != 0);
     blurSpin->setVisible((mask & 32) != 0);
     kernelSpin->setVisible((mask & 64) != 0);
+    devoidSpin->setVisible((mask & 128) != 0);
 }
 
 //
@@ -240,9 +242,12 @@ void MainWindow::buildToolBar()
     despeckleToolButton->setMenu(despeckleMenu);
     despeckleToolButton->setDefaultAction(ui->despeckleAct);
     ui->toolBar->addWidget(despeckleToolButton);
-    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 1, "Maximum\nBlob Size", ui->toolBar);
+    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 5, "Maximum\nBlob Size", ui->toolBar);
     despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
     despeckleSpin->setVisible(false);
+    devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Maximum\nVoid Size", ui->toolBar);
+    devoidSpin = ui->toolBar->addWidget(devoidWidget);
+    devoidSpin->setVisible(false);
 
     // Deskew button
     ui->toolBar->addAction(ui->deskewAct);

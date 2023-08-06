@@ -10,6 +10,7 @@ namespace Config
     int floodThreshold;
     double deskewAngle;
     int despeckleArea;
+    int devoidArea;
     int brushSize;
     int blurRadius;
     int kernelSize;
@@ -24,6 +25,7 @@ namespace Config
         floodThreshold = settings.value("floodThreshold", 50).toInt();
         deskewAngle = settings.value("deskewAngle", 0.0).toDouble();
         despeckleArea = settings.value("despeckleArea", 20).toInt();
+        devoidArea = settings.value("devoidArea", 20).toInt();
         brushSize = settings.value("brushSize", 1).toInt();
         if (brushSize >= 12)
             brushSize = 12;
@@ -51,6 +53,7 @@ namespace Config
         settings.setValue("floodThreshold", floodThreshold);
         settings.setValue("deskewAngle", deskewAngle);
         settings.setValue("despeckleArea", despeckleArea);
+        settings.setValue("devoidArea", devoidArea);
         settings.setValue("brushSize", brushSize);
         settings.setValue("blurRadius", blurRadius);
         settings.setValue("kernelSize", kernelSize);

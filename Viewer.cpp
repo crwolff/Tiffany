@@ -1100,7 +1100,15 @@ void Viewer::setDespeckle(int val)
     Config::despeckleArea = val;
     if (leftMode == Despeckle)
         despeckle();
-    else if (leftMode == Devoid)
+}
+
+//
+// Slot to set devoid area
+//
+void Viewer::setDevoid(int val)
+{
+    Config::devoidArea = val;
+    if (leftMode == Devoid)
         devoid();
 }
 
@@ -1132,7 +1140,7 @@ void Viewer::devoid()
     blinkTimer->stop();
     PageData invPage = currPage;
     invPage.invertPixels(QImage::InvertRgb);
-    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread, invPage, Config::despeckleArea);
+    QFuture<void> future = QtConcurrent::run(this, &Viewer::despeckleThread, invPage, Config::devoidArea);
     while (!future.isFinished())
     {
         QApplication::processEvents();

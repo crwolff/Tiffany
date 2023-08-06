@@ -12,6 +12,7 @@ namespace Config
     extern int floodThreshold;
     extern double deskewAngle;
     extern int despeckleArea;
+    extern int devoidArea;
     extern int brushSize;
     extern int blurRadius;
     extern int kernelSize;

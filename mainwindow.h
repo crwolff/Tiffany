@@ -50,6 +50,8 @@ private:
     QAction *deskewSpin;
     SpinWidget *despeckleWidget;
     QAction *despeckleSpin;
+    SpinWidget *devoidWidget;
+    QAction *devoidSpin;
     SpinWidget *blurWidget;
     QAction *blurSpin;
     SpinWidget *kernelWidget;
