@@ -40,6 +40,10 @@ private:
     void rotateSelection(int val);
     void mirrorSelection(int dir);
     QIcon makeIcon(PageData &image, bool flag);
+
+protected:
+    void enterEvent(QEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 };
 
 #endif

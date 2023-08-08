@@ -19,6 +19,19 @@ Bookmarks::~Bookmarks()
 {
 }
 
+// Capture/Release keyboard
+void Bookmarks::enterEvent(QEvent *event)
+{
+    setFocus();
+    event->accept();
+}
+
+void Bookmarks::leaveEvent(QEvent *event)
+{
+    clearFocus();
+    event->accept();
+}
+
 //
 // Load files into bookmark viewer
 //
