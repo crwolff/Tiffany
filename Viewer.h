@@ -26,7 +26,7 @@ public:
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle, Devoid };
+    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle, Devoid, LocateRef, PlaceRef };
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
@@ -140,6 +140,9 @@ private:
     RightMode rightMode = Idle;
     int gridOffsetX = 0;
     int gridOffsetY = 0;
+    bool shiftLocate = false;
+    QPointF locate1 = QPointF(0,0);
+    QPointF locate2 = QPointF(0,0);
 };
 
 #endif

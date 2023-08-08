@@ -263,11 +263,42 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
                 setCursor(Qt::ArrowCursor);
             }
         }
+        else if (leftMode == LocateRef)
+        {
+            float scale = scaleBase * scaleFactor;
+            QTransform transform = QTransform().scale(scale, scale).inverted();
+            QPointF tmp = transform.map(QPointF(event->pos()));
+            if (shiftLocate)
+                locate2 = tmp;
+            else
+                locate1 = tmp;
+            setCursor(Qt::ArrowCursor);
+            leftMode = Select;
+            update();
+        }
+        else if (leftMode == PlaceRef)
+        {
+            float scale = scaleBase * scaleFactor;
+            QTransform transform = QTransform().scale(scale, scale).inverted();
+            QPointF tmp = transform.map(QPointF(event->pos()));
+            if (shiftLocate)
+                tmp = locate2 - tmp;
+            else
+                tmp = locate1 - tmp;
+            pushImage(currListItem, currPage);
+            QImage xxx = currPage;
+            QPainter p(&currPage);
+            p.fillRect(currPage.rect(), backgroundColor);
+            p.drawImage(tmp, xxx);
+            p.end();
+            flag = true;
+        }
         if (flag)
         {
             currPage.setChanges(currPage.changes() + 1);
             currListItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit imageChangedSig();
+            update();
         }
     }
 
@@ -459,6 +490,37 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             setMouseTracking(true);
             flag = true;
         }
+        else if (event->key() == Qt::Key_R)
+        {
+            if (event->modifiers().testFlag(Qt::ShiftModifier))
+                shiftLocate = true;
+            else
+                shiftLocate = false;
+            leftMode = LocateRef;
+            blinkTimer->stop();
+            fgMask = QImage();
+            bgMask = QImage();
+            emit statusSig("");
+            deskewImg = QImage();
+            setCursor(Qt::CrossCursor);
+            update();
+            flag = true;
+        }
+        else if (event->key() == Qt::Key_E)
+        {
+            if (event->modifiers().testFlag(Qt::ShiftModifier))
+                shiftLocate = true;
+            else
+                shiftLocate = false;
+            leftMode = PlaceRef;
+            blinkTimer->stop();
+            fgMask = QImage();
+            bgMask = QImage();
+            emit statusSig("");
+            deskewImg = QImage();
+            setCursor(Qt::CrossCursor);
+            flag = true;
+        }
     }
     else if (event->modifiers().testFlag(Qt::ShiftModifier) && !deskewImg.isNull())
     {
@@ -576,6 +638,16 @@ void Viewer::paintEvent(QPaintEvent *)
                 QPointF finish = QPointF(warpCorner[idx].x, warpCorner[idx].y);
                 p.drawLine(start, finish);
             }
+        }
+        else if (leftMode == LocateRef)
+        {
+            // Draw alignment grid
+            p.setTransform(QTransform());           // Reset to view coordinates
+            p.setOpacity(0.5);
+            for(int idx=gridOffsetX + (width() % 50)/2; idx < width(); idx += 50)
+                p.drawLine(idx, 0, idx, height());
+            for(int idx=gridOffsetY + (height() % 50)/2; idx < height(); idx += 50)
+                p.drawLine(0, idx, width(), idx);
         }
     }
     else
