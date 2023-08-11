@@ -241,9 +241,14 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             floodLoc = transform.map(QPointF(event->pos()));
             floodFill();
         }
-        else if ((leftMode == Despeckle) || (leftMode == Devoid))
+        else if (leftMode == Despeckle)
         {
             despeckle();
+            setCursor(Qt::ArrowCursor);
+        }
+        else if (leftMode == Devoid)
+        {
+            devoid();
             setCursor(Qt::ArrowCursor);
         }
         else if (warpCount > 0)
