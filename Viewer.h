@@ -141,8 +141,6 @@ private:
     int gridOffsetX = 0;
     int gridOffsetY = 0;
     bool shiftLocate = false;
-    QPointF locate1 = QPointF(0,0);
-    QPointF locate2 = QPointF(0,0);
 };
 
 #endif

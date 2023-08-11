@@ -269,9 +269,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             QTransform transform = QTransform().scale(scale, scale).inverted();
             QPointF tmp = transform.map(QPointF(event->pos()));
             if (shiftLocate)
-                locate2 = tmp;
+                Config::locate2 = tmp;
             else
-                locate1 = tmp;
+                Config::locate1 = tmp;
             setCursor(Qt::ArrowCursor);
             leftMode = Select;
             update();
@@ -282,9 +282,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             QTransform transform = QTransform().scale(scale, scale).inverted();
             QPointF tmp = transform.map(QPointF(event->pos()));
             if (shiftLocate)
-                tmp = locate2 - tmp;
+                tmp = Config::locate2 - tmp;
             else
-                tmp = locate1 - tmp;
+                tmp = Config::locate1 - tmp;
             pushImage(currListItem, currPage);
             QImage xxx = currPage;
             QPainter p(&currPage);

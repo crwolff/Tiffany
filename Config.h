@@ -5,6 +5,7 @@
 #define CONFIG_H
 
 #include <QFont>
+#include <QPointF>
 
 namespace Config
 {
@@ -17,6 +18,8 @@ namespace Config
     extern int blurRadius;
     extern int kernelSize;
     extern QFont textFont;
+    extern QPointF locate1;
+    extern QPointF locate2;
 
     void LoadConfig();
     void SaveConfig();
