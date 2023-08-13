@@ -102,6 +102,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         origin = event->pos();
         if (shift)
         {
+            LastCursor = cursor();
             setCursor(Qt::OpenHandCursor);
             rightMode = Pan;
         }
@@ -312,7 +313,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if (rightMode == Pan)
         {
-            setCursor(Qt::ArrowCursor);
+            setCursor(LastCursor);
         }
         else
         {

@@ -117,6 +117,7 @@ private:
     bool pasteCtrl;
     QImage copyImage;
     QList<QImage> copyImageList;
+    QCursor LastCursor;
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
     bool pencil180 = false;
