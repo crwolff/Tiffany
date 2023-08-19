@@ -40,6 +40,7 @@ public slots:
     void setFloodThreshold(int val);
     void floodFill();
     void setDeskew(double val);
+    void calcDeskew();
     void deskew();
     void deskewThread();
     void setDespeckle(int val);

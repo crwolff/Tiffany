@@ -483,6 +483,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             regionOCR();
             flag = true;
         }
+        else if (event->key() == Qt::Key_G)
+        {
+            calcDeskew();
+            flag = true;
+        }
         else if (event->key() == Qt::Key_W)
         {
             leftMode = Select;
@@ -1118,6 +1123,42 @@ void Viewer::setDeskew(double angle)
     Config::deskewAngle = angle;
     if (leftMode == Deskew)
         deskew();
+}
+
+//
+// Calculate deskew angle
+//
+void Viewer::calcDeskew()
+{
+    if (currPage.isNull())
+        return;
+
+    PageData tmpImage = currPage;
+    if (tmpImage.format() != QImage::Format_Grayscale8)
+        tmpImage = tmpImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(tmpImage);
+
+    // Convert to binary
+    cv::Mat bin;
+    cv::threshold(mat, bin, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    // Convert to PIX
+    PIX *pixS = pixCreate(bin.size().width, bin.size().height, 1);
+    for(int i=0; i<bin.rows; i++)
+        for(int j=0; j<bin.cols; j++)
+            pixSetPixel(pixS, j, i, (l_uint32) bin.at<uchar>(i,j) & 1);
+
+    // Find skew angle
+    l_float32    angle, conf;
+    if (pixFindSkew(pixS, &angle, &conf))
+        Config::deskewAngle = 0.0;
+    else
+        Config::deskewAngle = angle;
+    emit setDeskewWidget(Config::deskewAngle+0.05); // Make certain of a change output
+    emit setDeskewWidget(Config::deskewAngle);
+    pixDestroy(&pixS);
 }
 
 //
