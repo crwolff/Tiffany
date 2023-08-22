@@ -655,10 +655,14 @@ void Viewer::paintEvent(QPaintEvent *)
             // Draw alignment grid
             p.setTransform(QTransform());           // Reset to view coordinates
             p.setOpacity(0.5);
-            for(int idx=gridOffsetX + (width() % 50)/2; idx < width(); idx += 50)
+            p.drawLine(width()/2, 0, width()/2, height());
+            for(int idx=(width() % 50)/2; idx < width(); idx += 50)
                 p.drawLine(idx, 0, idx, height());
-            for(int idx=gridOffsetY + (height() % 50)/2; idx < height(); idx += 50)
+            for(int idx=(height() % 50)/2; idx < height(); idx += 50)
                 p.drawLine(0, idx, width(), idx);
+            p.setPen(Qt::red);
+            p.drawLine(width()/2, 0, width()/2, height());
+            p.drawLine(0, height()/2, width(), height()/2);
         }
     }
     else
