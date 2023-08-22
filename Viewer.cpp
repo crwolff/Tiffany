@@ -358,7 +358,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     if (event->key() == Qt::Key_Escape)
     {
-        setCursor(Qt::ArrowCursor);
         fgMask = QImage();
         bgMask = QImage();
         emit statusSig("");
@@ -767,6 +766,7 @@ QSize Viewer::sizeHint() const
 //
 void Viewer::setTool(LeftMode tool)
 {
+    setCursor(Qt::ArrowCursor);
     leftMode = tool;
     fgMask = QImage();
     bgMask = QImage();
