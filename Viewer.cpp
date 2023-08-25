@@ -1045,6 +1045,14 @@ void Viewer::floodFill()
     if (currPage.isNull())
         return;
 
+    // Check for valid point
+    if ((floodLoc.x() < 0) || (floodLoc.x() >= currPage.width()) ||
+        (floodLoc.y() < 0) || (floodLoc.y() >= currPage.height()))
+    {
+        QMessageBox::information(this, "Flood Fill", "Reference outside image");
+        return;
+    }
+
     // Upconvert mono images
     QImage tmpPage;
     if (currPage.format() == QImage::Format_Mono)
