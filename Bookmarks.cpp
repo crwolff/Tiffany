@@ -56,7 +56,7 @@ void Bookmarks::readFiles(QString cmd)
     int firstIdx = rows[0];
 
     // Popup file dialog
-    QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "Images (*.png *.tif *.tiff)");
+    QStringList filenames = QFileDialog::getOpenFileNames(this, cmd + " Files", "", "PNG files (*.png);;TIFF files (*.tif *.tiff);;All files(*)");
     if (filenames.isEmpty())
         return;
 
