@@ -1373,6 +1373,28 @@ void Viewer::copySelection()
     if (copyImageList.size() > 12)
         copyImageList.removeLast();
     rubberBand->hide();
+
+    // Test code - display HSV of copied region
+    if (0)
+    {
+        qreal hue, hueAvg = 0.0;
+        qreal sat, satAvg = 0.0;
+        qreal val, valAvg = 0.0;
+        int avgCnt = 0;
+
+        // Average pixels in copied image
+        for(int i=0; i<copyImage.height(); i++)
+        {
+            QRgb *srcPtr = (QRgb *)copyImage.scanLine(i);
+            QRgb pix = *srcPtr++;
+            QColor(pix).getHsvF(&hue, &sat, &val);
+            hueAvg += hue;
+            satAvg += sat;
+            valAvg += val;
+            avgCnt++;
+        }
+        qInfo() << int(360.0*hueAvg/avgCnt) << int(100.0*satAvg/avgCnt) << int(100.0*valAvg/avgCnt);
+    }
 }
 
 //
