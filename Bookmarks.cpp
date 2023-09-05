@@ -78,6 +78,17 @@ void Bookmarks::readFiles(QString cmd)
             if (p.format() == QImage::Format_Indexed8)
                 p = p.convertToFormat(QImage::Format_RGB32);
 
+            // If image has 2 colors, but they aren't black and white, promote to RGB
+            if ((p.format() == QImage::Format_Mono) && (p.colorCount() == 2))
+            {
+                if ((p.color(0) == 0xFFFFFFFF) && (p.color(1) == 0xFF000000))
+                    ;
+                else if ((p.color(0) == 0xFF000000) && (p.color(1) == 0xFFFFFFFF))
+                    ;
+                else
+                    p = p.convertToFormat(QImage::Format_RGB32);
+            }
+
             // Remove the next item to be replaced
             if (cmd == "Replace")
                 delete takeItem(rows[0]);
