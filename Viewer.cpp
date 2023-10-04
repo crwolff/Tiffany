@@ -139,7 +139,6 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     {
         pasteLoc = event->pos();
         pasteCtrl = ctrl;
-        pasteShft = shift;
         update();
         flag = true;
     }
@@ -218,7 +217,9 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if (pasting)
         {
-            pasteSelection(pasteCtrl, pasteShft);
+            Qt::KeyboardModifiers keyMod = event->modifiers();
+            bool shift = keyMod.testFlag(Qt::ShiftModifier);
+            pasteSelection(pasteCtrl, shift);
             flag = true;
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))

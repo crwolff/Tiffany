@@ -116,7 +116,6 @@ private:
     bool pasting = false;
     QPoint pasteLoc;
     bool pasteCtrl;
-    bool pasteShft;
     QImage copyImage;
     QList<QImage> copyImageList;
     QCursor LastCursor;
