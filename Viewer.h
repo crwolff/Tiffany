@@ -92,7 +92,7 @@ private:
     void applyDeskew();
     void copySelection();
     QPointF pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc);
-    void pasteSelection(bool ctrl);
+    void pasteSelection(bool ctrl, bool shft);
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
     void regionOCR();
@@ -116,6 +116,7 @@ private:
     bool pasting = false;
     QPoint pasteLoc;
     bool pasteCtrl;
+    bool pasteShft;
     QImage copyImage;
     QList<QImage> copyImageList;
     QCursor LastCursor;

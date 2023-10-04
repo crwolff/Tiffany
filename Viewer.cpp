@@ -139,6 +139,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     {
         pasteLoc = event->pos();
         pasteCtrl = ctrl;
+        pasteShft = shift;
         update();
         flag = true;
     }
@@ -217,7 +218,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if (pasting)
         {
-            pasteSelection(pasteCtrl);
+            pasteSelection(pasteCtrl, pasteShft);
             flag = true;
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))
@@ -1443,7 +1444,7 @@ QPointF Viewer::pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc)
 //
 // Paste from clipboard into page
 //
-void Viewer::pasteSelection(bool ctrl)
+void Viewer::pasteSelection(bool ctrl, bool shft)
 {
     pasting = false;
     setMouseTracking(false);
@@ -1466,7 +1467,28 @@ void Viewer::pasteSelection(bool ctrl)
 
     // Paint the copied section
     QPainter p(&currPage);
-    p.drawImage(loc, copyImage);
+    if (shft)
+    {
+        // If shift is pressed, convert everything close to white into transparent
+        QImage tmp = copyImage.copy();
+        if (copyImage.format() != QImage::Format_ARGB32)
+            tmp = copyImage.convertToFormat(QImage::Format_ARGB32);
+        QRgb transparent = qRgba(0,0,0,0);
+        for(int i=0; i<tmp.height(); i++)
+        {
+            QRgb *srcPtr = (QRgb *)tmp.scanLine(i);
+            for(int j=0; j<tmp.width(); j++)
+            {
+                QRgb val = *srcPtr;
+                if ((qRed(val) >= 240) && (qGreen(val) >= 240) && (qBlue(val) >= 240))
+                    *srcPtr = transparent;
+                srcPtr++;
+            }
+        }
+        p.drawImage(loc, tmp);
+    }
+    else
+        p.drawImage(loc, copyImage);
     p.end();
     update();
 }
