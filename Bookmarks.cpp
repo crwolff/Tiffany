@@ -1,15 +1,10 @@
 #include "Bookmarks.h"
-#include "UndoBuffer.h"
-#include "ViewData.h"
-#include "QImage2OCV.h"
-#include <QColor>
 #include <QDebug>
 #include <QFileDialog>
 #include <QImage>
 #include <QImageWriter>
 #include <QMessageBox>
 #include <QPainter>
-#include <QTransform>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)
 {
@@ -97,8 +92,6 @@ void Bookmarks::readFiles(QString cmd)
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
             newItem->setData(Qt::UserRole, QVariant::fromValue(p));
-            newItem->setData(Qt::UserRole+1, QVariant::fromValue(UndoBuffer()));
-            newItem->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
             newItem->setIcon(makeIcon(p, p.modified()));
             QString txt = QFileInfo(filenames.at(idx)).fileName();
             int suffix = txt.lastIndexOf(".");
@@ -200,11 +193,6 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
     itemPtr->setIcon(makeIcon(image, false));
 
-    // Flush undo buffer
-    UndoBuffer ub = itemPtr->data(Qt::UserRole+1).value<UndoBuffer>();
-    ub.flush();
-    itemPtr->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
     // No errors
     return true;
 }
@@ -250,9 +238,6 @@ void Bookmarks::saveFiles()
 
     // Cleanup status bar
     emit progressSig("", -1);
-
-    // Signal redraw
-    emit updateViewerSig();
 
     // Report errors
     if (writeErr != 0)
@@ -303,9 +288,6 @@ void Bookmarks::saveToDir()
 
     // Cleanup status bar
     emit progressSig("", -1);
-
-    // Signal redraw
-    emit updateViewerSig();
 
     // Report errors
     if (writeErr != 0)
@@ -367,142 +349,6 @@ void Bookmarks::deleteSelection()
         else
             delete item;
     }
-}
-
-//
-// Rotate selected items
-//  1 = 90
-//  2 = 180
-//  3 = 270
-//
-void Bookmarks::rotateSelection(int rot)
-{
-    QTransform tmat = QTransform().rotate(rot * 90.0);
-
-    // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
-    {
-        // Add progress to status bar
-        emit progressSig("Rotating...", items.count());
-
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
-        {
-            // Rotate old image and update rotation flag
-            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
-            PageData rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
-            rotImage.copyOtherData(oldImage);
-            rotImage.setRotation(oldImage.rotation() + rot);
-
-            // Push old image into the undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.push(oldImage);
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(rotImage));
-            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
-            item->setIcon(makeIcon(rotImage, rotImage.modified()));
-
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
-        }
-
-        // Cleanup status bar
-        emit progressSig("", -1);
-    }
-
-    // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
-}
-
-//
-// Rotate clockwise
-//
-void Bookmarks::rotateCW()
-{
-    rotateSelection(1);
-}
-
-//
-// Rotate counter-clockwise
-//
-void Bookmarks::rotateCCW()
-{
-    rotateSelection(3);
-}
-
-//
-// Rotate clockwise
-//
-void Bookmarks::rotate180()
-{
-    rotateSelection(2);
-}
-
-//
-// Mirror selected items
-//  1 = horizontal
-//  2 = vertical
-//  3 = both
-//
-void Bookmarks::mirrorSelection(int dir)
-{
-    // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
-    {
-        // Add progress to status bar
-        emit progressSig("Mirroring...", items.count());
-
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
-        {
-            // Rotate old image and update mirror flag
-            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
-            PageData mirImage = oldImage.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
-            mirImage.copyOtherData(oldImage);
-            mirImage.setMirrors(oldImage.mirrors() ^ dir);
-
-            // Push old image into the undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.push(oldImage);
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(mirImage));
-            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
-            item->setIcon(makeIcon(mirImage, mirImage.modified()));
-
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
-        }
-
-        // Cleanup status bar
-        emit progressSig("", -1);
-    }
-
-    // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
-}
-
-//
-// Mirror across horizontal axis
-//
-void Bookmarks::mirrorHoriz()
-{
-    mirrorSelection(1);
-}
-
-//
-// Mirror across vertical axis
-//
-void Bookmarks::mirrorVert()
-{
-    mirrorSelection(2);
 }
 
 //

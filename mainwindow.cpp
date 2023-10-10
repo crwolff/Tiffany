@@ -55,13 +55,7 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->selectEvenAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectEven );
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
-    QObject::connect( ui->blankAct, &QAction::triggered, ui->viewer, &Viewer::blankPage );
     QObject::connect( ui->fontAct, &QAction::triggered, this, &MainWindow::fontSelect );
-    QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
-    QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
-    QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
-    QObject::connect( ui->mirrorHorizAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorHoriz );
-    QObject::connect( ui->mirrorVertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorVert );
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -71,43 +65,6 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->fitWidthAct, &QAction::triggered, ui->viewer, &Viewer::fitWidth );
     QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
 
-    // Tools menu
-    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
-    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Pencil); });
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Eraser); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
-    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Devoid); });
-
-    // Stroke menu
-    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { Config::brushSize = 1; });
-    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { Config::brushSize = 4; });
-    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { Config::brushSize = 8; });
-    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { Config::brushSize = 12; });
-
-    // Toolbar
-    QObject::connect( ui->undoAct, &QAction::triggered, ui->viewer, &Viewer::undoEdit );
-    QObject::connect( ui->redoAct, &QAction::triggered, ui->viewer, &Viewer::redoEdit );
-    QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
-    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
-    QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
-    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toDithered );
-
-    // Toggle spinbox depending on active tool
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeVisible(1); });
-    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeVisible(2); });
-    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->makeVisible(4); });
-    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->makeVisible(4); });
-    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->makeVisible(8); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeVisible(16); });
-    QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeVisible(32); });
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeVisible(32+64); });
-    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, [this]() { this->makeVisible(0); });
-    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeVisible(128); });
-
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -115,32 +72,7 @@ void MainWindow::connectSignalSlots()
     // Interconnects
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
-    QObject::connect( ui->bookmarks, &Bookmarks::updateViewerSig, ui->viewer, &Viewer::updateViewer );
-    QObject::connect( ui->viewer, &Viewer::statusSig, this, &MainWindow::setStatus );
     QObject::connect( ui->viewer, &Viewer::zoomSig, this, &MainWindow::updateActions );
-    QObject::connect( ui->viewer, &Viewer::imageChangedSig, ui->bookmarks, &Bookmarks::updateIcon );
-    QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
-    QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDropperThreshold);
-    QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setFloodThreshold);
-    QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), ui->viewer, &Viewer::setDeskew);
-    QObject::connect( ui->viewer, &Viewer::setDeskewWidget, deskewWidget->spinBox, &QDoubleSpinBox::setValue);
-    QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDespeckle);
-    QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setDevoid);
-    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setBlurRadius);
-    QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->viewer, &Viewer::setKernelSize);
-}
-
-// Toggle visibility on the spin boxes
-void MainWindow::makeVisible(int mask)
-{
-    dropperThresholdSpin->setVisible((mask & 1) != 0);
-    floodThresholdSpin->setVisible((mask & 2) != 0);
-    toolSizeButton->setVisible((mask & 4) != 0);
-    deskewSpin->setVisible((mask & 8) != 0);
-    despeckleSpin->setVisible((mask & 16) != 0);
-    blurSpin->setVisible((mask & 32) != 0);
-    kernelSpin->setVisible((mask & 64) != 0);
-    devoidSpin->setVisible((mask & 128) != 0);
 }
 
 //
