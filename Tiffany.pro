@@ -29,12 +29,12 @@ UI_DIR = ./.build
 QT += widgets gui concurrent
 
 # Input
-HEADERS += mainwindow.h Bookmarks.h Viewer.h Config.h 
+HEADERS += mainwindow.h Bookmarks.h Viewer.h
 HEADERS += PageData.h
-HEADERS += Widgets/PopupQToolButton.h Widgets/ColorQToolButton.h Widgets/SpinWidget.h Widgets/DoubleSpinWidget.h
+HEADERS += Widgets/PopupQToolButton.h
 FORMS += mainWin.ui
-SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp Config.cpp
-SOURCES += Widgets/PopupQToolButton.cpp Widgets/ColorQToolButton.cpp Widgets/SpinWidget.cpp Widgets/DoubleSpinWidget.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp
+SOURCES += Widgets/PopupQToolButton.cpp
 RESOURCES += rsrc.qrc
 
 # OpenCV

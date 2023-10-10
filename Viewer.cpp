@@ -241,7 +241,6 @@ void Viewer::zoomIn()
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(1.25);
-    emit zoomSig(scaleFactor);
 }
 
 //
@@ -254,7 +253,6 @@ void Viewer::zoomOut()
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(0.8);
-    emit zoomSig(scaleFactor);
 }
 
 //
@@ -299,7 +297,6 @@ void Viewer::zoomArea(QRect rect)
     scrollArea->verticalScrollBar()->setValue(int(
                 centerY * scrollArea->verticalScrollBar()->maximum() +
                 ((centerY - 0.5) * scrollArea->verticalScrollBar()->pageStep())));
-    emit zoomSig(scaleFactor);
 }
 
 //
@@ -320,7 +317,6 @@ void Viewer::zoomWheel(QPoint pos, float factor)
     updateScrollBars();
     scrollArea->horizontalScrollBar()->setValue(int(hVal + (factor - 1) * pos.x()));
     scrollArea->verticalScrollBar()->setValue(int(vVal + (factor - 1) * pos.y()));
-    emit zoomSig(scaleFactor);
 }
 
 //
@@ -369,10 +365,7 @@ void Viewer::fitToWindow()
         scaleBase = (float)viewH / imageH;
     else
         scaleBase = (float)viewW / imageW;
-
-    // Update button actions
     scaleFactor = 1.0;
-    emit zoomSig(scaleFactor);
 
     // Update scrollarea
     updateGeometry();
@@ -393,10 +386,7 @@ void Viewer::fitWidth()
         scaleBase = (float)(viewW - scrollBarSize) / imageW;
     else
         scaleBase = (float)viewW / imageW;
-
-    // Update button actions
     scaleFactor = 1.0;
-    emit zoomSig(scaleFactor);
 
     // Update scrollarea
     updateGeometry();
@@ -417,10 +407,7 @@ void Viewer::fitHeight()
         scaleBase = (float)(viewH - scrollBarSize) / imageH;
     else
         scaleBase = (float)viewH / imageH;
-
-    // Update button actions
     scaleFactor = 1.0;
-    emit zoomSig(scaleFactor);
 
     // Update scrollarea
     updateGeometry();

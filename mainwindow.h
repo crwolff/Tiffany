@@ -7,9 +7,6 @@
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include "Widgets/PopupQToolButton.h"
-#include "Widgets/ColorQToolButton.h"
-#include "Widgets/SpinWidget.h"
-#include "Widgets/DoubleSpinWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,12 +19,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    ColorQToolButton colorToolButton;
 
 public slots:
     void updateProgress(QString descr, int val);
     void setStatus(QString descr);
-    void updateActions(float scale);
     void about();
     void closeEvent (QCloseEvent *event);
 
@@ -36,25 +31,8 @@ private:
     void connectSignalSlots();
     void makeVisible(int mask);
     void buildToolBar();
-    void colorMagic();
-    void fontSelect();
 
-    QAction *toolSizeButton;
     QLabel *statusLabel;
     QProgressBar *progressBar;
-    SpinWidget *dropperThresholdWidget;
-    QAction *dropperThresholdSpin;
-    SpinWidget *floodThresholdWidget;
-    QAction *floodThresholdSpin;
-    DoubleSpinWidget *deskewWidget;
-    QAction *deskewSpin;
-    SpinWidget *despeckleWidget;
-    QAction *despeckleSpin;
-    SpinWidget *devoidWidget;
-    QAction *devoidSpin;
-    SpinWidget *blurWidget;
-    QAction *blurSpin;
-    SpinWidget *kernelWidget;
-    QAction *kernelSpin;
 };
 #endif // MAINWINDOW_H

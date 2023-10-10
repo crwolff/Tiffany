@@ -29,9 +29,6 @@ public slots:
     void fitHeight();
     void fillWindow();
 
-signals:
-    void zoomSig(float scale);
-
 protected:
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
