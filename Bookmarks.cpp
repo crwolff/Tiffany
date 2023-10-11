@@ -184,11 +184,6 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     if (writer.write(image) == false)
         return false;
 
-    // Clear file change marks
-    image.setChanges(0);
-    image.setRotation(0);
-    image.setMirrors(0);
-
     // Update item
     itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
     itemPtr->setIcon(makeIcon(image, false));
