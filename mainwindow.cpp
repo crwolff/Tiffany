@@ -68,8 +68,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     // Interconnects
+    QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->bookmarks, &Bookmarks::currItemChanged );
+    QObject::connect( ui->bookmarks, &Bookmarks::changePage, ui->viewer, &Viewer::changePage );
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
-    QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::imageSelected );
 }
 
 //

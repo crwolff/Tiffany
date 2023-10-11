@@ -28,6 +28,17 @@ void Bookmarks::leaveEvent(QEvent *event)
 }
 
 //
+// Current item changed, so activate page
+//
+void Bookmarks::currItemChanged(QListWidgetItem *curr, QListWidgetItem *)
+{
+    if (curr != NULL)
+        emit changePage(curr->data(Qt::UserRole).value<Page>());
+    else
+        emit changePage(Page());
+}
+
+//
 // Load files into bookmark viewer
 //
 void Bookmarks::readFiles(QString cmd)
@@ -59,12 +70,11 @@ void Bookmarks::readFiles(QString cmd)
     emit progressSig("Reading...", filenames.count());
 
     // Open each file in turn and add to listWidget
-    PageData p;
     int progress = 1;
     for(int idx=0; idx < filenames.count(); idx++)
     {
         // Read image and add to listwidget
-        p = PageData(filenames.at(idx));
+        Page p = Page(filenames.at(idx));
         if (p.isNull())
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
@@ -178,7 +188,7 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     }
 
     // Save image to <fileName>
-    PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+    Page image = itemPtr->data(Qt::UserRole).value<Page>();
     QImageWriter writer(fileName);
     writer.setCompression(100);     // TIF is LZW, no Group 4 option
     if (writer.write(image) == false)
@@ -214,7 +224,7 @@ void Bookmarks::saveFiles()
     foreach(QListWidgetItem* itemPtr, selection)
     {
         // Skip if unchanged
-        PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+        Page image = itemPtr->data(Qt::UserRole).value<Page>();
         if (!image.modified())
             continue;
 
@@ -296,7 +306,7 @@ bool Bookmarks::anyModified()
 {
     for(int idx=0; idx<count(); idx++)
     {
-        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
+        Page image = item(idx)->data(Qt::UserRole).value<Page>();
         if (image.modified())
             return true;
     }
@@ -330,7 +340,7 @@ void Bookmarks::deleteSelection()
     foreach(QListWidgetItem* item, items)
     {
         // Skip if changed
-        PageData image = item->data(Qt::UserRole).value<PageData>();
+        Page image = item->data(Qt::UserRole).value<Page>();
         if (image.modified())
         {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany",
@@ -352,14 +362,14 @@ void Bookmarks::deleteSelection()
 void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
-    PageData image = item->data(Qt::UserRole).value<PageData>();
+    Page image = item->data(Qt::UserRole).value<Page>();
     item->setIcon(makeIcon(image, image.modified()));
 }
 
 //
 // Make an icon from the image and add a marker if it has changed
 //
-QIcon Bookmarks::makeIcon(PageData &image, bool flag)
+QIcon Bookmarks::makeIcon(Page &image, bool flag)
 {
     // Fill background
     QImage qimg(100, 100, QImage::Format_RGB32);

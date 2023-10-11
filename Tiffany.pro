@@ -29,11 +29,10 @@ UI_DIR = ./.build
 QT += widgets gui concurrent
 
 # Input
-HEADERS += mainwindow.h Bookmarks.h Viewer.h
-HEADERS += PageData.h
+HEADERS += mainwindow.h Bookmarks.h Viewer.h Page.h
 HEADERS += Widgets/PopupQToolButton.h
 FORMS += mainWin.ui
-SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp Page.cpp
 SOURCES += Widgets/PopupQToolButton.cpp
 RESOURCES += rsrc.qrc
 

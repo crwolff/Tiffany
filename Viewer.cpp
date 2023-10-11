@@ -175,26 +175,12 @@ void Viewer::paintEvent(QPaintEvent *)
 }
 
 //
-// New image selected in bookmarks
+// Change Page
 //
-void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
+void Viewer::changePage(Page curr)
 {
-    // Load new page
-    if (curr != NULL)
-    {
-        currPage = curr->data(Qt::UserRole).value<PageData>();
-        fitToWindow();
-    }
-    else
-        currPage = PageData();
-    updateViewer();
-}
-
-//
-// Image changed so force redraw
-//
-void Viewer::updateViewer()
-{
+    currPage = curr;
+    fitToWindow();
     rubberBand->hide();
     update();
 }
@@ -323,7 +309,7 @@ void Viewer::zoomWheel(QPoint pos, float factor)
 // Helper function for window fit functions
 //     returns true if horizontal dimension is larger
 //
-bool Viewer::measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
+bool Viewer::measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH)
 {
     // Get handle to parent's scrollbars
     if (scrollArea == NULL)

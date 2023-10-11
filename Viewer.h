@@ -1,7 +1,7 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include "PageData.h"
+#include "Page.h"
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
@@ -20,8 +20,7 @@ public:
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
-    void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
-    void updateViewer();
+    void changePage(Page curr);
     void zoomIn();
     void zoomOut();
     void fitToWindow();
@@ -44,11 +43,11 @@ private:
     void zoomWheel(QPoint pos, float factor);
     void updateScrollBars();
     void adjustScrollBars(float factor);
-    bool measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+    bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
 
     QPoint origin;
     QCursor LastCursor;
-    PageData currPage;
+    Page currPage;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;

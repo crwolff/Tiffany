@@ -1,9 +1,10 @@
 #ifndef BOOKMARKS_H
 #define BOOKMARKS_H
 
-#include <QWidget>
+#include "Page.h"
+#include <QImage>
 #include <QListWidget>
-#include "PageData.h"
+#include <QWidget>
 
 class Bookmarks : public QListWidget
 {
@@ -14,6 +15,7 @@ public:
     ~Bookmarks();
 
 public slots:
+    void currItemChanged(QListWidgetItem *curr, QListWidgetItem *);
     void openFiles();
     void insertFiles();
     void replaceFiles();
@@ -26,12 +28,13 @@ public slots:
     void updateIcon();
 
 signals:
+    void changePage(Page page);
     void progressSig(QString descr, int val);
 
 private:
     void readFiles(QString cmd);
     bool saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName);
-    QIcon makeIcon(PageData &image, bool flag);
+    QIcon makeIcon(Page &image, bool flag);
 
 protected:
     void enterEvent(QEvent *event) override;
