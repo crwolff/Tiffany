@@ -15,7 +15,6 @@ public:
     ~Bookmarks();
 
 public slots:
-    void currItemChanged(QListWidgetItem *curr, QListWidgetItem *);
     void openFiles();
     void insertFiles();
     void replaceFiles();
@@ -28,7 +27,6 @@ public slots:
     void updateIcon();
 
 signals:
-    void changePage(Page page);
     void progressSig(QString descr, int val);
 
 private:

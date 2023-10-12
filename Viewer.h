@@ -20,7 +20,7 @@ public:
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
-    void changePage(Page curr);
+    void currentItemChanged(QListWidgetItem *curr, QListWidgetItem *prev);
     void zoomIn();
     void zoomOut();
     void fitToWindow();
@@ -46,7 +46,8 @@ private:
     bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
 
     QPoint origin;
-    QCursor LastCursor;
+    QCursor lastCursor;
+    QListWidgetItem *currItem = nullptr;
     Page currPage;
     float scaleFactor = 1.0;
     float scaleBase = 1.0;

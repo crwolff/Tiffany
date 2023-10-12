@@ -16,6 +16,7 @@ Viewer::~Viewer()
 {
 }
 
+// Capture/Release keyboard
 void Viewer::enterEvent(QEvent *event)
 {
     setFocus();
@@ -49,7 +50,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         origin = event->pos();
         if (shift)
         {
-            LastCursor = cursor();
+            lastCursor = cursor();
             setCursor(Qt::OpenHandCursor);
             rightMode = Pan;
         }
@@ -121,7 +122,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     {
         if (rightMode == Pan)
         {
-            setCursor(LastCursor);
+            setCursor(lastCursor);
         }
         else
         {
@@ -177,10 +178,46 @@ void Viewer::paintEvent(QPaintEvent *)
 //
 // Change Page
 //
-void Viewer::changePage(Page curr)
+void Viewer::currentItemChanged(QListWidgetItem *curr, QListWidgetItem *)
 {
-    currPage = curr;
-    fitToWindow();
+    // Save current view
+    if (currItem != nullptr)
+    {
+        currPage.scaleBase = scaleBase;
+        currPage.scaleFactor = scaleFactor;
+        currPage.horizontalScroll = scrollArea->horizontalScrollBar()->value();
+        currPage.verticalScroll = scrollArea->verticalScrollBar()->value();
+        currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    }
+
+    // Load new page
+    if (curr != nullptr)
+    {
+        currItem = curr;
+        currPage = currItem->data(Qt::UserRole).value<Page>();
+
+        // Restore view position
+        if (currPage.scaleBase != 0.0)
+        {
+            scaleBase = currPage.scaleBase;
+            scaleFactor = currPage.scaleFactor;
+            updateGeometry();
+            updateScrollBars();
+            scrollArea->horizontalScrollBar()->setValue(currPage.horizontalScroll);
+            scrollArea->verticalScrollBar()->setValue(currPage.verticalScroll);
+        }
+        else
+        {
+            fitToWindow();
+        }
+    }
+    else
+    {
+        currItem = nullptr;
+        currPage = Page();
+    }
+
+    // Cleanup
     rubberBand->hide();
     update();
 }

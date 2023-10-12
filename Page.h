@@ -16,6 +16,12 @@ public:
 
     // Methods
     bool modified();
+
+    // View position data
+    float scaleBase = 0.0;
+    float scaleFactor = 0.0;
+    int horizontalScroll = 0;
+    int verticalScroll = 0;
 };
 
 Q_DECLARE_METATYPE(Page)

@@ -28,17 +28,6 @@ void Bookmarks::leaveEvent(QEvent *event)
 }
 
 //
-// Current item changed, so activate page
-//
-void Bookmarks::currItemChanged(QListWidgetItem *curr, QListWidgetItem *)
-{
-    if (curr != NULL)
-        emit changePage(curr->data(Qt::UserRole).value<Page>());
-    else
-        emit changePage(Page());
-}
-
-//
 // Load files into bookmark viewer
 //
 void Bookmarks::readFiles(QString cmd)
