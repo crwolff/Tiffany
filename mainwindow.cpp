@@ -100,14 +100,17 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->deleteAct);
 
     // Zooms actions
-    ui->toolBar->addAction(ui->zoomOutAct);
-    ui->toolBar->addAction(ui->zoomInAct);
-    ui->toolBar->addAction(ui->fitToWindowAct);
-
-    // Adjust text for better toolbar layout
-    ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
-    ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
-    ui->fitToWindowAct->setText(QApplication::translate("MainWindow", "&Fit to\nWindow", nullptr));
+    QMenu *zoomMenu = new QMenu();
+    zoomMenu->addAction( ui->zoomInAct );
+    zoomMenu->addAction( ui->zoomOutAct );
+    zoomMenu->addAction( ui->fitToWindowAct );
+    zoomMenu->addAction( ui->fillWindowAct );
+    zoomMenu->addAction( ui->fitWidthAct );
+    zoomMenu->addAction( ui->fitHeightAct );
+    PopupQToolButton *zoomToolButton = new PopupQToolButton();
+    zoomToolButton->setMenu(zoomMenu);
+    zoomToolButton->setDefaultAction(ui->fitToWindowAct);
+    ui->toolBar->addWidget(zoomToolButton);
 }
 
 //

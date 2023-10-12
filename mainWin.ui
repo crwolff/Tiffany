@@ -330,7 +330,7 @@
      <normaloff>:/images/assets/fit_window.svg</normaloff>:/images/assets/fit_window.svg</iconset>
    </property>
    <property name="text">
-    <string>&amp;Fit to Window</string>
+    <string>Zoom Fit</string>
    </property>
    <property name="toolTip">
     <string>Fit To Window</string>
@@ -342,7 +342,10 @@
      <normaloff>:/images/assets/fill_window.svg</normaloff>:/images/assets/fill_window.svg</iconset>
    </property>
    <property name="text">
-    <string>Fil&amp;l Window</string>
+    <string>Zoom Fill</string>
+   </property>
+   <property name="toolTip">
+    <string>Fill Window</string>
    </property>
   </action>
   <action name="fitWidthAct">
@@ -351,7 +354,7 @@
      <normaloff>:/images/assets/fit_width.svg</normaloff>:/images/assets/fit_width.svg</iconset>
    </property>
    <property name="text">
-    <string>Fit &amp;Width</string>
+    <string>Fit Width</string>
    </property>
   </action>
   <action name="fitHeightAct">
@@ -360,7 +363,7 @@
      <normaloff>:/images/assets/fit_height.svg</normaloff>:/images/assets/fit_height.svg</iconset>
    </property>
    <property name="text">
-    <string>Fit &amp;Height</string>
+    <string>Fit Height</string>
    </property>
   </action>
   <action name="pointerAct">
