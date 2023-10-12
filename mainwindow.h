@@ -34,5 +34,7 @@ private:
 
     QLabel *statusLabel;
     QProgressBar *progressBar;
+
+    PopupQToolButton *zoomToolButton = new PopupQToolButton();
 };
 #endif // MAINWINDOW_H

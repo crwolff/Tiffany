@@ -70,6 +70,7 @@ void MainWindow::connectSignalSlots()
     // Interconnects
     QObject::connect( ui->bookmarks, &QListWidget::currentItemChanged, ui->viewer, &Viewer::currentItemChanged );
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
+    QObject::connect( ui->viewer, &Viewer::zoomSig, zoomToolButton, &QToolButton::click );
 }
 
 //
@@ -107,7 +108,7 @@ void MainWindow::buildToolBar()
     zoomMenu->addAction( ui->fillWindowAct );
     zoomMenu->addAction( ui->fitWidthAct );
     zoomMenu->addAction( ui->fitHeightAct );
-    PopupQToolButton *zoomToolButton = new PopupQToolButton();
+    //PopupQToolButton *zoomToolButton = new PopupQToolButton();
     zoomToolButton->setMenu(zoomMenu);
     zoomToolButton->setDefaultAction(ui->fitToWindowAct);
     ui->toolBar->addWidget(zoomToolButton);

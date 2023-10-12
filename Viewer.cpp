@@ -156,6 +156,29 @@ void Viewer::wheelEvent(QWheelEvent *event)
 }
 
 //
+// Handle key presses
+//
+void Viewer::keyPressEvent(QKeyEvent *event)
+{
+    if (currPage.isNull())
+        return;
+
+    bool flag = false;
+
+    if (event->key() == Qt::Key_F)
+    {
+        emit zoomSig();
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::keyPressEvent(event);
+}
+
+//
 // Replace paintEvent to get proper scaling of image
 //
 void Viewer::paintEvent(QPaintEvent *)
