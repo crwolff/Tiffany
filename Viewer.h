@@ -20,7 +20,7 @@ public:
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
-    void currentItemChanged(QListWidgetItem *curr, QListWidgetItem *prev);
+    void changePage(QListWidgetItem *curr);
     void zoomIn();
     void zoomOut();
     void fitToWindow();

@@ -201,7 +201,7 @@ void Viewer::paintEvent(QPaintEvent *)
 //
 // Change Page
 //
-void Viewer::currentItemChanged(QListWidgetItem *curr, QListWidgetItem *)
+void Viewer::changePage(QListWidgetItem *curr)
 {
     // Save current view
     if (currItem != nullptr)

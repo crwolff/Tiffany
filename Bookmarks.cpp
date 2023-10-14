@@ -28,6 +28,18 @@ void Bookmarks::leaveEvent(QEvent *event)
 }
 
 //
+// Monitor selection list and update viewer
+//
+void Bookmarks::itemSelectionChanged()
+{
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() > 0)
+        emit changePageSig(items.last());
+    else
+        emit changePageSig(nullptr);
+}
+
+//
 // Load files into bookmark viewer
 //
 void Bookmarks::readFiles(QString cmd)
