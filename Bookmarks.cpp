@@ -380,7 +380,8 @@ void Bookmarks::deleteSelection()
             delete item;
     }
     // Select a new item since we deleted the rest
-    currentItem()->setSelected(true);
+    if (currentItem() != nullptr)
+        currentItem()->setSelected(true);
 }
 
 //
