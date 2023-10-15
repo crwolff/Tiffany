@@ -31,7 +31,7 @@ public:
 
 public slots:
     void blinker();
-    void imageSelected(QListWidgetItem *curr, QListWidgetItem *prev);
+    void changePage(QListWidgetItem *curr);
     void updateViewer();
     void setTool(LeftMode tool);
     void blankPage();

@@ -689,7 +689,7 @@ void Viewer::blinker()
 //
 // Update image selection from bookmarks
 //
-void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
+void Viewer::changePage(QListWidgetItem *curr)
 {
     // Save current view
     if (currListItem != nullptr)
@@ -704,7 +704,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
     }
 
     // Load new page
-    if (curr != NULL)
+    if (curr != nullptr)
     {
         currListItem = curr;
         currPage = curr->data(Qt::UserRole).value<PageData>();
@@ -726,7 +726,7 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
     }
     else
     {
-        currListItem = NULL;
+        currListItem = nullptr;
         currPage = PageData();
     }
     updateViewer();
@@ -737,11 +737,11 @@ void Viewer::imageSelected(QListWidgetItem *curr, QListWidgetItem *)
 //
 void Viewer::updateViewer()
 {
-    if (currPage.isNull())
-        return;
-
     // Reload image from list
-    currPage = currListItem->data(Qt::UserRole).value<PageData>();
+    if (currListItem != nullptr)
+        currPage = currListItem->data(Qt::UserRole).value<PageData>();
+    else
+        currPage = PageData();
     fgMask = QImage();
     bgMask = QImage();
     emit statusSig("");
