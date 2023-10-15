@@ -429,7 +429,7 @@ void Bookmarks::rotateSelection(int rot)
     }
 
     // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
+    itemSelectionChanged();
 }
 
 //
@@ -500,7 +500,7 @@ void Bookmarks::mirrorSelection(int dir)
     }
 
     // Signal redraw
-    emit currentItemChanged(currentItem(), NULL);
+    itemSelectionChanged();
 }
 
 //
