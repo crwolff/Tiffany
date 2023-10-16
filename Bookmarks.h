@@ -26,6 +26,11 @@ public slots:
     void selectOdd();
     void deleteSelection();
     void blankPage();
+    void rotateCW();
+    void rotateCCW();
+    void rotate180();
+    void mirrorHoriz();
+    void mirrorVert();
     void updateIcon();
 
 signals:
@@ -36,6 +41,8 @@ signals:
 private:
     void readFiles(QString cmd);
     bool saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName);
+    void rotateSelection(int val);
+    void mirrorSelection(int dir);
     QIcon makeIcon(Page &image, bool flag);
 
 protected:

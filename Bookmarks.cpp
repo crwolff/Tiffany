@@ -384,6 +384,7 @@ void Bookmarks::blankPage()
         foreach(QListWidgetItem* item, selection)
         {
             Page image = item->data(Qt::UserRole).value<Page>();
+            // TODO push image
             QPainter p(&image);
             p.fillRect(image.rect(), Config::bgColor);
             p.setPen(Config::fgColor);
@@ -391,10 +392,138 @@ void Bookmarks::blankPage()
             p.drawText(image.rect(), Qt::AlignCenter, text);
             p.end();
             item->setData(Qt::UserRole, QVariant::fromValue(image));
-            item->setIcon(makeIcon(image, true));
+            item->setIcon(makeIcon(image, image.modified()));
         }
         emit updatePageSig();
     }
+}
+
+//
+// Rotate selected items
+//  1 = 90
+//  2 = 180
+//  3 = 270
+//
+void Bookmarks::rotateSelection(int rot)
+{
+    QTransform tmat = QTransform().rotate(rot * 90.0);
+
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+
+    // Add progress to status bar
+    emit progressSig("Rotating...", selection.count());
+
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        // Rotate old image and update rotation flag
+        Page image = item->data(Qt::UserRole).value<Page>();
+        // TODO push image
+        image = image.transformed(tmat, Qt::SmoothTransformation);
+
+        // Update item
+        item->setData(Qt::UserRole, QVariant::fromValue(image));
+        item->setIcon(makeIcon(image, image.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Signal redraw
+    emit updatePageSig();
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotateCW()
+{
+    rotateSelection(1);
+}
+
+//
+// Rotate counter-clockwise
+//
+void Bookmarks::rotateCCW()
+{
+    rotateSelection(3);
+}
+
+//
+// Rotate clockwise
+//
+void Bookmarks::rotate180()
+{
+    rotateSelection(2);
+}
+
+//
+// Mirror selected items
+//  1 = horizontal
+//  2 = vertical
+//  3 = both
+//
+void Bookmarks::mirrorSelection(int dir)
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+
+    // Add progress to status bar
+    emit progressSig("Mirroring...", selection.count());
+
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        // Rotate old image and update rotation flag
+        Page image = item->data(Qt::UserRole).value<Page>();
+        // TODO push image
+        image = image.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
+
+        // Update item
+        item->setData(Qt::UserRole, QVariant::fromValue(image));
+        item->setIcon(makeIcon(image, image.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Signal redraw
+    emit updatePageSig();
+}
+
+//
+// Mirror across horizontal axis
+//
+void Bookmarks::mirrorHoriz()
+{
+    mirrorSelection(1);
+}
+
+//
+// Mirror across vertical axis
+//
+void Bookmarks::mirrorVert()
+{
+    mirrorSelection(2);
 }
 
 //

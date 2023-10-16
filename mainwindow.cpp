@@ -57,6 +57,11 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
     QObject::connect( ui->blankAct, &QAction::triggered, ui->bookmarks, &Bookmarks::blankPage );
     QObject::connect( ui->fontAct, &QAction::triggered, this, &MainWindow::fontSelect );
+    QObject::connect( ui->rotateCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCW );
+    QObject::connect( ui->rotateCCWAct, &QAction::triggered, ui->bookmarks, &Bookmarks::rotateCCW );
+    QObject::connect( ui->rotate180Act, &QAction::triggered, ui->bookmarks, &Bookmarks::rotate180 );
+    QObject::connect( ui->mirrorHorizAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorHoriz );
+    QObject::connect( ui->mirrorVertAct, &QAction::triggered, ui->bookmarks, &Bookmarks::mirrorVert );
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -105,6 +110,18 @@ void MainWindow::buildToolBar()
     // Delete actions
     ui->toolBar->addAction(ui->deleteAct);
     ui->toolBar->addAction(ui->blankAct);
+
+    // Rotate button
+    QMenu *rotateMenu = new QMenu();
+    rotateMenu->addAction(ui->rotateCWAct);
+    rotateMenu->addAction(ui->rotateCCWAct);
+    rotateMenu->addAction(ui->rotate180Act);
+    rotateMenu->addAction(ui->mirrorHorizAct);
+    rotateMenu->addAction(ui->mirrorVertAct);
+    PopupQToolButton *rotateToolButton = new PopupQToolButton();
+    rotateToolButton->setMenu(rotateMenu);
+    rotateToolButton->setDefaultAction(ui->rotateCWAct);
+    ui->toolBar->addWidget(rotateToolButton);
 
     // Zooms actions
     QMenu *zoomMenu = new QMenu();
