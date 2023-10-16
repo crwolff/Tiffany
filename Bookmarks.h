@@ -37,7 +37,7 @@ public slots:
 
 signals:
     void changePageSig(QListWidgetItem* curr);
-    void updatePageSig();
+    void updatePageSig(bool updateZoom);
     void progressSig(QString descr, int val);
 
 private:

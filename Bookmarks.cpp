@@ -402,7 +402,7 @@ void Bookmarks::blankPage()
             item->setIcon(makeIcon(page.m_img, page.modified()));
         }
         // Update Viewer
-        emit updatePageSig();
+        emit updatePageSig(false);
     }
 }
 
@@ -451,7 +451,7 @@ void Bookmarks::rotateSelection(int rot)
     emit progressSig("", -1);
 
     // Update Viewer
-    emit updatePageSig();
+    emit updatePageSig(true);
 }
 
 //
@@ -521,7 +521,7 @@ void Bookmarks::mirrorSelection(int dir)
     emit progressSig("", -1);
 
     // Update Viewer
-    emit updatePageSig();
+    emit updatePageSig(false);
 }
 
 //
@@ -627,12 +627,12 @@ void Bookmarks::undoEdit()
     Page page = item->data(Qt::UserRole).value<Page>();
 
     // Revert last edit
-    page.undo();
+    bool flag = page.undo();
     item->setData(Qt::UserRole, QVariant::fromValue(page));
     item->setIcon(makeIcon(page.m_img, page.modified()));
 
     // Update Viewer
-    emit updatePageSig();
+    emit updatePageSig(flag);
 }
 
 //
@@ -650,11 +650,11 @@ void Bookmarks::redoEdit()
     Page page = item->data(Qt::UserRole).value<Page>();
 
     // Revert last edit
-    page.redo();
+    bool flag = page.redo();
     item->setData(Qt::UserRole, QVariant::fromValue(page));
     item->setIcon(makeIcon(page.m_img, page.modified()));
 
     // Update Viewer
-    emit updatePageSig();
+    emit updatePageSig(flag);
 }
 

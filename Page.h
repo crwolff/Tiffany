@@ -18,8 +18,8 @@ public:
     bool modified();
     void flush();
     void push();
-    void undo();
-    void redo();
+    bool undo();
+    bool redo();
 
     // Flag if image was changed
     unsigned int m_modified = 0;

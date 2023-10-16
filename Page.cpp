@@ -58,25 +58,29 @@ void Page::push()
 //
 // Undo last edit
 //
-void Page::undo()
+bool Page::undo()
 {
+    QSize oldSize = m_img.size();
     if (m_undo.count() > 0)
     {
         m_redo.insert(0, m_img);
         m_img = m_undo.takeFirst();
         m_modified--;
     }
+    return (m_img.size() != oldSize);
 }
 
 //
 // Redo last undo
 //
-void Page::redo()
+bool Page::redo()
 {
+    QSize oldSize = m_img.size();
     if (m_redo.count() > 0)
     {
         m_undo.insert(0, m_img);
         m_img = m_redo.takeFirst();
         m_modified++;
     }
+    return (m_img.size() != oldSize);
 }

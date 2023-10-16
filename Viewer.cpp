@@ -233,6 +233,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         flag = true;
     }
 
+
     // Event was handled
     if (flag)
         event->accept();
@@ -317,9 +318,11 @@ void Viewer::changePage(QListWidgetItem *curr)
 //
 // Page has changed, redraw
 //
-void Viewer::updatePage()
+void Viewer::updatePage(bool updateZoom)
 {
     currPage = currItem->data(Qt::UserRole).value<Page>();
+    if (updateZoom)
+        fitToWindow();
     update();
 }
 

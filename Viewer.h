@@ -22,7 +22,7 @@ public:
 
 public slots:
     void changePage(QListWidgetItem *curr);
-    void updatePage();
+    void updatePage(bool updateZoom);
     void setTool(LeftMode tool);
     void zoomIn();
     void zoomOut();
@@ -72,7 +72,7 @@ private:
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
     bool pencil180;
-    bool shiftPencil;
+    bool shiftPencil = false;
     QPoint drawLoc;
     QColor currColor;
 };
