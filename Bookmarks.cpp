@@ -541,11 +541,13 @@ void Bookmarks::mirrorVert()
 }
 
 //
-// Make a new icon after editting in Viewer
+// Make a new icon after editing in Viewer
 //
 void Bookmarks::updateIcon()
 {
-    QListWidgetItem *item = currentItem();
+    // Get active item
+    QList<QListWidgetItem*> items = selectedItems();
+    QListWidgetItem* item = items.last();
     Page page = item->data(Qt::UserRole).value<Page>();
     item->setIcon(makeIcon(page.m_img, page.modified()));
 }

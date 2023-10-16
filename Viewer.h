@@ -17,11 +17,13 @@ public:
 
     QColor foregroundColor = Qt::black;
     QColor backgroundColor = Qt::white;
+    enum LeftMode { Select, Pencil, Eraser };
     enum RightMode { Idle, Zoom, Pan };
 
 public slots:
     void changePage(QListWidgetItem *curr);
     void updatePage();
+    void setTool(LeftMode tool);
     void zoomIn();
     void zoomOut();
     void fitToWindow();
@@ -30,6 +32,7 @@ public slots:
     void fillWindow();
 
 signals:
+    void updateIconSig();
     void zoomSig();
 
 protected:
@@ -44,13 +47,17 @@ protected:
     QSize sizeHint() const override;
 
 private:
+    void drawLine(QPoint start, QPoint finish, QColor color);
+    void drawDot(QPoint loc, QColor color);
+
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
     void updateScrollBars();
     void adjustScrollBars(float factor);
     bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
 
-    QPoint origin;
+    QPoint leftOrigin;
+    QPoint rightOrigin;
     QCursor lastCursor;
     QListWidgetItem *currItem = nullptr;
     Page currPage;
@@ -59,7 +66,15 @@ private:
     QScrollArea *scrollArea = NULL;
     QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
     QImage logo;
+    LeftMode leftMode = Select;
     RightMode rightMode = Idle;
+
+    QCursor PencilCursor;
+    QCursor Pencil180Cursor;
+    bool pencil180;
+    bool shiftPencil;
+    QPoint drawLoc;
+    QColor currColor;
 };
 
 #endif

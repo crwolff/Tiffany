@@ -75,6 +75,17 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->undoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::undoEdit );
     QObject::connect( ui->redoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::redoEdit );
 
+    // Pencil menu
+    QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
+    QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Pencil); });
+    QObject::connect( ui->eraserAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Eraser); });
+
+    // Stroke menu
+    QObject::connect( ui->pix1Act, &QAction::triggered, [this]() { Config::brushSize = 1; });
+    QObject::connect( ui->pix4Act, &QAction::triggered, [this]() { Config::brushSize = 4; });
+    QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { Config::brushSize = 8; });
+    QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { Config::brushSize = 12; });
+
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -83,6 +94,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->bookmarks, &QListWidget::itemSelectionChanged, ui->bookmarks, &Bookmarks::itemSelectionChanged );
     QObject::connect( ui->bookmarks, &Bookmarks::changePageSig, ui->viewer, &Viewer::changePage );
     QObject::connect( ui->bookmarks, &Bookmarks::updatePageSig, ui->viewer, &Viewer::updatePage );
+    QObject::connect( ui->viewer, &Viewer::updateIconSig, ui->bookmarks, &Bookmarks::updateIcon );
+
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->viewer, &Viewer::zoomSig, zoomToolButton, &QToolButton::click );
 }
@@ -148,6 +161,37 @@ void MainWindow::buildToolBar()
     zoomToolButton->setMenu(zoomMenu);
     zoomToolButton->setDefaultAction(ui->fitToWindowAct);
     ui->toolBar->addWidget(zoomToolButton);
+
+    // Tools
+    ui->toolBar->addSeparator();
+    ui->toolBar->addAction(ui->pointerAct);
+
+    // Pencil button
+    QMenu *pencilMenu = new QMenu();
+    pencilMenu->addAction(ui->pencilAct);
+    pencilMenu->addAction(ui->eraserAct);
+    PopupQToolButton *pencilToolButton = new PopupQToolButton();
+    pencilToolButton->setMenu(pencilMenu);
+    pencilToolButton->setDefaultAction(ui->pencilAct);
+    ui->toolBar->addWidget(pencilToolButton);
+
+    // Line button
+    QMenu *toolSizeMenu = new QMenu();
+    toolSizeMenu->addAction(ui->pix1Act);
+    toolSizeMenu->addAction(ui->pix4Act);
+    toolSizeMenu->addAction(ui->pix8Act);
+    toolSizeMenu->addAction(ui->pix12Act);
+    PopupQToolButton *toolSizeToolButton = new PopupQToolButton();
+    toolSizeToolButton->setMenu(toolSizeMenu);
+    if (Config::brushSize == 12)
+        toolSizeToolButton->setDefaultAction(ui->pix12Act);
+    else if (Config::brushSize == 8)
+        toolSizeToolButton->setDefaultAction(ui->pix8Act);
+    else if (Config::brushSize == 4)
+        toolSizeToolButton->setDefaultAction(ui->pix4Act);
+    else
+        toolSizeToolButton->setDefaultAction(ui->pix1Act);
+    ui->toolBar->addWidget(toolSizeToolButton);
 }
 
 //

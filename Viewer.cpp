@@ -1,3 +1,4 @@
+#include "Config.h"
 #include "Viewer.h"
 #include <QDebug>
 #include <QMouseEvent>
@@ -10,6 +11,13 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
 
     // Setup logo
     logo = QImage(":/images/assets/tiffany.png");
+
+    // Setup custom cursors
+    QPixmap p;
+    p = QPixmap(":/images/assets/pencil.svg").scaled(32,32,Qt::KeepAspectRatio);
+    PencilCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/pencil180.svg").scaled(32,32,Qt::KeepAspectRatio);
+    Pencil180Cursor = QCursor(p, 31, 0);
 }
 
 Viewer::~Viewer()
@@ -44,10 +52,25 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     // Event handled flag
     bool flag = false;
 
+    // If left mouse button pressed
+    if (event->button() == Qt::LeftButton)
+    {
+        leftOrigin = event->pos();
+        if ((leftMode == Pencil) || (leftMode == Eraser))
+        {
+            currColor = (leftMode == Pencil) ? Config::fgColor : Config::bgColor;
+            currPage.push();
+            setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
+            if (!shift)
+                drawDot(leftOrigin, currColor);
+            flag = true;
+        }
+    }
+
     // If right mouse button pressed
     if (event->button() == Qt::RightButton)
     {
-        origin = event->pos();
+        rightOrigin = event->pos();
         if (shift)
         {
             lastCursor = cursor();
@@ -56,7 +79,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         }
         else
         {
-            rubberBand->setGeometry(QRect(origin, QSize()));
+            rubberBand->setGeometry(QRect(rightOrigin, QSize()));
             rubberBand->show();
             rightMode = Zoom;
         }
@@ -78,15 +101,40 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     if (currPage.m_img.isNull())
         return;
 
+    // Grab keyboard modifiers
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
+
     // Event handled flag
     bool flag = false;
+
+    // If left mouse button is pressed
+    if (event->buttons() & Qt::LeftButton)
+    {
+        if ((leftMode == Pencil) || (leftMode == Eraser))
+        {
+            if (shift)
+            {
+                shiftPencil = true;
+                drawLoc = event->pos();
+                update();
+            }
+            else
+            {
+                shiftPencil = false;
+                drawLine(leftOrigin, event->pos(), currColor);
+                leftOrigin = event->pos();
+            }
+            flag = true;
+        }
+    }
 
     // If right mouse button pressed
     if (event->buttons() & Qt::RightButton)
     {
         if (rightMode == Pan)
         {
-            QPoint delta = event->pos() - origin;
+            QPoint delta = event->pos() - rightOrigin;
             scrollArea->horizontalScrollBar()->setValue(
                 scrollArea->horizontalScrollBar()->value() - delta.x());
             scrollArea->verticalScrollBar()->setValue(
@@ -94,7 +142,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         }
         else
         {
-            rubberBand->setGeometry(QRect(origin, event->pos()).normalized());
+            rubberBand->setGeometry(QRect(rightOrigin, event->pos()).normalized());
         }
         flag = true;
     }
@@ -116,6 +164,20 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 
     // Event handled flag
     bool flag = false;
+
+    // If left mouse button was released
+    if (event->button() == Qt::LeftButton)
+    {
+        if ((leftMode == Pencil) || (leftMode == Eraser))
+        {
+            shiftPencil = false;
+            drawLine(leftOrigin, event->pos(), currColor);
+            setCursor(Qt::ArrowCursor);
+            currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit updateIconSig();
+            flag = true;
+        }
+    }
 
     // If right mouse button was released
     if (event->button() == Qt::RightButton)
@@ -194,6 +256,13 @@ void Viewer::paintEvent(QPaintEvent *)
 
         p.setTransform(transform);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
+        if (shiftPencil)
+        {
+            QPointF start = transform.inverted().map(leftOrigin);
+            QPointF finish = transform.inverted().map(drawLoc);
+            p.setPen(QPen(currColor, Config::brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            p.drawLine(start, finish);
+        }
     }
     p.end();
 }
@@ -251,6 +320,58 @@ void Viewer::changePage(QListWidgetItem *curr)
 void Viewer::updatePage()
 {
     currPage = currItem->data(Qt::UserRole).value<Page>();
+    update();
+}
+
+//
+// Change tool for left mouse button
+//
+void Viewer::setTool(LeftMode tool)
+{
+    setCursor(Qt::ArrowCursor);
+    leftMode = tool;
+    if ((tool == Pencil) || (tool == Eraser))
+        pencil180 = false;
+}
+
+//
+// Draw a line in the foreground color
+//
+void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
+{
+    if (currPage.m_img.isNull())
+        return;
+
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
+    QPainter p(&currPage.m_img);
+    p.setTransform(transform);
+    p.setPen(QPen(color, int(Config::brushSize * scale + 0.5), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.drawLine(start, finish);
+    p.end();
+    update();
+}
+
+//
+// Draw a dot in the foreground color
+//
+void Viewer::drawDot(QPoint loc, QColor color)
+{
+    if (currPage.m_img.isNull())
+        return;
+    QImage img = currPage.m_img;
+
+    float scale = scaleBase * scaleFactor;
+    QTransform transform = QTransform().scale(scale, scale).inverted();
+
+    QPainter p(&currPage.m_img);
+    p.setTransform(transform);
+    p.setBrush(color);
+    p.setRenderHint(QPainter::Antialiasing, false);
+    p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.drawEllipse(loc, int(Config::brushSize * scale/2.0 + 0.5), int(Config::brushSize * scale/2.0 + 0.5));
+    p.end();
     update();
 }
 
