@@ -71,6 +71,10 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->fitWidthAct, &QAction::triggered, ui->viewer, &Viewer::fitWidth );
     QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
 
+    // Undo menu
+    QObject::connect( ui->undoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::undoEdit );
+    QObject::connect( ui->redoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::redoEdit );
+
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -122,6 +126,15 @@ void MainWindow::buildToolBar()
     rotateToolButton->setMenu(rotateMenu);
     rotateToolButton->setDefaultAction(ui->rotateCWAct);
     ui->toolBar->addWidget(rotateToolButton);
+
+    // Undo button
+    QMenu *undoMenu = new QMenu();
+    undoMenu->addAction(ui->undoAct);
+    undoMenu->addAction(ui->redoAct);
+    PopupQToolButton *undoToolButton = new PopupQToolButton();
+    undoToolButton->setMenu(undoMenu);
+    undoToolButton->setDefaultAction(ui->undoAct);
+    ui->toolBar->addWidget(undoToolButton);
 
     // Zooms actions
     QMenu *zoomMenu = new QMenu();

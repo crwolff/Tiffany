@@ -77,24 +77,24 @@ void Bookmarks::readFiles(QString cmd)
     for(int idx=0; idx < filenames.count(); idx++)
     {
         // Read image and add to listwidget
-        Page p = Page(filenames.at(idx));
-        if (p.m_img.isNull())
+        Page page = Page(filenames.at(idx));
+        if (page.m_img.isNull())
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
             // Cannot paint on indexed8, so convert to RGB
-            if (p.m_img.format() == QImage::Format_Indexed8)
-                p.m_img = p.m_img.convertToFormat(QImage::Format_RGB32);
+            if (page.m_img.format() == QImage::Format_Indexed8)
+                page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
 
             // If image has 2 colors, but they aren't black and white, promote to RGB
-            if ((p.m_img.format() == QImage::Format_Mono) && (p.m_img.colorCount() == 2))
+            if ((page.m_img.format() == QImage::Format_Mono) && (page.m_img.colorCount() == 2))
             {
-                if ((p.m_img.color(0) == 0xFFFFFFFF) && (p.m_img.color(1) == 0xFF000000))
+                if ((page.m_img.color(0) == 0xFFFFFFFF) && (page.m_img.color(1) == 0xFF000000))
                     ;
-                else if ((p.m_img.color(0) == 0xFF000000) && (p.m_img.color(1) == 0xFFFFFFFF))
+                else if ((page.m_img.color(0) == 0xFF000000) && (page.m_img.color(1) == 0xFFFFFFFF))
                     ;
                 else
-                    p.m_img = p.m_img.convertToFormat(QImage::Format_RGB32);
+                    page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
             }
 
             // Remove the next item to be replaced
@@ -104,8 +104,8 @@ void Bookmarks::readFiles(QString cmd)
             // Build list item and insert
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
-            newItem->setData(Qt::UserRole, QVariant::fromValue(p));
-            newItem->setIcon(makeIcon(p.m_img, p.modified()));
+            newItem->setData(Qt::UserRole, QVariant::fromValue(page));
+            newItem->setIcon(makeIcon(page.m_img, page.modified()));
             QString txt = QFileInfo(filenames.at(idx)).fileName();
             int suffix = txt.lastIndexOf(".");
             if (suffix > 0)
@@ -191,15 +191,16 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     }
 
     // Save image to <fileName>
-    Page image = itemPtr->data(Qt::UserRole).value<Page>();
+    Page page = itemPtr->data(Qt::UserRole).value<Page>();
     QImageWriter writer(fileName);
     writer.setCompression(100);     // TIF is LZW, no Group 4 option
-    if (writer.write(image.m_img) == false)
+    if (writer.write(page.m_img) == false)
         return false;
 
     // Update item
-    itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
-    itemPtr->setIcon(makeIcon(image.m_img, false));
+    page.flush();
+    itemPtr->setData(Qt::UserRole, QVariant::fromValue(page));
+    itemPtr->setIcon(makeIcon(page.m_img, false));
 
     // No errors
     return true;
@@ -227,8 +228,8 @@ void Bookmarks::saveFiles()
     foreach(QListWidgetItem* itemPtr, selection)
     {
         // Skip if unchanged
-        Page image = itemPtr->data(Qt::UserRole).value<Page>();
-        if (!image.modified())
+        Page page = itemPtr->data(Qt::UserRole).value<Page>();
+        if (!page.modified())
             continue;
 
         // Get the filenames
@@ -309,8 +310,8 @@ bool Bookmarks::anyModified()
 {
     for(int idx=0; idx<count(); idx++)
     {
-        Page image = item(idx)->data(Qt::UserRole).value<Page>();
-        if (image.modified())
+        Page page = item(idx)->data(Qt::UserRole).value<Page>();
+        if (page.modified())
             return true;
     }
     return false;
@@ -343,8 +344,8 @@ void Bookmarks::deleteSelection()
     foreach(QListWidgetItem* item, items)
     {
         // Skip if changed
-        Page image = item->data(Qt::UserRole).value<Page>();
-        if (image.modified())
+        Page page = item->data(Qt::UserRole).value<Page>();
+        if (page.modified())
         {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany",
                     item->toolTip() + " has been modified, are you sure?\n",
@@ -384,8 +385,8 @@ void Bookmarks::blankPage()
         foreach(QListWidgetItem* item, selection)
         {
             Page page = item->data(Qt::UserRole).value<Page>();
+            page.push();
             QImage img = page.m_img;
-            // TODO push image
 
             // Erase and draw text
             QPainter p(&img);
@@ -430,8 +431,8 @@ void Bookmarks::rotateSelection(int rot)
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
         QImage img = page.m_img;
-        // TODO push image
 
         // Rotate image based on transform
         img = img.transformed(tmat, Qt::SmoothTransformation);
@@ -500,8 +501,8 @@ void Bookmarks::mirrorSelection(int dir)
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
         QImage img = page.m_img;
-        // TODO push image
 
         // Mirror image
         img = img.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
@@ -545,8 +546,8 @@ void Bookmarks::mirrorVert()
 void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
-    Page image = item->data(Qt::UserRole).value<Page>();
-    item->setIcon(makeIcon(image.m_img, image.modified()));
+    Page page = item->data(Qt::UserRole).value<Page>();
+    item->setIcon(makeIcon(page.m_img, page.modified()));
 }
 
 //
@@ -608,3 +609,50 @@ QIcon Bookmarks::makeIcon(QImage &image, bool flag)
     QIcon icon = QIcon(QPixmap::fromImage(qimg));
     return icon;
 }
+
+//
+// Undo last change
+//     TODO Should this apply to current page only or all selected?
+//
+void Bookmarks::undoEdit()
+{
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() == 0)
+        return;
+
+    // Get active item
+    QListWidgetItem* item = items.last();
+    Page page = item->data(Qt::UserRole).value<Page>();
+
+    // Revert last edit
+    page.undo();
+    item->setData(Qt::UserRole, QVariant::fromValue(page));
+    item->setIcon(makeIcon(page.m_img, page.modified()));
+
+    // Update Viewer
+    emit updatePageSig();
+}
+
+//
+// Redo last undo
+//     TODO Should this apply to current page only or all selected?
+//
+void Bookmarks::redoEdit()
+{
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() == 0)
+        return;
+
+    // Get active item
+    QListWidgetItem* item = items.last();
+    Page page = item->data(Qt::UserRole).value<Page>();
+
+    // Revert last edit
+    page.redo();
+    item->setData(Qt::UserRole, QVariant::fromValue(page));
+    item->setIcon(makeIcon(page.m_img, page.modified()));
+
+    // Update Viewer
+    emit updatePageSig();
+}
+

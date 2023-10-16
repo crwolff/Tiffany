@@ -32,6 +32,8 @@ public slots:
     void mirrorHoriz();
     void mirrorVert();
     void updateIcon();
+    void undoEdit();
+    void redoEdit();
 
 signals:
     void changePageSig(QListWidgetItem* curr);

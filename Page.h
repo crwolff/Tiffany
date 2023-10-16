@@ -16,6 +16,13 @@ public:
 
     // Methods
     bool modified();
+    void flush();
+    void push();
+    void undo();
+    void redo();
+
+    // Flag if image was changed
+    unsigned int m_modified = 0;
 
     // View position data
     float scaleBase = 0.0;
@@ -25,6 +32,11 @@ public:
 
     // The main image
     QImage m_img;
+
+    // Undo buffers
+#define MAX_UNDO 8
+    QList<QImage> m_undo;
+    QList<QImage> m_redo;
 };
 
 Q_DECLARE_METATYPE(Page)
