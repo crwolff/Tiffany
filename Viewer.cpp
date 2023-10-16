@@ -34,7 +34,7 @@ void Viewer::leaveEvent(QEvent *event)
 //
 void Viewer::mousePressEvent(QMouseEvent *event)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Grab keyboard modifiers
@@ -75,7 +75,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 //
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Event handled flag
@@ -111,7 +111,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 //
 void Viewer::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Event handled flag
@@ -145,7 +145,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
 //
 void Viewer::wheelEvent(QWheelEvent *event)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     if (event->angleDelta().y() > 0)
@@ -160,7 +160,7 @@ void Viewer::wheelEvent(QWheelEvent *event)
 //
 void Viewer::keyPressEvent(QKeyEvent *event)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     bool flag = false;
@@ -185,7 +185,7 @@ void Viewer::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     else
     {
@@ -193,7 +193,7 @@ void Viewer::paintEvent(QPaintEvent *)
         QTransform transform = QTransform().scale(scale, scale);
 
         p.setTransform(transform);
-        p.drawImage(currPage.rect().topLeft(), currPage);
+        p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
     }
     p.end();
 }
@@ -259,9 +259,9 @@ void Viewer::updatePage()
 //
 QSize Viewer::sizeHint() const
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return logo.size();
-    return currPage.size() * scaleBase * scaleFactor;
+    return currPage.m_img.size() * scaleBase * scaleFactor;
 }
 
 //
@@ -290,7 +290,7 @@ void Viewer::adjustScrollBars(float factor)
 //
 void Viewer::zoomIn()
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
     scaleFactor *= 1.25;
     updateGeometry();
@@ -302,7 +302,7 @@ void Viewer::zoomIn()
 // Draw image 20% smaller
 void Viewer::zoomOut()
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
     scaleFactor *= 0.8;
     updateGeometry();
@@ -315,7 +315,7 @@ void Viewer::zoomOut()
 //
 void Viewer::zoomArea(QRect rect)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Get center of zoom rectangle
@@ -359,7 +359,7 @@ void Viewer::zoomArea(QRect rect)
 //
 void Viewer::zoomWheel(QPoint pos, float factor)
 {
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Save for later
@@ -396,8 +396,8 @@ bool Viewer::measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, 
         viewH += scrollBarSize;
 
     // Size of image
-    imageW = page.size().width();
-    imageH = page.size().height();
+    imageW = page.m_img.size().width();
+    imageH = page.m_img.size().height();
 
     // Scale to horizontal if it is larger
     if (viewW * imageH > viewH * imageW)
@@ -412,7 +412,7 @@ void Viewer::fitToWindow()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Scale to larger dimension
@@ -433,7 +433,7 @@ void Viewer::fitWidth()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // If height is larger dimension, leave space for vertical scroll bar
@@ -454,7 +454,7 @@ void Viewer::fitHeight()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // If width is larger dimension, leave space for horizontal scroll bar
@@ -475,7 +475,7 @@ void Viewer::fillWindow()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
-    if (currPage.isNull())
+    if (currPage.m_img.isNull())
         return;
 
     // Scale to smaller dimension

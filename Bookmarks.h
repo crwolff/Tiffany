@@ -43,7 +43,7 @@ private:
     bool saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString &backupName);
     void rotateSelection(int val);
     void mirrorSelection(int dir);
-    QIcon makeIcon(Page &image, bool flag);
+    QIcon makeIcon(QImage &image, bool flag);
 
 protected:
     void enterEvent(QEvent *event) override;

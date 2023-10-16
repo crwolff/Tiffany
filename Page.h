@@ -5,7 +5,7 @@
 #include <QImage>
 #include <QMetaType>
 
-class Page : public QImage
+class Page
 {
 public:
     // Constructors
@@ -22,6 +22,9 @@ public:
     float scaleFactor = 0.0;
     int horizontalScroll = 0;
     int verticalScroll = 0;
+
+    // The main image
+    QImage m_img;
 };
 
 Q_DECLARE_METATYPE(Page)

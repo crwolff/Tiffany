@@ -78,23 +78,23 @@ void Bookmarks::readFiles(QString cmd)
     {
         // Read image and add to listwidget
         Page p = Page(filenames.at(idx));
-        if (p.isNull())
+        if (p.m_img.isNull())
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
             // Cannot paint on indexed8, so convert to RGB
-            if (p.format() == QImage::Format_Indexed8)
-                p = p.convertToFormat(QImage::Format_RGB32);
+            if (p.m_img.format() == QImage::Format_Indexed8)
+                p.m_img = p.m_img.convertToFormat(QImage::Format_RGB32);
 
             // If image has 2 colors, but they aren't black and white, promote to RGB
-            if ((p.format() == QImage::Format_Mono) && (p.colorCount() == 2))
+            if ((p.m_img.format() == QImage::Format_Mono) && (p.m_img.colorCount() == 2))
             {
-                if ((p.color(0) == 0xFFFFFFFF) && (p.color(1) == 0xFF000000))
+                if ((p.m_img.color(0) == 0xFFFFFFFF) && (p.m_img.color(1) == 0xFF000000))
                     ;
-                else if ((p.color(0) == 0xFF000000) && (p.color(1) == 0xFFFFFFFF))
+                else if ((p.m_img.color(0) == 0xFF000000) && (p.m_img.color(1) == 0xFFFFFFFF))
                     ;
                 else
-                    p = p.convertToFormat(QImage::Format_RGB32);
+                    p.m_img = p.m_img.convertToFormat(QImage::Format_RGB32);
             }
 
             // Remove the next item to be replaced
@@ -105,7 +105,7 @@ void Bookmarks::readFiles(QString cmd)
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
             newItem->setData(Qt::UserRole, QVariant::fromValue(p));
-            newItem->setIcon(makeIcon(p, p.modified()));
+            newItem->setIcon(makeIcon(p.m_img, p.modified()));
             QString txt = QFileInfo(filenames.at(idx)).fileName();
             int suffix = txt.lastIndexOf(".");
             if (suffix > 0)
@@ -194,12 +194,12 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     Page image = itemPtr->data(Qt::UserRole).value<Page>();
     QImageWriter writer(fileName);
     writer.setCompression(100);     // TIF is LZW, no Group 4 option
-    if (writer.write(image) == false)
+    if (writer.write(image.m_img) == false)
         return false;
 
     // Update item
     itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
-    itemPtr->setIcon(makeIcon(image, false));
+    itemPtr->setIcon(makeIcon(image.m_img, false));
 
     // No errors
     return true;
@@ -383,17 +383,24 @@ void Bookmarks::blankPage()
     {
         foreach(QListWidgetItem* item, selection)
         {
-            Page image = item->data(Qt::UserRole).value<Page>();
+            Page page = item->data(Qt::UserRole).value<Page>();
+            QImage img = page.m_img;
             // TODO push image
-            QPainter p(&image);
-            p.fillRect(image.rect(), Config::bgColor);
+
+            // Erase and draw text
+            QPainter p(&img);
+            p.fillRect(img.rect(), Config::bgColor);
             p.setPen(Config::fgColor);
             p.setFont(Config::textFont);
-            p.drawText(image.rect(), Qt::AlignCenter, text);
+            p.drawText(img.rect(), Qt::AlignCenter, text);
             p.end();
-            item->setData(Qt::UserRole, QVariant::fromValue(image));
-            item->setIcon(makeIcon(image, image.modified()));
+
+            // Update list with new image
+            page.m_img = img;
+            item->setData(Qt::UserRole, QVariant::fromValue(page));
+            item->setIcon(makeIcon(page.m_img, page.modified()));
         }
+        // Update Viewer
         emit updatePageSig();
     }
 }
@@ -422,14 +429,17 @@ void Bookmarks::rotateSelection(int rot)
     int progress = 1;
     foreach(QListWidgetItem* item, selection)
     {
-        // Rotate old image and update rotation flag
-        Page image = item->data(Qt::UserRole).value<Page>();
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage img = page.m_img;
         // TODO push image
-        image = image.transformed(tmat, Qt::SmoothTransformation);
 
-        // Update item
-        item->setData(Qt::UserRole, QVariant::fromValue(image));
-        item->setIcon(makeIcon(image, image.modified()));
+        // Rotate image based on transform
+        img = img.transformed(tmat, Qt::SmoothTransformation);
+
+        // Update list with new image
+        page.m_img = img;
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
 
         // Update progress
         emit progressSig("", progress);
@@ -439,7 +449,7 @@ void Bookmarks::rotateSelection(int rot)
     // Cleanup status bar
     emit progressSig("", -1);
 
-    // Signal redraw
+    // Update Viewer
     emit updatePageSig();
 }
 
@@ -484,19 +494,22 @@ void Bookmarks::mirrorSelection(int dir)
     }
 
     // Add progress to status bar
-    emit progressSig("Mirroring...", selection.count());
+    emit progressSig("Rotating...", selection.count());
 
     int progress = 1;
     foreach(QListWidgetItem* item, selection)
     {
-        // Rotate old image and update rotation flag
-        Page image = item->data(Qt::UserRole).value<Page>();
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage img = page.m_img;
         // TODO push image
-        image = image.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
 
-        // Update item
-        item->setData(Qt::UserRole, QVariant::fromValue(image));
-        item->setIcon(makeIcon(image, image.modified()));
+        // Mirror image
+        img = img.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
+
+        // Update list with new image
+        page.m_img = img;
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
 
         // Update progress
         emit progressSig("", progress);
@@ -506,7 +519,7 @@ void Bookmarks::mirrorSelection(int dir)
     // Cleanup status bar
     emit progressSig("", -1);
 
-    // Signal redraw
+    // Update Viewer
     emit updatePageSig();
 }
 
@@ -533,13 +546,13 @@ void Bookmarks::updateIcon()
 {
     QListWidgetItem *item = currentItem();
     Page image = item->data(Qt::UserRole).value<Page>();
-    item->setIcon(makeIcon(image, image.modified()));
+    item->setIcon(makeIcon(image.m_img, image.modified()));
 }
 
 //
 // Make an icon from the image and add a marker if it has changed
 //
-QIcon Bookmarks::makeIcon(Page &image, bool flag)
+QIcon Bookmarks::makeIcon(QImage &image, bool flag)
 {
     // Fill background
     QImage qimg(100, 100, QImage::Format_RGB32);
