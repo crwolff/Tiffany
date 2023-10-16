@@ -355,6 +355,9 @@ void Bookmarks::deleteSelection()
         else
             delete item;
     }
+    // Since entire selection was deleted, select whatever the listwidget picked as current
+    if (currentItem() != nullptr)
+        currentItem()->setSelected(true);
 }
 
 //
