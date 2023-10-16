@@ -1,8 +1,10 @@
 #include "Bookmarks.h"
+#include "Config.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <QImage>
 #include <QImageWriter>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QPainter>
 
@@ -358,6 +360,41 @@ void Bookmarks::deleteSelection()
     // Since entire selection was deleted, select whatever the listwidget picked as current
     if (currentItem() != nullptr)
         currentItem()->setSelected(true);
+}
+
+//
+// Erase selected pages and insert 'Blank' into center
+//
+void Bookmarks::blankPage()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Page Contents"),
+                                         "", QLineEdit::Normal,
+                                         "BLANK", &ok);
+    if (ok)
+    {
+        foreach(QListWidgetItem* item, selection)
+        {
+            Page image = item->data(Qt::UserRole).value<Page>();
+            QPainter p(&image);
+            p.fillRect(image.rect(), Config::bgColor);
+            p.setPen(Config::fgColor);
+            p.setFont(Config::textFont);
+            p.drawText(image.rect(), Qt::AlignCenter, text);
+            p.end();
+            item->setData(Qt::UserRole, QVariant::fromValue(image));
+            item->setIcon(makeIcon(image, true));
+        }
+        emit updatePageSig();
+    }
 }
 
 //

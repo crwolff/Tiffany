@@ -246,6 +246,15 @@ void Viewer::changePage(QListWidgetItem *curr)
 }
 
 //
+// Page has changed, redraw
+//
+void Viewer::updatePage()
+{
+    currPage = currItem->data(Qt::UserRole).value<Page>();
+    update();
+}
+
+//
 // Always honor aspect ratio when resizing
 //
 QSize Viewer::sizeHint() const

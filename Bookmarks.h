@@ -25,10 +25,12 @@ public slots:
     void selectEven();
     void selectOdd();
     void deleteSelection();
+    void blankPage();
     void updateIcon();
 
 signals:
     void changePageSig(QListWidgetItem* curr);
+    void updatePageSig();
     void progressSig(QString descr, int val);
 
 private:

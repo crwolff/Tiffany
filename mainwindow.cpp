@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainWin.h"
+#include "Config.h"
 #include <QCloseEvent>
 #include <QColorDialog>
 #include <QDebug>
@@ -13,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-//    Config::LoadConfig();
+    Config::LoadConfig();
     ui->setupUi(this);
     buildToolBar();
     connectSignalSlots();
@@ -54,6 +55,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->selectEvenAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectEven );
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
+    QObject::connect( ui->blankAct, &QAction::triggered, ui->bookmarks, &Bookmarks::blankPage );
+    QObject::connect( ui->fontAct, &QAction::triggered, this, &MainWindow::fontSelect );
 
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
@@ -70,6 +73,7 @@ void MainWindow::connectSignalSlots()
     // Interconnects
     QObject::connect( ui->bookmarks, &QListWidget::itemSelectionChanged, ui->bookmarks, &Bookmarks::itemSelectionChanged );
     QObject::connect( ui->bookmarks, &Bookmarks::changePageSig, ui->viewer, &Viewer::changePage );
+    QObject::connect( ui->bookmarks, &Bookmarks::updatePageSig, ui->viewer, &Viewer::updatePage );
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->viewer, &Viewer::zoomSig, zoomToolButton, &QToolButton::click );
 }
@@ -100,6 +104,7 @@ void MainWindow::buildToolBar()
 
     // Delete actions
     ui->toolBar->addAction(ui->deleteAct);
+    ui->toolBar->addAction(ui->blankAct);
 
     // Zooms actions
     QMenu *zoomMenu = new QMenu();
@@ -113,6 +118,17 @@ void MainWindow::buildToolBar()
     zoomToolButton->setMenu(zoomMenu);
     zoomToolButton->setDefaultAction(ui->fitToWindowAct);
     ui->toolBar->addWidget(zoomToolButton);
+}
+
+//
+// Set font for text insertion
+//
+void MainWindow::fontSelect()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, Config::textFont, this);
+    if (ok)
+        Config::textFont = font;
 }
 
 //

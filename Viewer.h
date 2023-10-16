@@ -21,6 +21,7 @@ public:
 
 public slots:
     void changePage(QListWidgetItem *curr);
+    void updatePage();
     void zoomIn();
     void zoomOut();
     void fitToWindow();

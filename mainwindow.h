@@ -21,6 +21,7 @@ public:
     ~MainWindow();
 
 public slots:
+    void fontSelect();
     void updateProgress(QString descr, int val);
     void setStatus(QString descr);
     void about();
