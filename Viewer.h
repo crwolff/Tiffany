@@ -66,7 +66,8 @@ private:
     float scaleFactor = 1.0;
     float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
-    QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QRubberBand *rightBand = new QRubberBand(QRubberBand::Rectangle, this);
     QImage logo;
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;

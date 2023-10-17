@@ -56,7 +56,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         leftOrigin = event->pos();
-        if ((leftMode == Pencil) || (leftMode == Eraser))
+        if (leftMode == Select)
+        {
+            leftBand->setGeometry(QRect(leftOrigin, QSize()));
+            leftBand->show();
+            flag = true;
+        }
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             currColor = (leftMode == Pencil) ? Config::fgColor : Config::bgColor;
             currPage.push();
@@ -79,8 +85,8 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         }
         else
         {
-            rubberBand->setGeometry(QRect(rightOrigin, QSize()));
-            rubberBand->show();
+            rightBand->setGeometry(QRect(rightOrigin, QSize()));
+            rightBand->show();
             rightMode = Zoom;
         }
         flag = true;
@@ -111,7 +117,12 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // If left mouse button is pressed
     if (event->buttons() & Qt::LeftButton)
     {
-        if ((leftMode == Pencil) || (leftMode == Eraser))
+        if (leftMode == Select)
+        {
+            leftBand->setGeometry(QRect(leftOrigin, event->pos()).normalized());
+            flag = true;
+        }
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             if (shift)
             {
@@ -142,7 +153,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         }
         else
         {
-            rubberBand->setGeometry(QRect(rightOrigin, event->pos()).normalized());
+            rightBand->setGeometry(QRect(rightOrigin, event->pos()).normalized());
         }
         flag = true;
     }
@@ -168,7 +179,11 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     // If left mouse button was released
     if (event->button() == Qt::LeftButton)
     {
-        if ((leftMode == Pencil) || (leftMode == Eraser))
+        if (leftMode == Select)
+        {
+            flag = true;
+        }
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             shiftPencil = false;
             drawLine(leftOrigin, event->pos(), currColor);
@@ -188,8 +203,8 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         }
         else
         {
-            rubberBand->hide();
-            zoomArea(rubberBand->geometry());
+            rightBand->hide();
+            zoomArea(rightBand->geometry());
         }
         rightMode = Idle;
         flag = true;
@@ -309,6 +324,7 @@ void Viewer::paintEvent(QPaintEvent *)
 
         p.setTransform(transform);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
+
         if (shiftPencil)
         {
             QPointF start = transform.inverted().map(leftOrigin);
@@ -363,7 +379,8 @@ void Viewer::changePage(QListWidgetItem *curr)
     }
 
     // Cleanup
-    rubberBand->hide();
+    leftBand->hide();
+    rightBand->hide();
     update();
 }
 
