@@ -319,15 +319,16 @@ void Viewer::paintEvent(QPaintEvent *)
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     else
     {
-        QTransform transform = QTransform().scale(scaleFactor, scaleFactor);
+        QTransform transform = QTransform::fromScale(scaleFactor, scaleFactor);
+        QTransform inverted = transform.inverted();
 
         p.setTransform(transform);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
 
         if (shiftPencil)
         {
-            QPointF start = transform.inverted().map(leftOrigin);
-            QPointF finish = transform.inverted().map(drawLoc);
+            QPointF start = inverted.map(leftOrigin);
+            QPointF finish = inverted.map(drawLoc);
             p.setPen(QPen(currColor, Config::brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             p.drawLine(start, finish);
         }
@@ -411,10 +412,8 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
     if (currPage.m_img.isNull())
         return;
 
-    QTransform transform = QTransform().scale(scaleFactor, scaleFactor).inverted();
-
     QPainter p(&currPage.m_img);
-    p.setTransform(transform);
+    p.setTransform(QTransform::fromScale(scaleFactor, scaleFactor).inverted());
     p.setPen(QPen(color, int(Config::brushSize * scaleFactor + 0.5), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
@@ -428,12 +427,9 @@ void Viewer::drawDot(QPoint loc, QColor color)
 {
     if (currPage.m_img.isNull())
         return;
-    QImage img = currPage.m_img;
-
-    QTransform transform = QTransform().scale(scaleFactor, scaleFactor).inverted();
 
     QPainter p(&currPage.m_img);
-    p.setTransform(transform);
+    p.setTransform(QTransform::fromScale(scaleFactor, scaleFactor).inverted());
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
