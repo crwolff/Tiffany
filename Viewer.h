@@ -64,7 +64,6 @@ private:
     QListWidgetItem *currItem = nullptr;
     Page currPage;
     float scaleFactor = 1.0;
-    float scaleBase = 1.0;
     QScrollArea *scrollArea = NULL;
     QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
     QRubberBand *rightBand = new QRubberBand(QRubberBand::Rectangle, this);

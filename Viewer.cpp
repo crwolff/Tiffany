@@ -319,8 +319,7 @@ void Viewer::paintEvent(QPaintEvent *)
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     else
     {
-        float scale = scaleBase * scaleFactor;
-        QTransform transform = QTransform().scale(scale, scale);
+        QTransform transform = QTransform().scale(scaleFactor, scaleFactor);
 
         p.setTransform(transform);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
@@ -344,7 +343,6 @@ void Viewer::changePage(QListWidgetItem *curr)
     // Save current view
     if (currItem != nullptr)
     {
-        currPage.scaleBase = scaleBase;
         currPage.scaleFactor = scaleFactor;
         currPage.horizontalScroll = scrollArea->horizontalScrollBar()->value();
         currPage.verticalScroll = scrollArea->verticalScrollBar()->value();
@@ -358,9 +356,8 @@ void Viewer::changePage(QListWidgetItem *curr)
         currPage = currItem->data(Qt::UserRole).value<Page>();
 
         // Restore view position
-        if (currPage.scaleBase != 0.0)
+        if (currPage.scaleFactor != 0.0)
         {
-            scaleBase = currPage.scaleBase;
             scaleFactor = currPage.scaleFactor;
             updateGeometry();
             updateScrollBars();
@@ -414,12 +411,11 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
     if (currPage.m_img.isNull())
         return;
 
-    float scale = scaleBase * scaleFactor;
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(scaleFactor, scaleFactor).inverted();
 
     QPainter p(&currPage.m_img);
     p.setTransform(transform);
-    p.setPen(QPen(color, int(Config::brushSize * scale + 0.5), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    p.setPen(QPen(color, int(Config::brushSize * scaleFactor + 0.5), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
     update();
@@ -434,15 +430,14 @@ void Viewer::drawDot(QPoint loc, QColor color)
         return;
     QImage img = currPage.m_img;
 
-    float scale = scaleBase * scaleFactor;
-    QTransform transform = QTransform().scale(scale, scale).inverted();
+    QTransform transform = QTransform().scale(scaleFactor, scaleFactor).inverted();
 
     QPainter p(&currPage.m_img);
     p.setTransform(transform);
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    p.drawEllipse(loc, int(Config::brushSize * scale/2.0 + 0.5), int(Config::brushSize * scale/2.0 + 0.5));
+    p.drawEllipse(loc, int(Config::brushSize * scaleFactor/2.0 + 0.5), int(Config::brushSize * scaleFactor/2.0 + 0.5));
     p.end();
     update();
 }
@@ -454,7 +449,7 @@ QSize Viewer::sizeHint() const
 {
     if (currPage.m_img.isNull())
         return logo.size();
-    return currPage.m_img.size() * scaleBase * scaleFactor;
+    return currPage.m_img.size() * scaleFactor;
 }
 
 //
@@ -610,10 +605,9 @@ void Viewer::fitToWindow()
 
     // Scale to larger dimension
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)viewH / imageH;
+        scaleFactor = (float)viewH / imageH;
     else
-        scaleBase = (float)viewW / imageW;
-    scaleFactor = 1.0;
+        scaleFactor = (float)viewW / imageW;
 
     // Update scrollarea
     updateGeometry();
@@ -631,10 +625,9 @@ void Viewer::fitWidth()
 
     // If height is larger dimension, leave space for vertical scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)(viewW - scrollBarSize) / imageW;
+        scaleFactor = (float)(viewW - scrollBarSize) / imageW;
     else
-        scaleBase = (float)viewW / imageW;
-    scaleFactor = 1.0;
+        scaleFactor = (float)viewW / imageW;
 
     // Update scrollarea
     updateGeometry();
@@ -652,10 +645,9 @@ void Viewer::fitHeight()
 
     // If width is larger dimension, leave space for horizontal scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleBase = (float)(viewH - scrollBarSize) / imageH;
+        scaleFactor = (float)(viewH - scrollBarSize) / imageH;
     else
-        scaleBase = (float)viewH / imageH;
-    scaleFactor = 1.0;
+        scaleFactor = (float)viewH / imageH;
 
     // Update scrollarea
     updateGeometry();
