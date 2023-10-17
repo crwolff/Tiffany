@@ -218,6 +218,36 @@ void Viewer::wheelEvent(QWheelEvent *event)
 }
 
 //
+// Compare against standard key sequences
+//     Based on QKeyEvent::matches(...)
+//
+Viewer::MatchCode Viewer::keyMatches(QKeyEvent *event, QKeySequence::StandardKey matchKey)
+{
+    uint key = event->key();
+    uint mods = event->modifiers();
+
+    // Exact match
+    uint searchKey = (mods | key) & ~(Qt::KeypadModifier | Qt::GroupSwitchModifier);
+    QList<QKeySequence> bindings = QKeySequence::keyBindings(matchKey);
+    if (bindings.contains(QKeySequence(searchKey)))
+        return Exact;
+
+    // Match plus Shift
+    searchKey = ((mods & ~Qt::ShiftModifier) | key) & ~(Qt::KeypadModifier | Qt::GroupSwitchModifier);
+    bindings = QKeySequence::keyBindings(matchKey);
+    if (bindings.contains(QKeySequence(searchKey)))
+        return Shifted;
+
+    // Match plus Control
+    searchKey = ((mods & ~Qt::ControlModifier) | key) & ~(Qt::KeypadModifier | Qt::GroupSwitchModifier);
+    bindings = QKeySequence::keyBindings(matchKey);
+    if (bindings.contains(QKeySequence(searchKey)))
+        return Ctrled;
+
+    return None;
+}
+
+//
 // Handle key presses
 //
 void Viewer::keyPressEvent(QKeyEvent *event)
@@ -225,14 +255,36 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (currPage.m_img.isNull())
         return;
 
+    uint key = event->key();
+    bool shft = event->modifiers().testFlag(Qt::ShiftModifier);
+    bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
     bool flag = false;
 
-    if (event->key() == Qt::Key_F)
+    if (key == Qt::Key_F)
     {
         emit zoomSig();
         flag = true;
     }
-
+    else if (event->matches(QKeySequence::Undo))
+    {
+        bool updateZoom = currPage.undo();
+        currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+        emit updateIconSig();
+        if (updateZoom)
+            fitToWindow();
+        update();
+        flag = true;
+    }
+    else if (event->matches(QKeySequence::Redo))
+    {
+        bool updateZoom = currPage.redo();
+        currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+        emit updateIconSig();
+        if (updateZoom)
+            fitToWindow();
+        update();
+        flag = true;
+    }
 
     // Event was handled
     if (flag)

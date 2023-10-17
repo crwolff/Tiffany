@@ -19,6 +19,7 @@ public:
     QColor backgroundColor = Qt::white;
     enum LeftMode { Select, Pencil, Eraser };
     enum RightMode { Idle, Zoom, Pan };
+    enum MatchCode { None, Exact, Shifted, Ctrled };
 
 public slots:
     void changePage(QListWidgetItem *curr);
@@ -47,6 +48,7 @@ protected:
     QSize sizeHint() const override;
 
 private:
+    MatchCode keyMatches(QKeyEvent *event, QKeySequence::StandardKey matchKey);
     void drawLine(QPoint start, QPoint finish, QColor color);
     void drawDot(QPoint loc, QColor color);
 
