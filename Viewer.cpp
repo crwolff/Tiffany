@@ -317,6 +317,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
                 fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::bgColor, false);
         }
+        flag = true;
     }
     else if (ctrl & (event->key() == Qt::Key_S))
     {
@@ -328,6 +329,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
                 fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::bgColor, true);
         }
+        flag = true;
     }
 
     // Event was handled
