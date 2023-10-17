@@ -51,6 +51,7 @@ private:
     MatchCode keyMatches(QKeyEvent *event, QKeySequence::StandardKey matchKey);
     void drawLine(QPoint start, QPoint finish, QColor color);
     void drawDot(QPoint loc, QColor color);
+    void fillArea(QRect rect, QColor color, bool outside);
 
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);

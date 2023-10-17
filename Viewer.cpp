@@ -307,6 +307,28 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         update();
         flag = true;
     }
+    else if (keyMatches(event, QKeySequence::Cut) != None)
+    {
+        if (!leftBand->isHidden())
+        {
+            leftBand->hide();
+            if (shft)
+                fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::fgColor, false);
+            else
+                fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::bgColor, false);
+        }
+    }
+    else if (ctrl & (event->key() == Qt::Key_S))
+    {
+        if (!leftBand->isHidden())
+        {
+            leftBand->hide();
+            if (shft)
+                fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::fgColor, true);
+            else
+                fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::bgColor, true);
+        }
+    }
 
     // Event was handled
     if (flag)
@@ -447,6 +469,38 @@ void Viewer::drawDot(QPoint loc, QColor color)
     p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawEllipse(loc, int(Config::brushSize * scaleFactor/2.0 + 0.5), int(Config::brushSize * scaleFactor/2.0 + 0.5));
     p.end();
+    update();
+}
+
+//
+// Fill area with color
+//
+void Viewer::fillArea(QRect rect, QColor color, bool outside)
+{
+    if (currPage.m_img.isNull())
+        return;
+
+    currPage.push();
+    QPainter p(&currPage.m_img);
+    if (outside)
+    {
+        QRect box = scrnToPage.mapRect(rect);
+        int imgW = currPage.m_img.size().width();
+        int imgH = currPage.m_img.size().height();
+
+        p.fillRect(0, 0, imgW, box.top(), color);
+        p.fillRect(0, 0, box.left(), imgH, color);
+        p.fillRect(box.right(), 0, imgW, imgH, color);
+        p.fillRect(0, box.bottom(), imgW, imgH, color);
+    }
+    else
+    {
+        p.setTransform(scrnToPage);
+        p.fillRect(rect, color);
+    }
+    p.end();
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
     update();
 }
 

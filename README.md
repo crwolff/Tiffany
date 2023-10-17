@@ -3,23 +3,22 @@
 
 A Specialized tool for editing scanned documents.
 
-Left Mouse Button:
-* pointer to draw selection rectangle
-* Draw in foreground color
-* Dropper to select all pixels within threshold of current one (Cut to erase them)
-* Deskew tool (rotate using spinbox on toolbar, Paste to fix image)
+Left Mouse Button (function based on toolbar):
+* Pointer - Draw selection rectangle
+* Pencil/Eraser - Draw or Erase in various pen widths. Hold shift to draw straight lines
 
 Right Mouse Button:
 * Zoom to rectangle
 * Shift - pan image
 
-Esc - cancel paste operation
-^C - Copy from selection rectangle
-^V - Drag copied data around with mouse, LMB to place
-^Z - Undo previous edit
-^X - Fill area with background color
-^S - Fill outside area with background color
-Shift-^Z - Redo previous undo
+Keyboard:
+* 'F' - Apply most recent toolbar zoom (default: zoom to fit)
+* Cut ('^X') - fill selection with background color
+* Shift-Cut - Fill selection with foreground color
+* '^S' - Fill outside selection with background color
+* Shift-'^S' - Fill outside selection with foreground color
+* Undo ('^Z') - Undo previous edit
+* Shift-Undo - Redo previous undo
 
 ## To compile:
 ```
