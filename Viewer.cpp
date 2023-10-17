@@ -8,6 +8,7 @@
 Viewer::Viewer(QWidget * parent) : QWidget(parent)
 {
     setFocusPolicy(Qt::WheelFocus);
+    setScaleFactor(1.0);
 
     // Setup logo
     logo = QImage(":/images/assets/tiffany.png");
@@ -319,16 +320,13 @@ void Viewer::paintEvent(QPaintEvent *)
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     else
     {
-        QTransform transform = QTransform::fromScale(scaleFactor, scaleFactor);
-        QTransform inverted = transform.inverted();
-
-        p.setTransform(transform);
+        p.setTransform(pageToScrn);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
 
         if (shiftPencil)
         {
-            QPointF start = inverted.map(leftOrigin);
-            QPointF finish = inverted.map(drawLoc);
+            QPointF start = scrnToPage.map(leftOrigin);
+            QPointF finish = scrnToPage.map(drawLoc);
             p.setPen(QPen(currColor, Config::brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             p.drawLine(start, finish);
         }
@@ -359,7 +357,7 @@ void Viewer::changePage(QListWidgetItem *curr)
         // Restore view position
         if (currPage.scaleFactor != 0.0)
         {
-            scaleFactor = currPage.scaleFactor;
+            setScaleFactor(currPage.scaleFactor);
             updateGeometry();
             updateScrollBars();
             scrollArea->horizontalScrollBar()->setValue(currPage.horizontalScroll);
@@ -413,7 +411,7 @@ void Viewer::drawLine(QPoint start, QPoint finish, QColor color)
         return;
 
     QPainter p(&currPage.m_img);
-    p.setTransform(QTransform::fromScale(scaleFactor, scaleFactor).inverted());
+    p.setTransform(scrnToPage);
     p.setPen(QPen(color, int(Config::brushSize * scaleFactor + 0.5), Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     p.drawLine(start, finish);
     p.end();
@@ -429,7 +427,7 @@ void Viewer::drawDot(QPoint loc, QColor color)
         return;
 
     QPainter p(&currPage.m_img);
-    p.setTransform(QTransform::fromScale(scaleFactor, scaleFactor).inverted());
+    p.setTransform(scrnToPage);
     p.setBrush(color);
     p.setRenderHint(QPainter::Antialiasing, false);
     p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
@@ -446,6 +444,20 @@ QSize Viewer::sizeHint() const
     if (currPage.m_img.isNull())
         return logo.size();
     return currPage.m_img.size() * scaleFactor;
+}
+
+//
+// Set scale factor and transforms
+//
+void Viewer::setScaleFactor(float val)
+{
+    // Too much zoom causes crashes
+    // Should be calculated from image size vs window size
+    if (val > 10000)
+        val = 10000;
+    scaleFactor = val;
+    pageToScrn = QTransform::fromScale(scaleFactor, scaleFactor);
+    scrnToPage = pageToScrn.inverted();
 }
 
 //
@@ -476,7 +488,7 @@ void Viewer::zoomIn()
 {
     if (currPage.m_img.isNull())
         return;
-    scaleFactor *= 1.25;
+    setScaleFactor(scaleFactor * 1.25);
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(1.25);
@@ -488,7 +500,7 @@ void Viewer::zoomOut()
 {
     if (currPage.m_img.isNull())
         return;
-    scaleFactor *= 0.8;
+    setScaleFactor(scaleFactor * 0.8);
     updateGeometry();
     updateScrollBars();
     adjustScrollBars(0.8);
@@ -521,11 +533,9 @@ void Viewer::zoomArea(QRect rect)
     if ((rectW < 5) || (rectH < 5))
         return;
     if ((rectW * viewH) > (rectH * viewW))
-        scaleFactor *= (float)viewW / rectW;
+        setScaleFactor(scaleFactor * (float)viewW / rectW);
     else
-        scaleFactor *= (float)viewH / rectH;
-    if (scaleFactor > 10000)
-        scaleFactor = 10000;
+        setScaleFactor(scaleFactor * (float)viewH / rectH);
     updateGeometry();
     updateScrollBars();
 
@@ -551,7 +561,7 @@ void Viewer::zoomWheel(QPoint pos, float factor)
     int vVal = scrollArea->verticalScrollBar()->value();
 
     // Apply the zoom
-    scaleFactor *= factor;
+    setScaleFactor(scaleFactor * factor);
     updateGeometry();
     updateScrollBars();
     scrollArea->horizontalScrollBar()->setValue(int(hVal + (factor - 1) * pos.x()));
@@ -601,9 +611,9 @@ void Viewer::fitToWindow()
 
     // Scale to larger dimension
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleFactor = (float)viewH / imageH;
+        setScaleFactor((float)viewH / imageH);
     else
-        scaleFactor = (float)viewW / imageW;
+        setScaleFactor((float)viewW / imageW);
 
     // Update scrollarea
     updateGeometry();
@@ -621,9 +631,9 @@ void Viewer::fitWidth()
 
     // If height is larger dimension, leave space for vertical scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleFactor = (float)(viewW - scrollBarSize) / imageW;
+        setScaleFactor((float)(viewW - scrollBarSize) / imageW);
     else
-        scaleFactor = (float)viewW / imageW;
+        setScaleFactor((float)viewW / imageW);
 
     // Update scrollarea
     updateGeometry();
@@ -641,9 +651,9 @@ void Viewer::fitHeight()
 
     // If width is larger dimension, leave space for horizontal scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        scaleFactor = (float)(viewH - scrollBarSize) / imageH;
+        setScaleFactor((float)(viewH - scrollBarSize) / imageH);
     else
-        scaleFactor = (float)viewH / imageH;
+        setScaleFactor((float)viewH / imageH);
 
     // Update scrollarea
     updateGeometry();

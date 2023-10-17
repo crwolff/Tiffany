@@ -57,13 +57,16 @@ private:
     void updateScrollBars();
     void adjustScrollBars(float factor);
     bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+    void setScaleFactor(float val);
 
     QPoint leftOrigin;
     QPoint rightOrigin;
     QCursor lastCursor;
     QListWidgetItem *currItem = nullptr;
     Page currPage;
-    float scaleFactor = 1.0;
+    float scaleFactor;
+    QTransform pageToScrn;
+    QTransform scrnToPage;
     QScrollArea *scrollArea = NULL;
     QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
     QRubberBand *rightBand = new QRubberBand(QRubberBand::Rectangle, this);
