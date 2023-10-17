@@ -59,7 +59,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         leftOrigin = event->pos();
         if (leftMode == Select)
         {
-            leftBand->setGeometry(QRect(leftOrigin, QSize()));
+            LMRBstart = scrnToPage.map(leftOrigin);
+            LMRBend = LMRBstart;
+            leftBand->setGeometry(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)));
             leftBand->show();
             flag = true;
         }
@@ -86,7 +88,9 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         }
         else
         {
-            rightBand->setGeometry(QRect(rightOrigin, QSize()));
+            RMRBstart = scrnToPage.map(rightOrigin);
+            RMRBend = RMRBstart;
+            rightBand->setGeometry(QRect(pageToScrn.map(RMRBstart), pageToScrn.map(RMRBend)));
             rightBand->show();
             rightMode = Zoom;
         }
@@ -120,7 +124,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     {
         if (leftMode == Select)
         {
-            leftBand->setGeometry(QRect(leftOrigin, event->pos()).normalized());
+            LMRBend = scrnToPage.map(event->pos());
+            leftBand->setGeometry(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized());
             flag = true;
         }
         else if ((leftMode == Pencil) || (leftMode == Eraser))
@@ -154,7 +159,8 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         }
         else
         {
-            rightBand->setGeometry(QRect(rightOrigin, event->pos()).normalized());
+            RMRBend = scrnToPage.map(event->pos());
+            rightBand->setGeometry(QRect(pageToScrn.map(RMRBstart), pageToScrn.map(RMRBend)).normalized());
         }
         flag = true;
     }
@@ -205,7 +211,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         else
         {
             rightBand->hide();
-            zoomArea(rightBand->geometry());
+            zoomArea(QRect(pageToScrn.map(RMRBstart), pageToScrn.map(RMRBend)).normalized());
         }
         rightMode = Idle;
         flag = true;
@@ -320,9 +326,17 @@ void Viewer::paintEvent(QPaintEvent *)
         p.drawImage((rect().bottomRight() - logo.rect().bottomRight())/2.0, logo);
     else
     {
+        // Adjust rubberbands for scale
+        if (!leftBand->isHidden())
+            leftBand->setGeometry(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized());
+        if (!rightBand->isHidden())
+            rightBand->setGeometry(QRect(pageToScrn.map(RMRBstart), pageToScrn.map(RMRBend)).normalized());
+
+        // Draw page
         p.setTransform(pageToScrn);
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
 
+        // Additions to page
         if (shiftPencil)
         {
             QPointF start = scrnToPage.map(leftOrigin);

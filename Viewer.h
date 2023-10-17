@@ -69,7 +69,11 @@ private:
     QTransform scrnToPage;
     QScrollArea *scrollArea = NULL;
     QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QPoint LMRBstart;   // Left mouse rubberBand start
+    QPoint LMRBend;
     QRubberBand *rightBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QPoint RMRBstart;
+    QPoint RMRBend;
     QImage logo;
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;
