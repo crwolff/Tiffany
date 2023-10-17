@@ -309,7 +309,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (keyMatches(event, QKeySequence::Cut) != None)
     {
-        if (!leftBand->isHidden())
+        if (leftBand->isHidden())
+        {
+            QMessageBox::information(this, "Cut", "Area must be selected");
+            return;
+        }
+        else
         {
             leftBand->hide();
             if (shft)
@@ -321,7 +326,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (ctrl & (event->key() == Qt::Key_S))
     {
-        if (!leftBand->isHidden())
+        if (leftBand->isHidden())
+        {
+            QMessageBox::information(this, "Cut", "Area must be selected");
+            return;
+        }
+        else
         {
             leftBand->hide();
             if (shft)
