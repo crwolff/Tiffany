@@ -309,6 +309,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (key == Qt::Key_Escape)
     {
         pasting = false;
+        update();
         flag = true;
     }
     else if (key == Qt::Key_F)
@@ -393,7 +394,23 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (pasting)
     {
-        pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
+        if (keyMatches(event, QKeySequence::Delete) == Exact)
+        {
+            int idx = copyImageList.indexOf(copyImage);
+            if (idx >= 0)
+                copyImageList.removeAt(idx);
+            if (copyImageList.size() > 0)
+            {
+                copyImage = copyImageList.at(0);
+            }
+            else
+            {
+                copyImage = QImage();
+                pasting = false;
+            }
+        }
+        else
+            pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
         update();
         flag = true;
     }

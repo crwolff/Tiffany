@@ -13,6 +13,7 @@ Right Mouse Button:
 * Shift - pan image
 
 Keyboard:
+* Escape - Cancels current command (Paste, etc)
 * 'F' - Apply most recent toolbar zoom (default: zoom to fit)
 * Cut ('^X') - Fill selection with background color
 * Shift-Cut - Fill selection with foreground color
@@ -24,8 +25,9 @@ Keyboard:
 * Paste - Paste copied item
     * Click LMB to paste 
     * Holding control snaps image to 'best' nearby location
-    * Repeating Paste command cycles through list of copied items.
-    * Pressing control without moviing the mouse snaps the image (better for large pastes)
+    * Repeating Paste command cycles through list of copied items
+    * Pressing Control without moving the mouse snaps the image (better for large pastes)
+    * Pressing Delete while pasting removes current image from copied item list
 * Shift-Paste - Transparent paste
     * Hold shift while clicking to paste white regions (>F0F0F0) as transparent
 
