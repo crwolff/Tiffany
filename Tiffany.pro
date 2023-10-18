@@ -30,9 +30,11 @@ QT += widgets gui concurrent
 
 # Input
 HEADERS += mainwindow.h Bookmarks.h Config.h Page.h Viewer.h
+HEADERS += Utils/QImage2OCV.h
 HEADERS += Widgets/PopupQToolButton.h
 FORMS += mainWin.ui
 SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Config.cpp Page.cpp Viewer.cpp
+SOURCES += Utils/QImage2OCV.cpp
 SOURCES += Widgets/PopupQToolButton.cpp
 RESOURCES += rsrc.qrc
 

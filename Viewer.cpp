@@ -1,6 +1,8 @@
 #include "Config.h"
 #include "Viewer.h"
+#include "Utils/QImage2OCV.h"
 #include <QDebug>
+#include <QMessageBox>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -57,7 +59,11 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         leftOrigin = event->pos();
-        if (leftMode == Select)
+        if (pasting)
+        {
+            flag = true;
+        }
+        else if (leftMode == Select)
         {
             LMRBstart = scrnToPage.map(leftOrigin);
             LMRBend = LMRBstart;
@@ -115,9 +121,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     // Grab keyboard modifiers
     Qt::KeyboardModifiers keyMod = event->modifiers();
     bool shift = keyMod.testFlag(Qt::ShiftModifier);
+    bool ctrl = keyMod.testFlag(Qt::ControlModifier);
 
     // Event handled flag
     bool flag = false;
+
+    // If pasting, update location
+    if (pasting)
+    {
+        pasteLoc = pasteLocator(event->pos(), ctrl);
+        update();
+        flag = true;
+    }
 
     // If left mouse button is pressed
     if (event->buttons() & Qt::LeftButton)
@@ -180,13 +195,22 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
     if (currPage.m_img.isNull())
         return;
 
+    // Grab keyboard modifiers
+    Qt::KeyboardModifiers keyMod = event->modifiers();
+    bool shift = keyMod.testFlag(Qt::ShiftModifier);
+
     // Event handled flag
     bool flag = false;
 
     // If left mouse button was released
     if (event->button() == Qt::LeftButton)
     {
-        if (leftMode == Select)
+        if (pasting)
+        {
+            doPaste(shift);
+            flag = true;
+        }
+        else if (leftMode == Select)
         {
             flag = true;
         }
@@ -282,7 +306,12 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
     bool flag = false;
 
-    if (key == Qt::Key_F)
+    if (key == Qt::Key_Escape)
+    {
+        pasting = false;
+        flag = true;
+    }
+    else if (key == Qt::Key_F)
     {
         emit zoomSig();
         flag = true;
@@ -324,7 +353,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         flag = true;
     }
-    else if (ctrl & (event->key() == Qt::Key_S))
+    else if (ctrl & (key == Qt::Key_S))
     {
         if (leftBand->isHidden())
         {
@@ -339,6 +368,56 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             else
                 fillArea(QRect(pageToScrn.map(LMRBstart), pageToScrn.map(LMRBend)).normalized(), Config::bgColor, true);
         }
+        flag = true;
+    }
+    else if (keyMatches(event, QKeySequence::Copy) != None)
+    {
+        if (leftBand->isHidden())
+        {
+            QMessageBox::information(this, "Copy", "Area must be selected");
+            return;
+        }
+        else
+        {
+            leftBand->hide();
+            doCopy(QRect(LMRBstart, LMRBend).normalized());
+        }
+        flag = true;
+    }
+    else if (keyMatches(event, QKeySequence::Paste) != None)
+    {
+        // Don't optimize location since Ctrl may already be down
+        pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), false);
+        setupPaste();
+        flag = true;
+    }
+    else if (pasting)
+    {
+        pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
+        flag = true;
+    }
+
+    // Event was handled
+    if (flag)
+        event->accept();
+    else
+        QWidget::keyPressEvent(event);
+}
+
+//
+// Handle key releases
+//
+void Viewer::keyReleaseEvent(QKeyEvent *event)
+{
+    if (currPage.m_img.isNull())
+        return;
+
+    bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
+    bool flag = false;
+
+    if (pasting)
+    {
+        pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
         flag = true;
     }
 
@@ -371,7 +450,12 @@ void Viewer::paintEvent(QPaintEvent *)
         p.drawImage(currPage.m_img.rect().topLeft(), currPage.m_img);
 
         // Additions to page
-        if (shiftPencil)
+        if (pasting)
+        {
+            p.setOpacity(0.3);
+            p.drawImage(pasteLoc, copyImage);
+        }
+        else if (shiftPencil)
         {
             QPointF start = scrnToPage.map(leftOrigin);
             QPointF finish = scrnToPage.map(drawLoc);
@@ -514,6 +598,133 @@ void Viewer::fillArea(QRect rect, QColor color, bool outside)
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
     emit updateIconSig();
     update();
+}
+
+//
+// Copy the region
+//
+void Viewer::doCopy(QRect box)
+{
+    copyImage = currPage.m_img.copy(box);
+    copyImageList.prepend(copyImage);
+    if (copyImageList.size() > 12)
+        copyImageList.removeLast();
+}
+
+//
+// Setup paste of copyied region
+//
+void Viewer::setupPaste()
+{
+    if (copyImage.isNull())
+        return;
+
+    // If already pasting, switch to next image in list
+    if (pasting)
+    {
+        int idx = copyImageList.indexOf(copyImage);
+        if ((idx + 1) < copyImageList.size())
+            copyImage = copyImageList.at(idx+1);
+        else
+            copyImage = copyImageList.at(0);
+    }
+
+    // Turn on pasting
+    pasting = true;
+    setMouseTracking(true);
+    update();
+}
+
+//
+// Paste copyImage into page
+//
+void Viewer::doPaste(bool transparent)
+{
+    // Cleanup
+    pasting = false;
+    setMouseTracking(false);
+    currPage.push();
+
+    // Bump copyImage to head of list
+    int idx = copyImageList.indexOf(copyImage);
+    if (idx > 0)
+        copyImageList.move(idx, 0);
+
+    // Paint the copied section
+    QPainter p(&currPage.m_img);
+    if (transparent)
+    {
+        // If shift is pressed, convert everything close to white into transparent
+        QImage tmp = copyImage.copy();
+        if (copyImage.format() != QImage::Format_ARGB32)
+            tmp = copyImage.convertToFormat(QImage::Format_ARGB32);
+        QRgb transparent = qRgba(0,0,0,0);
+        for(int i=0; i<tmp.height(); i++)
+        {
+            QRgb *srcPtr = (QRgb *)tmp.scanLine(i);
+            for(int j=0; j<tmp.width(); j++)
+            {
+                QRgb val = *srcPtr;
+                if ((qRed(val) >= 240) && (qGreen(val) >= 240) && (qBlue(val) >= 240))
+                    *srcPtr = transparent;
+                srcPtr++;
+            }
+        }
+        p.drawImage(pasteLoc, tmp);
+    }
+    else
+        p.drawImage(pasteLoc, copyImage);
+    p.end();
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
+}
+
+//
+// Compute the location of the paste image from cursor position
+//
+QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
+{
+    // Map to page coordinates
+    QPointF loc = scrnToPage.map(mouse);
+
+    // Offset from center to upper left corner
+    qreal imgW = copyImage.size().width();
+    qreal imgH = copyImage.size().height();
+    loc = loc - QPointF(imgW/2.0, imgH/2.0);
+
+    if (optimize)
+    {
+        // Find position that has highest corelation
+        int win = 4;
+
+        // Convert area around mouse to grayscale
+        QImage tmp1 = currPage.m_img.copy(loc.x() - win, loc.y() - win, imgW + win*2, imgH + win*2);
+        if (tmp1.format() != QImage::Format_Grayscale8)
+            tmp1 = tmp1.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+        cv::Mat mat1 = QImage2OCV(tmp1);
+
+        // Convert paste image to grayscale
+        QImage tmp2 = copyImage;
+        if (tmp2.format() != QImage::Format_Grayscale8)
+            tmp2 = tmp2.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+        cv::Mat mat2 = QImage2OCV(tmp2);
+
+        // Make a target array
+        cv::Mat res;
+        res.create( win * 2 + 1, win * 2 + 1, CV_32FC1 );
+
+        // Correlate the images
+        cv::matchTemplate( mat1, mat2, res, cv::TM_CCOEFF );
+
+        // Find max
+        cv::Point matchLoc;
+        cv::minMaxLoc( res, NULL, NULL, NULL, &matchLoc, cv::Mat() );
+
+        // Snap to best location
+        return QPoint( loc.x() + matchLoc.x - win + 0.5, loc.y() + matchLoc.y - win + 0.5 );
+    }
+    return QPoint( loc.x() + 0.5, loc.y() + 0.5 );
 }
 
 //
