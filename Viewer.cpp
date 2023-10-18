@@ -394,6 +394,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     else if (pasting)
     {
         pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
+        update();
         flag = true;
     }
 
@@ -418,6 +419,7 @@ void Viewer::keyReleaseEvent(QKeyEvent *event)
     if (pasting)
     {
         pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
+        update();
         flag = true;
     }
 

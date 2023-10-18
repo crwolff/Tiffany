@@ -25,6 +25,7 @@ Keyboard:
     * Click LMB to paste 
     * Holding control snaps image to 'best' nearby location
     * Repeating Paste command cycles through list of copied items.
+    * Pressing control without moviing the mouse snaps the image (better for large pastes)
 * Shift-Paste - Transparent paste
     * Hold shift while clicking to paste white regions (>F0F0F0) as transparent
 
