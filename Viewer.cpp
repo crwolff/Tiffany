@@ -722,9 +722,9 @@ QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
         cv::minMaxLoc( res, NULL, NULL, NULL, &matchLoc, cv::Mat() );
 
         // Snap to best location
-        return QPoint( loc.x() + matchLoc.x - win + 0.5, loc.y() + matchLoc.y - win + 0.5 );
+        return QPoint( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
     }
-    return QPoint( loc.x() + 0.5, loc.y() + 0.5 );
+    return QPoint( loc.x(), loc.y() );
 }
 
 //
