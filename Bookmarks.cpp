@@ -382,6 +382,11 @@ void Bookmarks::blankPage()
                                          "BLANK", &ok);
     if (ok)
     {
+        // Add progress to status bar
+        emit progressSig("Blanking...", selection.count());
+
+        // Blank each page in turn
+        int progress = 1;
         foreach(QListWidgetItem* item, selection)
         {
             Page page = item->data(Qt::UserRole).value<Page>();
@@ -400,7 +405,14 @@ void Bookmarks::blankPage()
             page.m_img = img;
             item->setData(Qt::UserRole, QVariant::fromValue(page));
             item->setIcon(makeIcon(page.m_img, page.modified()));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
         }
+        // Cleanup status bar
+        emit progressSig("", -1);
+
         // Update Viewer
         emit updatePageSig(false);
     }
@@ -413,6 +425,12 @@ void Bookmarks::removeBG()
 {
     // Get list of all selected items
     QList<QListWidgetItem*> selection = selectedItems();
+
+    // Add progress to status bar
+    emit progressSig("Background...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
@@ -422,7 +440,14 @@ void Bookmarks::removeBG()
 
         item->setData(Qt::UserRole, QVariant::fromValue(page));
         item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
     }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
     // Update Viewer
     emit updatePageSig(false);
 }
