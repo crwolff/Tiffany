@@ -193,7 +193,7 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     // Save image to <fileName>
     Page page = itemPtr->data(Qt::UserRole).value<Page>();
     QImageWriter writer(fileName);
-    writer.setCompression(100);     // TIF is LZW, no Group 4 option
+    //writer.setCompression(100);     // TIF is LZW, no Group 4 option
     if (writer.write(page.m_img) == false)
         return false;
 
