@@ -229,7 +229,17 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             QPoint loc = scrnToPageOffs.map(event->pos());
             QRgb pixel = currPage.m_img.pixel(loc);
             blinkTimer->stop();
-            pageMask = currPage.colorSelect(pixel);
+            pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
+            blinkTimer->start(300);
+            update();
+            flag = true;
+        }
+        else if (leftMode == FloodFill)
+        {
+            // Get pixel under cursor
+            QPoint loc = scrnToPageOffs.map(event->pos());
+            blinkTimer->stop();
+            pageMask = floodFill(loc, Config::floodThreshold);
             blinkTimer->start(300);
             update();
             flag = true;
@@ -567,6 +577,8 @@ void Viewer::changePage(QListWidgetItem *curr)
 //
 void Viewer::updatePage(bool updateZoom)
 {
+    if (currItem == nullptr)
+        return;
     currPage = currItem->data(Qt::UserRole).value<Page>();
     if (updateZoom)
         fitToWindow();
@@ -585,7 +597,7 @@ void Viewer::setTool(LeftMode tool)
         pencil180 = false;
         setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
     }
-    else if (tool == ColorSelect)
+    else if ((tool == ColorSelect) || (tool == FloodFill))
         setCursor(DropperCursor);
     resetTools();
 }
@@ -799,6 +811,66 @@ QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
         return QPoint( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
     }
     return QPoint( loc.x(), loc.y() );
+}
+
+//
+// Select adjacent pixels near the cursor's color
+//
+QImage Viewer::floodFill(QPoint loc, int threshold)
+{
+    // Check for valid point
+    if ((loc.x() < 0) || (loc.x() >= currPage.m_img.width()) ||
+        (loc.y() < 0) || (loc.y() >= currPage.m_img.height()))
+    {
+        QMessageBox::information(this, "Flood Fill", "Start point outside image");
+        return QImage();
+    }
+
+    // Upconvert mono images
+    QImage img;
+    if (currPage.m_img.format() == QImage::Format_Mono)
+        img = currPage.m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    else
+        img = currPage.m_img;
+
+    // Convert to OpenCV
+    cv::Mat orig = QImage2OCV(img);
+    if ((img.format() == QImage::Format_RGB32) || (img.format() == QImage::Format_ARGB32))
+        cv::cvtColor(orig, orig, cv::COLOR_RGBA2RGB);   // floodfill doesn't work with alpha channel
+
+    // Make all zero mask
+    cv::Mat floodMask = cv::Mat::zeros(img.height() + 2, img.width() + 2, CV_8UC1);
+
+    // Fill adjacent pixels
+    cv::Point ref(loc.x(), loc.y());
+    cv::Rect region;
+    cv::Scalar thresh(threshold, threshold, threshold);
+    int flags = 8 | (255 << 8 ) | cv::FLOODFILL_FIXED_RANGE | cv::FLOODFILL_MASK_ONLY;
+    cv::floodFill(orig, floodMask, ref, 0, &region, thresh, thresh, flags);
+
+    // Convert mask back
+    QImage tmp = OCV2QImage(floodMask);
+    tmp = tmp.copy(1, 1, tmp.width() - 2, tmp.height() - 2);
+
+    // Initialize mask
+    QImage mask(img.size(), QImage::Format_Indexed8);
+    mask.setColor( 0, Config::fgColor.rgba() );
+    mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
+
+    // Scan through page seeking matches
+    for(int i=0; i<tmp.height(); i++)
+    {
+        uchar *srcPtr = tmp.scanLine(i);
+        uchar *maskPtr = reinterpret_cast<uchar*>(mask.scanLine(i));
+        for(int j=0; j<tmp.width(); j++)
+        {
+            if (*srcPtr++ <= 128)
+                *maskPtr++ = 1;
+            else
+                *maskPtr++ = 0;
+        }
+    }
+    return mask;
 }
 
 //

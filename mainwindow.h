@@ -31,13 +31,18 @@ public slots:
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
-    void makeVisible(int mask);
     void buildToolBar();
+    void makeDropperVisible(int mask);
 
     QLabel *statusLabel;
     QProgressBar *progressBar;
 
     PopupQToolButton *zoomToolButton;
+    SpinWidget *bgRemoveThresholdWidget;
+    QAction *bgRemoveThresholdSpin;
     SpinWidget *dropperThresholdWidget;
+    QAction *dropperThresholdSpin;
+    SpinWidget *floodThresholdWidget;
+    QAction *floodThresholdSpin;
 };
 #endif // MAINWINDOW_H

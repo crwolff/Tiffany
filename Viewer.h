@@ -17,7 +17,7 @@ public:
     ~Viewer();
 
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, Pencil, Eraser, ColorSelect };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -60,6 +60,7 @@ private:
     void setupPaste();
     void doPaste(bool transparent);
     QPoint pasteLocator(QPoint mouse, bool optimize);
+    QImage floodFill(QPoint loc, int threshold);
 
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);

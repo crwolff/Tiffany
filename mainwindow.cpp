@@ -87,10 +87,19 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { Config::brushSize = 12; });
 
     // Dropper menu
-    QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
+    QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
     QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
             [this]() { Config::dropperThreshold = dropperThresholdWidget->spinBox->value(); });
+    QObject::connect( bgRemoveThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
+            [this]() { Config::bgRemoveThreshold = bgRemoveThresholdWidget->spinBox->value(); });
+    QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
+            [this]() { Config::floodThreshold = floodThresholdWidget->spinBox->value(); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
+    QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
+
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -204,12 +213,32 @@ void MainWindow::buildToolBar()
     QMenu *dropperMenu = new QMenu();
     dropperMenu->addAction(ui->dropperAct);
     dropperMenu->addAction(ui->removeAct);
+    dropperMenu->addAction(ui->floodAct);
     PopupQToolButton *dropperToolButton = new PopupQToolButton();
     dropperToolButton->setMenu(dropperMenu);
     dropperToolButton->setDefaultAction(ui->dropperAct);
     ui->toolBar->addWidget(dropperToolButton);
-    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Threshold", ui->toolBar);
-    ui->toolBar->addWidget(dropperThresholdWidget);
+
+    // Dropper button thresholds
+    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
+    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
+    dropperThresholdSpin->setVisible(true);
+    bgRemoveThresholdWidget = new SpinWidget(0, 255, Config::bgRemoveThreshold, 5, "BG Thresh", ui->toolBar);
+    bgRemoveThresholdSpin = ui->toolBar->addWidget(bgRemoveThresholdWidget);
+    bgRemoveThresholdSpin->setVisible(false);
+    floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood", ui->toolBar);
+    floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
+    floodThresholdSpin->setVisible(false);
+}
+
+//
+// Set one of the dropper spinboxes visible
+//
+void MainWindow::makeDropperVisible(int mask)
+{
+    dropperThresholdSpin->setVisible((mask & 1) != 0);
+    bgRemoveThresholdSpin->setVisible((mask & 2) != 0);
+    floodThresholdSpin->setVisible((mask & 4) != 0);
 }
 
 //

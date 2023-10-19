@@ -6,6 +6,7 @@
 
 namespace Config
 {
+    int bgRemoveThreshold;
     int dropperThreshold;
     int floodThreshold;
     double deskewAngle;
@@ -26,6 +27,7 @@ namespace Config
     {
         QSettings settings;
 
+        bgRemoveThreshold = settings.value("bgRemoveThreshold", 20).toInt();
         dropperThreshold = settings.value("dropperThreshold", 20).toInt();
         floodThreshold = settings.value("floodThreshold", 50).toInt();
         deskewAngle = settings.value("deskewAngle", 0.0).toDouble();
@@ -60,6 +62,7 @@ namespace Config
     void SaveConfig()
     {
         QSettings settings;
+        settings.setValue("bgRemoveThreshold", bgRemoveThreshold);
         settings.setValue("dropperThreshold", dropperThreshold);
         settings.setValue("floodThreshold", floodThreshold);
         settings.setValue("deskewAngle", deskewAngle);

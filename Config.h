@@ -10,6 +10,7 @@
 
 namespace Config
 {
+    extern int bgRemoveThreshold;
     extern int dropperThreshold;
     extern int floodThreshold;
     extern double deskewAngle;

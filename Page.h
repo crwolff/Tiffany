@@ -20,7 +20,7 @@ public:
     void push();
     bool undo();
     bool redo();
-    QImage colorSelect(QRgb target);
+    QImage colorSelect(QRgb target, int threshold);
     void applyMask(QImage mask, QColor color);
 
     // Flag if image was changed

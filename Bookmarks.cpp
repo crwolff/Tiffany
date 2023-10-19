@@ -434,7 +434,7 @@ void Bookmarks::removeBG()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
-        QImage mask = page.colorSelect(QColor(Qt::white).rgb());
+        QImage mask = page.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
         page.push();
         page.applyMask(mask, Config::bgColor);
 

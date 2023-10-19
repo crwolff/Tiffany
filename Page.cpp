@@ -90,7 +90,7 @@ bool Page::redo()
 //
 // Select all pixels near the cursor's color
 //
-QImage Page::colorSelect(QRgb target)
+QImage Page::colorSelect(QRgb target, int threshold)
 {
     // Initialize mask
     QImage mask(m_img.size(), QImage::Format_Indexed8);
@@ -119,7 +119,7 @@ QImage Page::colorSelect(QRgb target)
                 tmp = abs(blu - qBlue(val));
                 if (tmp > max)
                     max = tmp;
-                if (max > Config::dropperThreshold)
+                if (max > threshold)
                     *maskPtr++ = 1;
                 else
                     *maskPtr++ = 0;
@@ -139,7 +139,7 @@ QImage Page::colorSelect(QRgb target)
             {
                 int val = *srcPtr++;
                 int max = abs(pix - val);
-                if (max > Config::dropperThreshold)
+                if (max > threshold)
                     *maskPtr++ = 1;
                 else
                     *maskPtr++ = 0;
