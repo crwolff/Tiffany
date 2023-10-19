@@ -100,6 +100,8 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
     QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
 
+    // Color button
+    QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -229,6 +231,11 @@ void MainWindow::buildToolBar()
     floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
+
+    // Color button
+    colorToolButton.setDefaultAction(ui->colorAct);
+    colorToolButton.setIcon(Config::fgColor, Config::bgColor);
+    ui->toolBar->addWidget(&colorToolButton);
 }
 
 //
@@ -239,6 +246,38 @@ void MainWindow::makeDropperVisible(int mask)
     dropperThresholdSpin->setVisible((mask & 1) != 0);
     bgRemoveThresholdSpin->setVisible((mask & 2) != 0);
     floodThresholdSpin->setVisible((mask & 4) != 0);
+}
+
+//
+// Manipulate drawing colors
+//
+void MainWindow::colorMagic()
+{
+    if (colorToolButton.mode == "Foreground")
+    {
+        QColor tmp = QColorDialog::getColor(Config::fgColor, nullptr, "Foreground");
+        if (tmp.isValid())
+            Config::fgColor = tmp;
+    }
+    else if (colorToolButton.mode == "Background")
+    {
+        QColor tmp = QColorDialog::getColor(Config::bgColor, nullptr, "Background");
+        if (tmp.isValid())
+            Config::bgColor = tmp;
+    }
+    else if (colorToolButton.mode == "Swap")
+    {
+        QColor tmp;
+        tmp = Config::fgColor;
+        Config::fgColor = Config::bgColor;
+        Config::bgColor = tmp;
+    }
+    else if (colorToolButton.mode == "Reset")
+    {
+        Config::fgColor = Qt::black;
+        Config::bgColor = Qt::white;
+    }
+    colorToolButton.setIcon(Config::fgColor, Config::bgColor);
 }
 
 //

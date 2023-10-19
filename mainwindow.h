@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QVBoxLayout>
+#include "Widgets/ColorQToolButton.h"
 #include "Widgets/PopupQToolButton.h"
 #include "Widgets/SpinWidget.h"
 
@@ -22,6 +23,7 @@ public:
     ~MainWindow();
 
 public slots:
+    void colorMagic();
     void fontSelect();
     void updateProgress(QString descr, int val);
     void setStatus(QString descr);
@@ -33,7 +35,6 @@ private:
     void connectSignalSlots();
     void buildToolBar();
     void makeDropperVisible(int mask);
-
     QLabel *statusLabel;
     QProgressBar *progressBar;
 
@@ -44,5 +45,7 @@ private:
     QAction *dropperThresholdSpin;
     SpinWidget *floodThresholdWidget;
     QAction *floodThresholdSpin;
+
+    ColorQToolButton colorToolButton;
 };
 #endif // MAINWINDOW_H
