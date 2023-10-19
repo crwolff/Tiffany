@@ -626,15 +626,19 @@ void Viewer::drawDot(QPoint loc, QColor color)
 
     // Ellipse doesn't work well for single pixels
     if (Config::brushSize == 1)
-        return;
-
-    QPainter p(&currPage.m_img);
-    p.setTransform(scrnToPage);
-    p.setBrush(color);
-    p.setRenderHint(QPainter::Antialiasing, false);
-    p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
-    p.drawEllipse(loc, int(Config::brushSize * scaleFactor/2.0 + 0.5), int(Config::brushSize * scaleFactor/2.0 + 0.5));
-    p.end();
+    {
+        currPage.m_img.setPixelColor(scrnToPageOffs.map(loc), color);
+    }
+    else
+    {
+        QPainter p(&currPage.m_img);
+        p.setTransform(scrnToPage);
+        p.setBrush(color);
+        p.setRenderHint(QPainter::Antialiasing, false);
+        p.setPen(QPen(color, 0, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        p.drawEllipse(loc, int(Config::brushSize * scaleFactor/2.0 + 0.5), int(Config::brushSize * scaleFactor/2.0 + 0.5));
+        p.end();
+    }
     update();
 }
 
