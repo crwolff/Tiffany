@@ -767,7 +767,7 @@ void Viewer::setScaleFactor(float val)
         val = 10000;
     scaleFactor = val;
     pageToScrn = QTransform::fromScale(scaleFactor, scaleFactor);
-    scrnToPage = pageToScrn.inverted();
+    scrnToPage = pageToScrn.inverted().translate(-scaleFactor*0.5,-scaleFactor*0.5);
 }
 
 //
