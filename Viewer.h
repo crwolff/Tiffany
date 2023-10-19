@@ -76,6 +76,7 @@ private:
     float scaleFactor;
     QTransform pageToScrn;
     QTransform scrnToPage;
+    QTransform scrnToPageOffs;
     QScrollArea *scrollArea = NULL;
     QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
     QPoint LMRBstart;   // Left mouse rubberBand start

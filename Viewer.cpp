@@ -226,7 +226,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         else if (leftMode == ColorSelect)
         {
             // Get pixel under cursor
-            QPoint loc = scrnToPage.map(event->pos());
+            QPoint loc = scrnToPageOffs.map(event->pos());
             QRgb pixel = currPage.m_img.pixel(loc);
             blinkTimer->stop();
             pageMask = currPage.colorSelect(pixel);
@@ -624,6 +624,10 @@ void Viewer::drawDot(QPoint loc, QColor color)
     if (currPage.m_img.isNull())
         return;
 
+    // Ellipse doesn't work well for single pixels
+    if (Config::brushSize == 1)
+        return;
+
     QPainter p(&currPage.m_img);
     p.setTransform(scrnToPage);
     p.setBrush(color);
@@ -831,7 +835,8 @@ void Viewer::setScaleFactor(float val)
         val = 10000;
     scaleFactor = val;
     pageToScrn = QTransform::fromScale(scaleFactor, scaleFactor);
-    scrnToPage = pageToScrn.inverted().translate(-scaleFactor*0.5,-scaleFactor*0.5);
+    scrnToPage = pageToScrn.inverted();
+    scrnToPageOffs = pageToScrn.inverted().translate(-scaleFactor*0.5,-scaleFactor*0.5);
 }
 
 //
