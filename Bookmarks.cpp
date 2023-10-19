@@ -407,6 +407,27 @@ void Bookmarks::blankPage()
 }
 
 //
+// Remove background
+//
+void Bookmarks::removeBG()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage mask = page.colorSelect(QColor(Qt::white).rgb());
+        page.push();
+        page.applyMask(mask, Config::bgColor);
+
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+    }
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
 // Rotate selected items
 //  1 = 90
 //  2 = 180

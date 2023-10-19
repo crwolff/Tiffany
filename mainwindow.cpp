@@ -86,11 +86,18 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->pix8Act, &QAction::triggered, [this]() { Config::brushSize = 8; });
     QObject::connect( ui->pix12Act, &QAction::triggered, [this]() { Config::brushSize = 12; });
 
+    // Dropper menu
+    QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
+    QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
+            [this]() { Config::dropperThreshold = dropperThresholdWidget->spinBox->value(); });
+
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     // Interconnects
+    QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( ui->bookmarks, &QListWidget::itemSelectionChanged, ui->bookmarks, &Bookmarks::itemSelectionChanged );
     QObject::connect( ui->bookmarks, &Bookmarks::changePageSig, ui->viewer, &Viewer::changePage );
     QObject::connect( ui->bookmarks, &Bookmarks::updatePageSig, ui->viewer, &Viewer::updatePage );
@@ -157,7 +164,7 @@ void MainWindow::buildToolBar()
     zoomMenu->addAction( ui->fillWindowAct );
     zoomMenu->addAction( ui->fitWidthAct );
     zoomMenu->addAction( ui->fitHeightAct );
-    //PopupQToolButton *zoomToolButton = new PopupQToolButton();
+    zoomToolButton = new PopupQToolButton();
     zoomToolButton->setMenu(zoomMenu);
     zoomToolButton->setDefaultAction(ui->fitToWindowAct);
     ui->toolBar->addWidget(zoomToolButton);
@@ -192,6 +199,17 @@ void MainWindow::buildToolBar()
     else
         toolSizeToolButton->setDefaultAction(ui->pix1Act);
     ui->toolBar->addWidget(toolSizeToolButton);
+
+    // Dropper button
+    QMenu *dropperMenu = new QMenu();
+    dropperMenu->addAction(ui->dropperAct);
+    dropperMenu->addAction(ui->removeAct);
+    PopupQToolButton *dropperToolButton = new PopupQToolButton();
+    dropperToolButton->setMenu(dropperMenu);
+    dropperToolButton->setDefaultAction(ui->dropperAct);
+    ui->toolBar->addWidget(dropperToolButton);
+    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Threshold", ui->toolBar);
+    ui->toolBar->addWidget(dropperThresholdWidget);
 }
 
 //

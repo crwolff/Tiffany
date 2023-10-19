@@ -26,6 +26,7 @@ public slots:
     void selectOdd();
     void deleteSelection();
     void blankPage();
+    void removeBG();
     void rotateCW();
     void rotateCCW();
     void rotate180();

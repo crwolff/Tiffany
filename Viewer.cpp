@@ -21,6 +21,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     PencilCursor = QCursor(p, 0, 31);
     p = QPixmap(":/images/assets/pencil180.svg").scaled(32,32,Qt::KeepAspectRatio);
     Pencil180Cursor = QCursor(p, 31, 0);
+    p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
+    DropperCursor = QCursor(p, 0, 31);
 }
 
 Viewer::~Viewer()
@@ -75,7 +77,6 @@ void Viewer::mousePressEvent(QMouseEvent *event)
         {
             currColor = (leftMode == Pencil) ? Config::fgColor : Config::bgColor;
             currPage.push();
-            setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
             if (!shift)
                 drawDot(leftOrigin, currColor);
             flag = true;
@@ -218,9 +219,19 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             shiftPencil = false;
             drawLine(leftOrigin, event->pos(), currColor);
-            setCursor(Qt::ArrowCursor);
             currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit updateIconSig();
+            flag = true;
+        }
+        else if (leftMode == ColorSelect)
+        {
+            // Get pixel under cursor
+            QPoint loc = scrnToPage.map(event->pos());
+            QRgb pixel = currPage.m_img.pixel(loc);
+            blinkTimer->stop();
+            pageMask = currPage.colorSelect(pixel);
+            blinkTimer->start(300);
+            update();
             flag = true;
         }
     }
@@ -308,8 +319,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     if (key == Qt::Key_Escape)
     {
-        pasting = false;
-        update();
+        resetTools();
         flag = true;
     }
     else if (key == Qt::Key_F)
@@ -339,10 +349,19 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (keyMatches(event, QKeySequence::Cut) != None)
     {
-        if (leftBand->isHidden())
+        if (!pageMask.isNull())
+        {
+            blinkTimer->stop();
+            currPage.push();
+            currPage.applyMask(pageMask, Config::bgColor);
+            pageMask = QImage();
+            currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit updateIconSig();
+            update();
+        }
+        else if (leftBand->isHidden())
         {
             QMessageBox::information(this, "Cut", "Area must be selected");
-            return;
         }
         else
         {
@@ -356,10 +375,19 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (ctrl & (key == Qt::Key_S))
     {
-        if (leftBand->isHidden())
+        if (!pageMask.isNull())
+        {
+            blinkTimer->stop();
+            currPage.push();
+            currPage.applyMask(pageMask, Config::fgColor);
+            pageMask = QImage();
+            currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit updateIconSig();
+            update();
+        }
+        else if (leftBand->isHidden())
         {
             QMessageBox::information(this, "Cut", "Area must be selected");
-            return;
         }
         else
         {
@@ -376,7 +404,6 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         if (leftBand->isHidden())
         {
             QMessageBox::information(this, "Copy", "Area must be selected");
-            return;
         }
         else
         {
@@ -474,6 +501,10 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setOpacity(0.3);
             p.drawImage(pasteLoc, copyImage);
         }
+        else if (!pageMask.isNull())
+        {
+            p.drawImage(QPoint(0,0), pageMask);
+        }
         else if (shiftPencil)
         {
             QPointF start = scrnToPage.map(leftOrigin);
@@ -550,7 +581,23 @@ void Viewer::setTool(LeftMode tool)
     setCursor(Qt::ArrowCursor);
     leftMode = tool;
     if ((tool == Pencil) || (tool == Eraser))
+    {
         pencil180 = false;
+        setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
+    }
+    else if (tool == ColorSelect)
+        setCursor(DropperCursor);
+    resetTools();
+}
+
+//
+// Reset tools
+//
+void Viewer::resetTools()
+{
+    pasting = false;
+    pageMask = QImage();
+    update();
 }
 
 //
@@ -744,6 +791,23 @@ QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
         return QPoint( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
     }
     return QPoint( loc.x(), loc.y() );
+}
+
+//
+// Blink mask to make it easier to see
+//
+void Viewer::blinker()
+{
+    if (currPage.m_img.isNull() || pageMask.isNull())
+    {
+        blinkTimer->stop();
+        return;
+    }
+    if (pageMask.color(0) != Config::fgColor.rgba())
+        pageMask.setColor( 0, Config::fgColor.rgba() );
+    else
+        pageMask.setColor( 0, Config::bgColor.rgba() );
+    update();
 }
 
 //

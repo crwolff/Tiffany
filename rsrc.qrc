@@ -42,5 +42,6 @@
     <file>assets/devoid.svg</file>
     <file>assets/mirror_horiz.svg</file>
     <file>assets/mirror_vert.svg</file>
+    <file>assets/remove.svg</file>
   </qresource>
 </RCC>

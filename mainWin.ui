@@ -562,6 +562,18 @@
     <string>Erase all pixels with similiar color to selection</string>
    </property>
   </action>
+  <action name="removeAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/remove.svg</normaloff>:/images/assets/remove.svg</iconset>
+   </property>
+   <property name="text">
+    <string>BG Remove</string>
+   </property>
+   <property name="toolTip">
+    <string>Erase all pixels close to white</string>
+   </property>
+  </action>
   <action name="floodAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">

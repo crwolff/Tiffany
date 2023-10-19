@@ -7,6 +7,8 @@ Left Mouse Button (function based on toolbar):
 * Pointer - Draw selection rectangle
 * Pencil/Eraser - Draw or Erase in various pen widths
     * Hold shift to draw straight lines
+* Dropper - Recolor all pixels within threshold of selected color
+* BG Remove - Recolor all pixels within threshold of White (multi-page)
 
 Right Mouse Button:
 * Zoom to rectangle
@@ -15,10 +17,18 @@ Right Mouse Button:
 Keyboard:
 * Escape - Cancels current command (Paste, etc)
 * 'F' - Apply most recent toolbar zoom (default: zoom to fit)
-* Cut ('^X') - Fill selection with background color
-* Shift-Cut - Fill selection with foreground color
-* '^S' - Fill outside selection with background color
-* Shift-'^S' - Fill outside selection with foreground color
+* Cut ('^X') - Depends on tool
+    * Pointer - Fill selection with background color
+    * Dropper - Set blinking pixels to background color
+    * BG Remove - Set blinking pixels to background color
+* Shift-Cut - Depends on tool
+    * Pointer - Fill outside selection with background color
+* '^S' - Depends on tool
+    * Pointer - Fill selection with foreground color
+    * Dropper - Set blinking pixels to foreground color
+    * BG Remove - Set blinking pixels to foreground color
+* Shift-'^S' - Depends on tool
+    * Pointer - Fill outside selection with foreground color
 * Undo ('^Z') - Undo previous edit
 * Shift-Undo - Redo previous undo
 * Copy - Copy selection
@@ -29,7 +39,7 @@ Keyboard:
     * Pressing Control without moving the mouse snaps the image (better for large pastes)
     * Pressing Delete while pasting removes current image from copied item list
 * Shift-Paste - Transparent paste
-    * Hold shift while clicking to paste white regions (>F0F0F0) as transparent
+    * Hold shift while clicking to paste white regions (\>#F0F0F0) as transparent
 
 ## To compile:
 ```

@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include "Widgets/PopupQToolButton.h"
+#include "Widgets/SpinWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,6 +37,7 @@ private:
     QLabel *statusLabel;
     QProgressBar *progressBar;
 
-    PopupQToolButton *zoomToolButton = new PopupQToolButton();
+    PopupQToolButton *zoomToolButton;
+    SpinWidget *dropperThresholdWidget;
 };
 #endif // MAINWINDOW_H

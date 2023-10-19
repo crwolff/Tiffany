@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
+#include <QTimer>
 #include <QWidget>
 
 class Viewer : public QWidget
@@ -15,9 +16,8 @@ public:
     Viewer(QWidget * parent = NULL);
     ~Viewer();
 
-    QColor foregroundColor = Qt::black;
-    QColor backgroundColor = Qt::white;
-    enum LeftMode { Select, Pencil, Eraser };
+    QTimer *blinkTimer = new QTimer();
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -25,6 +25,9 @@ public slots:
     void changePage(QListWidgetItem *curr);
     void updatePage(bool updateZoom);
     void setTool(LeftMode tool);
+    void resetTools();
+
+    void blinker();
     void zoomIn();
     void zoomOut();
     void fitToWindow();
@@ -86,6 +89,7 @@ private:
 
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
+    QCursor DropperCursor;
     bool pencil180;
     bool shiftPencil = false;
     QPoint drawLoc;
@@ -95,6 +99,8 @@ private:
     QPoint pasteLoc;
     QImage copyImage;
     QList<QImage> copyImageList;
+
+    QImage pageMask;
 };
 
 #endif
