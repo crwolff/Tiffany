@@ -25,6 +25,7 @@ namespace Config
 
     extern QColor fgColor;
     extern QColor bgColor;
+    extern bool multiPage;
 
     void LoadConfig();
     void SaveConfig();

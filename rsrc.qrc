@@ -43,5 +43,7 @@
     <file>assets/mirror_horiz.svg</file>
     <file>assets/mirror_vert.svg</file>
     <file>assets/remove.svg</file>
+    <file>assets/single.svg</file>
+    <file>assets/multi.svg</file>
   </qresource>
 </RCC>

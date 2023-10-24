@@ -75,6 +75,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->undoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::undoEdit );
     QObject::connect( ui->redoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::redoEdit );
 
+    // Mode button
+    QObject::connect( ui->chngModeAct, &QAction::toggled, [this](bool checked) { Config::multiPage = checked; });
+
     // Pencil menu
     QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
     QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Pencil); });
@@ -144,7 +147,6 @@ void MainWindow::buildToolBar()
 
     // Delete actions
     ui->toolBar->addAction(ui->deleteAct);
-    ui->toolBar->addAction(ui->blankAct);
 
     // Rotate button
     QMenu *rotateMenu = new QMenu();
@@ -180,8 +182,17 @@ void MainWindow::buildToolBar()
     zoomToolButton->setDefaultAction(ui->fitToWindowAct);
     ui->toolBar->addWidget(zoomToolButton);
 
+    // Mode select button
+    ui->toolBar->addAction(ui->chngModeAct);
+
+    // Add a vertical bar
+    QFrame* separator = new QFrame(this);
+    separator -> setFrameShape(QFrame::VLine);
+    separator -> setFrameShadow(QFrame::Plain);
+    separator -> setContentsMargins(3, 0, 3, 0);
+    ui->toolBar->addWidget(separator);
+
     // Tools
-    ui->toolBar->addSeparator();
     ui->toolBar->addAction(ui->pointerAct);
 
     // Pencil button
@@ -214,8 +225,9 @@ void MainWindow::buildToolBar()
     // Dropper button
     QMenu *dropperMenu = new QMenu();
     dropperMenu->addAction(ui->dropperAct);
-    dropperMenu->addAction(ui->removeAct);
     dropperMenu->addAction(ui->floodAct);
+    dropperMenu->addAction(ui->removeAct);
+    dropperMenu->addAction(ui->blankAct);
     PopupQToolButton *dropperToolButton = new PopupQToolButton();
     dropperToolButton->setMenu(dropperMenu);
     dropperToolButton->setDefaultAction(ui->dropperAct);

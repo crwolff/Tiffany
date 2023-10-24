@@ -157,7 +157,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
-    <string>toolBar</string>
+    <string>Top Tool Bar</string>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -602,6 +602,19 @@
    </property>
    <property name="text">
     <string>Vertical Mirror</string>
+   </property>
+  </action>
+  <action name="chngModeAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/single.svg</normaloff>
+     <normalon>:/images/assets/multi.svg</normalon>:/images/assets/multi.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Mode</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

@@ -21,6 +21,7 @@ namespace Config
 
     QColor fgColor;
     QColor bgColor;
+    bool multiPage;
 
     // Load settings file
     void LoadConfig()
@@ -56,6 +57,7 @@ namespace Config
         // Not loaded or saved
         fgColor = Qt::black;
         bgColor = Qt::white;
+        multiPage = false;
     }
 
     // Save settings file

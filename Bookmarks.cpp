@@ -375,6 +375,12 @@ void Bookmarks::blankPage()
         QMessageBox::information(this, "Tiffany", "Nothing selected");
         return;
     }
+    if (!Config::multiPage)
+    {
+        QListWidgetItem* last = selection.last();
+        selection.clear();
+        selection.append(last);
+    }
 
     bool ok;
     QString text = QInputDialog::getText(this, tr("New Page Contents"),
@@ -425,6 +431,17 @@ void Bookmarks::removeBG()
 {
     // Get list of all selected items
     QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+    {
+        QListWidgetItem* last = selection.last();
+        selection.clear();
+        selection.append(last);
+    }
 
     // Add progress to status bar
     emit progressSig("Background...", selection.count());

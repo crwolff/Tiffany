@@ -3,12 +3,51 @@
 
 A Specialized tool for editing scanned documents.
 
+* Open - Open files
+    * Open - Open new files at end of list
+    * Insert - Insert new files before selection
+    * Replace - Replace all selected items with new files
+* Save - Save files
+    * Save - Replace changed files in selection
+    * Save To -  Save all files in selection to new directory
+* Delete - Remove selection from list (doesn't remove from directory)
+* Rotate
+    * Rotate CW - Rotates selected images 90 degrees
+    * Rotate CCW - Rotates selected images -90 degrees
+    * Rotate 180 - Turns selected images upside down
+    * Horizontal Mirror - Mirrors selected images about vertical line
+    * Vertical Mirror - Mirrors selected images about horizontal line
+* Undo/Redo
+    * Undo - Undo previous edit on active page
+    * Redo - Redo previous undo on active page
+* Zoom
+    * Zoom In - Increase magnification 25%
+    * Zoom Out - Decrease magnifaction 20%
+    * Zoom Fit - Adjust zoom so entire page fits in window
+    * Zoom Fill - Adjust zoom so entire window is filled
+    * Fit Width - Adjust zoom so full width of window is filled
+    * Fit Height - Adjust zoom so full height of window is filled
+* Mode
+    * (S)ingle Page Mode - Buttons only operate on active page
+    * (M)ulti-page Mode - Certain buttons operate on all selected pages
+
 Left Mouse Button (function based on toolbar):
 * Pointer - Draw selection rectangle
 * Pencil/Eraser - Draw or Erase in various pen widths
     * Hold shift to draw straight lines
 * Dropper - Recolor all pixels within threshold of selected color
-* BG Remove - Recolor all pixels within threshold of White (multi-page)
+* Flood Fill - Recolor all adjacent pixels within threshold of selected color
+
+Multi-page tools:
+* Dropper button
+    * BG Remove - Recolor all pixels within threshold of White
+    * Blank Page - Fill page with background and insert text into center
+
+Color button:
+* Click upper left to set background color
+* Click upper right to swap foreground/background colors
+* Click lower left to reset colors to Black/White
+* Click lower right to set foreground color
 
 Right Mouse Button:
 * Zoom to rectangle
