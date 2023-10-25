@@ -874,6 +874,22 @@ QImage Viewer::floodFill(QPoint loc, int threshold)
 }
 
 //
+// Remove background from current page
+//
+void Viewer::removeBG()
+{
+    if (currPage.m_img.isNull())
+        return;
+    if (Config::multiPage)
+        return;
+
+    blinkTimer->stop();
+    pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
+    blinkTimer->start(300);
+    update();
+}
+
+//
 // Blink mask to make it easier to see
 //
 void Viewer::blinker()

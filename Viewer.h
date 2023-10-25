@@ -27,6 +27,8 @@ public slots:
     void setTool(LeftMode tool);
     void resetTools();
 
+    void removeBG();
+
     void blinker();
     void zoomIn();
     void zoomOut();

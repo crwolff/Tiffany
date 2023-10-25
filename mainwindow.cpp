@@ -92,6 +92,7 @@ void MainWindow::connectSignalSlots()
     // Dropper menu
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
     QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
+    QObject::connect( ui->removeAct, &QAction::triggered, ui->viewer, &Viewer::removeBG );
     QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
     QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
             [this]() { Config::dropperThreshold = dropperThresholdWidget->spinBox->value(); });

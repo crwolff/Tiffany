@@ -425,7 +425,7 @@ void Bookmarks::blankPage()
 }
 
 //
-// Remove background
+// Remove background from multiple pages
 //
 void Bookmarks::removeBG()
 {
@@ -437,11 +437,7 @@ void Bookmarks::removeBG()
         return;
     }
     if (!Config::multiPage)
-    {
-        QListWidgetItem* last = selection.last();
-        selection.clear();
-        selection.append(last);
-    }
+        return;
 
     // Add progress to status bar
     emit progressSig("Background...", selection.count());
