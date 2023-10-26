@@ -39,10 +39,13 @@ A Specialized tool for editing scanned documents.
     * Hold shift to draw straight lines
     * Left click without moving to draw dot
 * Dropper button - Adjacent spinbox controls thresholds for different functions
-    * Dropper - Recolor all pixels within threshold of selected color
-    * Flood Fill - Recolor all adjacent pixels within threshold of selected color
-    * BG Remove - Recolor all pixels within threshold of White
-    * Blank Page - Fill page with background and insert text into center
+    * Dropper - Select all pixels within threshold of selected color
+    * Flood Fill - Select all adjacent pixels within threshold of selected color
+    * BG Remove - Select all pixels within threshold of White
+    * Blank Page - Fill page with background and insert foreground colored text into center
+* Despeckle button - Adjacent spinbox controls blob size
+    * Despeckle - Select all groups of non-white pixels below a certain size
+    * Devoid - Select all groups of non-black pixels below a certain size
 
 * Color button
     * Click upper left to set background color
