@@ -244,6 +244,14 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             update();
             flag = true;
         }
+        else if (leftMode == RemoveBG)
+        {
+            blinkTimer->stop();
+            pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
+            blinkTimer->start(300);
+            update();
+            flag = true;
+        }
     }
 
     // If right mouse button was released
@@ -590,7 +598,6 @@ void Viewer::updatePage(bool updateZoom)
 //
 void Viewer::setTool(LeftMode tool)
 {
-    setCursor(Qt::ArrowCursor);
     leftMode = tool;
     if ((tool == Pencil) || (tool == Eraser))
     {
@@ -599,6 +606,8 @@ void Viewer::setTool(LeftMode tool)
     }
     else if ((tool == ColorSelect) || (tool == FloodFill))
         setCursor(DropperCursor);
+    else
+        setCursor(Qt::ArrowCursor);
     resetTools();
 }
 
@@ -871,22 +880,6 @@ QImage Viewer::floodFill(QPoint loc, int threshold)
         }
     }
     return mask;
-}
-
-//
-// Remove background from current page
-//
-void Viewer::removeBG()
-{
-    if (currPage.m_img.isNull())
-        return;
-    if (Config::multiPage)
-        return;
-
-    blinkTimer->stop();
-    pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
-    blinkTimer->start(300);
-    update();
 }
 
 //

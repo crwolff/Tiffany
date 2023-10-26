@@ -91,18 +91,20 @@ void MainWindow::connectSignalSlots()
 
     // Dropper menu
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
-    QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
-    QObject::connect( ui->removeAct, &QAction::triggered, ui->viewer, &Viewer::removeBG );
-    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
     QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
             [this]() { Config::dropperThreshold = dropperThresholdWidget->spinBox->value(); });
-    QObject::connect( bgRemoveThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
-            [this]() { Config::bgRemoveThreshold = bgRemoveThresholdWidget->spinBox->value(); });
+    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
+
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
     QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
             [this]() { Config::floodThreshold = floodThresholdWidget->spinBox->value(); });
-    QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
-    QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
-    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
+    QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
+
+    QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::RemoveBG); });
+    QObject::connect( bgRemoveThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), 
+            [this]() { Config::bgRemoveThreshold = bgRemoveThresholdWidget->spinBox->value(); });
+    QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
+    QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
 
     // Color button
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
@@ -257,8 +259,8 @@ void MainWindow::buildToolBar()
 void MainWindow::makeDropperVisible(int mask)
 {
     dropperThresholdSpin->setVisible((mask & 1) != 0);
-    bgRemoveThresholdSpin->setVisible((mask & 2) != 0);
-    floodThresholdSpin->setVisible((mask & 4) != 0);
+    floodThresholdSpin->setVisible((mask & 2) != 0);
+    bgRemoveThresholdSpin->setVisible((mask & 4) != 0);
 }
 
 //

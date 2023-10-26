@@ -17,7 +17,7 @@ public:
     ~Viewer();
 
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -26,8 +26,6 @@ public slots:
     void updatePage(bool updateZoom);
     void setTool(LeftMode tool);
     void resetTools();
-
-    void removeBG();
 
     void blinker();
     void zoomIn();
