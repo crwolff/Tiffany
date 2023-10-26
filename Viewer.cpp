@@ -23,6 +23,8 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
     Pencil180Cursor = QCursor(p, 31, 0);
     p = QPixmap(":/images/assets/dropper.svg").scaled(32,32,Qt::KeepAspectRatio);
     DropperCursor = QCursor(p, 0, 31);
+    p = QPixmap(":/images/assets/despeckle.svg").scaled(32,32,Qt::KeepAspectRatio);
+    DespeckleCursor = QCursor(p, 15, 15);
 }
 
 Viewer::~Viewer()
@@ -248,6 +250,22 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             blinkTimer->stop();
             pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
+            blinkTimer->start(300);
+            update();
+            flag = true;
+        }
+        else if (leftMode == Despeckle)
+        {
+            blinkTimer->stop();
+            pageMask = currPage.despeckle(Config::despeckleArea, false);
+            blinkTimer->start(300);
+            update();
+            flag = true;
+        }
+        else if (leftMode == Devoid)
+        {
+            blinkTimer->stop();
+            pageMask = currPage.despeckle(Config::devoidArea, true);
             blinkTimer->start(300);
             update();
             flag = true;
@@ -606,6 +624,8 @@ void Viewer::setTool(LeftMode tool)
     }
     else if ((tool == ColorSelect) || (tool == FloodFill))
         setCursor(DropperCursor);
+    else if ((tool == Despeckle) || (tool == Devoid))
+        setCursor(DespeckleCursor);
     else
         setCursor(Qt::ArrowCursor);
     resetTools();

@@ -106,6 +106,19 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
     QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
 
+    // Despeckle menu
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
+    QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this]() { Config::despeckleArea = despeckleWidget->spinBox->value(); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::despeckle );
+
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Devoid); });
+    QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this]() { Config::devoidArea = devoidWidget->spinBox->value(); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, ui->bookmarks, &Bookmarks::devoid );
+
     // Color button
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
@@ -236,7 +249,7 @@ void MainWindow::buildToolBar()
     dropperToolButton->setDefaultAction(ui->dropperAct);
     ui->toolBar->addWidget(dropperToolButton);
 
-    // Dropper button thresholds
+    // Dropper button threshold widgets
     dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
     dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
     dropperThresholdSpin->setVisible(true);
@@ -246,6 +259,23 @@ void MainWindow::buildToolBar()
     floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
+
+    // Despeckle button
+    QMenu *despeckleMenu = new QMenu();
+    despeckleMenu->addAction(ui->despeckleAct);
+    despeckleMenu->addAction(ui->devoidAct);
+    PopupQToolButton *despeckleToolButton = new PopupQToolButton();
+    despeckleToolButton->setMenu(despeckleMenu);
+    despeckleToolButton->setDefaultAction(ui->despeckleAct);
+    ui->toolBar->addWidget(despeckleToolButton);
+
+    // Despeckle button size widgets
+    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 5, "Blob Size", ui->toolBar);
+    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
+    despeckleSpin->setVisible(true);
+    devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Void Size", ui->toolBar);
+    devoidSpin = ui->toolBar->addWidget(devoidWidget);
+    devoidSpin->setVisible(false);
 
     // Color button
     colorToolButton.setDefaultAction(ui->colorAct);
@@ -261,6 +291,15 @@ void MainWindow::makeDropperVisible(int mask)
     dropperThresholdSpin->setVisible((mask & 1) != 0);
     floodThresholdSpin->setVisible((mask & 2) != 0);
     bgRemoveThresholdSpin->setVisible((mask & 4) != 0);
+}
+
+//
+// Set one of the despeckle spinboxes visible
+//
+void MainWindow::makeDespeckleVisible(int mask)
+{
+    despeckleSpin->setVisible((mask & 1) != 0);
+    devoidSpin->setVisible((mask & 2) != 0);
 }
 
 //

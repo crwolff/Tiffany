@@ -17,7 +17,7 @@ public:
     ~Viewer();
 
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -92,6 +92,8 @@ private:
     QCursor PencilCursor;
     QCursor Pencil180Cursor;
     QCursor DropperCursor;
+    QCursor DespeckleCursor;
+
     bool pencil180;
     bool shiftPencil = false;
     QPoint drawLoc;

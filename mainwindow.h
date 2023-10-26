@@ -35,6 +35,7 @@ private:
     void connectSignalSlots();
     void buildToolBar();
     void makeDropperVisible(int mask);
+    void makeDespeckleVisible(int mask);
     QLabel *statusLabel;
     QProgressBar *progressBar;
 
@@ -45,6 +46,10 @@ private:
     QAction *dropperThresholdSpin;
     SpinWidget *floodThresholdWidget;
     QAction *floodThresholdSpin;
+    SpinWidget *despeckleWidget;
+    QAction *despeckleSpin;
+    SpinWidget *devoidWidget;
+    QAction *devoidSpin;
 
     ColorQToolButton colorToolButton;
 };

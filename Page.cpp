@@ -2,6 +2,7 @@
 
 #include "Config.h"
 #include "Page.h"
+#include "Utils/QImage2OCV.h"
 #include <QDebug>
 #include <QPainter>
 
@@ -148,6 +149,63 @@ QImage Page::colorSelect(QRgb target, int threshold)
     }
     else
         return QImage();
+    return mask;
+}
+
+//
+// Run this in a separate thread to keep from blocking the UI
+//
+QImage Page::despeckle(int blobSize, bool invert)
+{
+    // Invert for devoid
+    QImage img = m_img;
+    if (invert)
+        img.invertPixels(QImage::InvertRgb);
+
+    // Convert to grayscale
+    if (img.format() != QImage::Format_Grayscale8)
+        img = img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(img);
+
+    // Make B&W with background black
+    cv::Mat bw;
+    cv::threshold(mat, bw, 250, 255, cv::THRESH_BINARY_INV);
+
+    // Find blobs
+    cv::Mat stats, centroids, labelImg;
+    int nLabels = cv::connectedComponentsWithStats(bw, labelImg, stats, centroids, 4, CV_32S);
+
+    // Initialize mask
+    QImage mask(img.size(), QImage::Format_Indexed8);
+    mask.setColor( 0, Config::fgColor.rgba() );
+    mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
+    mask.fill(1);
+
+    // Build mask of blobs smaller than limit
+    for(int idx=1; idx<nLabels; idx++)
+    {
+        // Check if this blob is small enough
+        if (stats.at<int>(idx, cv::CC_STAT_AREA) <= blobSize)
+        {
+            int top = stats.at<int>(idx, cv::CC_STAT_TOP);
+            int bot = stats.at<int>(idx, cv::CC_STAT_TOP) + stats.at<int>(idx, cv::CC_STAT_HEIGHT);
+            int left = stats.at<int>(idx, cv::CC_STAT_LEFT);
+            int right = stats.at<int>(idx, cv::CC_STAT_LEFT) + stats.at<int>(idx, cv::CC_STAT_WIDTH);
+
+            // Sweep the enclosing rectangle, setting pixels in the mask
+            for (int row=top; row<bot; row++)
+            {
+                uchar *maskPtr = reinterpret_cast<uchar*>(mask.scanLine(row));
+                for (int col=left; col<right; col++)
+                {
+                    if (labelImg.at<int>(row,col) == idx)
+                        maskPtr[col] = 0;
+                }
+            }
+        }
+    }
     return mask;
 }
 
