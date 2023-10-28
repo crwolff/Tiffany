@@ -60,7 +60,6 @@ private:
     void setupPaste();
     void doPaste(bool transparent);
     QPoint pasteLocator(QPoint mouse, bool optimize);
-    QImage floodFill(QPoint loc, int threshold);
 
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);

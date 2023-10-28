@@ -22,6 +22,7 @@ public:
     bool redo();
     QImage colorSelect(QRgb target, int threshold);
     QImage despeckle(int blobSize, bool invert);
+    QImage floodFill(QPoint loc, int threshold);
     void applyMask(QImage mask, QColor color);
 
     // Flag if image was changed
