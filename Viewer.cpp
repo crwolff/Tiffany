@@ -252,14 +252,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             doDevoid();
             flag = true;
         }
-        else if (leftMode == Deskew)
-        {
-            // Auto-deskew on mouse click
-            Config::deskewAngle = currPage.calcDeskew();
-            emit setDeskewSig(Config::deskewAngle + 0.05);
-            emit setDeskewSig(Config::deskewAngle);
-            flag = true;
-        }
     }
 
     // If right mouse button was released
@@ -446,6 +438,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             currPage.applyDeskew(deskewImg);
             currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit updateIconSig();
+            leftMode = Select;
             resetTools();
             update();
         }
@@ -691,7 +684,6 @@ void Viewer::setTool(LeftMode tool)
         doRemoveBG();
     else if (tool == Deskew)
     {
-        setCursor(Qt::CrossCursor);
         Config::deskewAngle = currPage.calcDeskew();
         emit setDeskewSig(Config::deskewAngle + 0.05);
         emit setDeskewSig(Config::deskewAngle);
