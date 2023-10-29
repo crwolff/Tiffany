@@ -275,12 +275,12 @@ void MainWindow::buildToolBar()
     ui->toolBar->addWidget(dropperToolButton);
 
     // Dropper button threshold widgets
-    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
-    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
-    dropperThresholdSpin->setVisible(true);
     bgRemoveThresholdWidget = new SpinWidget(0, 255, Config::bgRemoveThreshold, 5, "BG Thresh", ui->toolBar);
     bgRemoveThresholdSpin = ui->toolBar->addWidget(bgRemoveThresholdWidget);
-    bgRemoveThresholdSpin->setVisible(false);
+    bgRemoveThresholdSpin->setVisible(true);
+    dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
+    dropperThresholdSpin = ui->toolBar->addWidget(dropperThresholdWidget);
+    dropperThresholdSpin->setVisible(false);
     floodThresholdWidget = new SpinWidget(0, 255, Config::floodThreshold, 5, "Flood", ui->toolBar);
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
