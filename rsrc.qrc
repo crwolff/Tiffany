@@ -45,5 +45,6 @@
     <file>assets/remove.svg</file>
     <file>assets/single.svg</file>
     <file>assets/multi.svg</file>
+    <file>assets/help.svg</file>
   </qresource>
 </RCC>

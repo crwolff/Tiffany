@@ -433,11 +433,19 @@
    </property>
   </action>
   <action name="aboutAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/help.svg</normaloff>:/images/assets/help.svg</iconset>
+   </property>
    <property name="text">
     <string>&amp;About</string>
    </property>
   </action>
   <action name="aboutQtAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/help.svg</normaloff>:/images/assets/help.svg</iconset>
+   </property>
    <property name="text">
     <string>About &amp;Qt</string>
    </property>

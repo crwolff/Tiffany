@@ -306,6 +306,20 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
     ui->toolBar->addWidget(deskewWidget);
+
+    // Right justify remaining icons
+    QWidget* spacer = new QWidget();
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->toolBar->addWidget(spacer);
+
+    // Help
+    QMenu *helpMenu = new QMenu();
+    helpMenu->addAction(ui->aboutAct);
+    helpMenu->addAction(ui->aboutQtAct);
+    PopupQToolButton *helpToolButton = new PopupQToolButton();
+    helpToolButton->setMenu(helpMenu);
+    helpToolButton->setDefaultAction(ui->aboutAct);
+    ui->toolBar->addWidget(helpToolButton);
 }
 
 //
