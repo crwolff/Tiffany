@@ -28,8 +28,8 @@ namespace Config
     {
         QSettings settings;
 
-        bgRemoveThreshold = settings.value("bgRemoveThreshold", 20).toInt();
-        dropperThreshold = settings.value("dropperThreshold", 20).toInt();
+        bgRemoveThreshold = settings.value("bgRemoveThreshold", 40).toInt();
+        dropperThreshold = settings.value("dropperThreshold", 40).toInt();
         floodThreshold = settings.value("floodThreshold", 50).toInt();
         deskewAngle = settings.value("deskewAngle", 0.0).toDouble();
         despeckleArea = settings.value("despeckleArea", 20).toInt();
