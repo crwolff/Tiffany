@@ -113,7 +113,7 @@
     </property>
     <addaction name="zoomInAct"/>
     <addaction name="zoomOutAct"/>
-    <addaction name="fitToWindowAct"/>
+    <addaction name="fitWindowAct"/>
     <addaction name="fillWindowAct"/>
     <addaction name="fitWidthAct"/>
     <addaction name="fitHeightAct"/>
@@ -324,7 +324,7 @@
     <string>Zoom &amp;Out</string>
    </property>
   </action>
-  <action name="fitToWindowAct">
+  <action name="fitWindowAct">
    <property name="icon">
     <iconset resource="rsrc.qrc">
      <normaloff>:/images/assets/fit_window.svg</normaloff>:/images/assets/fit_window.svg</iconset>

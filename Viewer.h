@@ -37,7 +37,7 @@ public slots:
     void blinker();
     void zoomIn();
     void zoomOut();
-    void fitToWindow();
+    void fitWindow();
     void fitWidth();
     void fitHeight();
     void fillWindow();

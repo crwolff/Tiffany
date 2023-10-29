@@ -66,7 +66,7 @@ void MainWindow::connectSignalSlots()
     // View menu
     QObject::connect( ui->zoomInAct, &QAction::triggered, ui->viewer, &Viewer::zoomIn );
     QObject::connect( ui->zoomOutAct, &QAction::triggered, ui->viewer, &Viewer::zoomOut );
-    QObject::connect( ui->fitToWindowAct, &QAction::triggered, ui->viewer, &Viewer::fitToWindow );
+    QObject::connect( ui->fitWindowAct, &QAction::triggered, ui->viewer, &Viewer::fitWindow );
     QObject::connect( ui->fillWindowAct, &QAction::triggered, ui->viewer, &Viewer::fillWindow );
     QObject::connect( ui->fitWidthAct, &QAction::triggered, ui->viewer, &Viewer::fitWidth );
     QObject::connect( ui->fitHeightAct, &QAction::triggered, ui->viewer, &Viewer::fitHeight );
@@ -74,6 +74,9 @@ void MainWindow::connectSignalSlots()
     // Undo menu
     QObject::connect( ui->undoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::undoEdit );
     QObject::connect( ui->redoAct, &QAction::triggered, ui->bookmarks, &Bookmarks::redoEdit );
+
+    // Color button
+    QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
     // Mode button
     QObject::connect( ui->chngModeAct, &QAction::toggled, [this](bool checked) { Config::multiPage = checked; });
@@ -124,9 +127,6 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deskew );
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             [this](double val){ Config::deskewAngle = val; this->ui->viewer->doDeskew(); });
-
-    // Color button
-    QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
@@ -182,6 +182,11 @@ void MainWindow::buildToolBar()
     rotateToolButton->setMenu(rotateMenu);
     rotateToolButton->setDefaultAction(ui->rotateCWAct);
     ui->toolBar->addWidget(rotateToolButton);
+    ui->rotateCWAct->setText(QApplication::translate("MainWindow", "&Rotate\nCW", nullptr));
+    ui->rotateCCWAct->setText(QApplication::translate("MainWindow", "Rotate\nCCW", nullptr));
+    ui->rotate180Act->setText(QApplication::translate("MainWindow", "Rotate\n180", nullptr));
+    ui->mirrorHorizAct->setText(QApplication::translate("MainWindow", "Horizontal\nMirror", nullptr));
+    ui->mirrorVertAct->setText(QApplication::translate("MainWindow", "Vertical\nMirror", nullptr));
 
     // Undo button
     QMenu *undoMenu = new QMenu();
@@ -196,14 +201,25 @@ void MainWindow::buildToolBar()
     QMenu *zoomMenu = new QMenu();
     zoomMenu->addAction( ui->zoomInAct );
     zoomMenu->addAction( ui->zoomOutAct );
-    zoomMenu->addAction( ui->fitToWindowAct );
+    zoomMenu->addAction( ui->fitWindowAct );
     zoomMenu->addAction( ui->fillWindowAct );
     zoomMenu->addAction( ui->fitWidthAct );
     zoomMenu->addAction( ui->fitHeightAct );
     zoomToolButton = new PopupQToolButton();
     zoomToolButton->setMenu(zoomMenu);
-    zoomToolButton->setDefaultAction(ui->fitToWindowAct);
+    zoomToolButton->setDefaultAction(ui->fitWindowAct);
     ui->toolBar->addWidget(zoomToolButton);
+    ui->zoomInAct->setText(QApplication::translate("MainWindow", "Zoom\n&In", nullptr));
+    ui->zoomOutAct->setText(QApplication::translate("MainWindow", "Zoom\n&Out", nullptr));
+    ui->fitWindowAct->setText(QApplication::translate("MainWindow", "&Fit\nWindow", nullptr));
+    ui->fillWindowAct->setText(QApplication::translate("MainWindow", "&Fill\nWindow", nullptr));
+    ui->fitWidthAct->setText(QApplication::translate("MainWindow", "&Fit\nWidth", nullptr));
+    ui->fitHeightAct->setText(QApplication::translate("MainWindow", "&Fit\nHeight", nullptr));
+
+    // Color button
+    colorToolButton.setDefaultAction(ui->colorAct);
+    colorToolButton.setIcon(Config::fgColor, Config::bgColor);
+    ui->toolBar->addWidget(&colorToolButton);
 
     // Mode select button
     ui->toolBar->addAction(ui->chngModeAct);
@@ -255,6 +271,7 @@ void MainWindow::buildToolBar()
     dropperToolButton->setMenu(dropperMenu);
     dropperToolButton->setDefaultAction(ui->dropperAct);
     ui->toolBar->addWidget(dropperToolButton);
+    ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
 
     // Dropper button threshold widgets
     dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
@@ -288,11 +305,6 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
     ui->toolBar->addWidget(deskewWidget);
-
-    // Color button
-    colorToolButton.setDefaultAction(ui->colorAct);
-    colorToolButton.setIcon(Config::fgColor, Config::bgColor);
-    ui->toolBar->addWidget(&colorToolButton);
 }
 
 //

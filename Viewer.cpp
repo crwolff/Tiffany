@@ -359,7 +359,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
         emit updateIconSig();
         if (updateZoom)
-            fitToWindow();
+            fitWindow();
         update();
         flag = true;
     }
@@ -369,7 +369,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
         emit updateIconSig();
         if (updateZoom)
-            fitToWindow();
+            fitWindow();
         update();
         flag = true;
     }
@@ -634,7 +634,7 @@ void Viewer::changePage(QListWidgetItem *curr)
         }
         else
         {
-            fitToWindow();
+            fitWindow();
         }
     }
     else
@@ -658,7 +658,7 @@ void Viewer::updatePage(bool updateZoom)
         return;
     currPage = currItem->data(Qt::UserRole).value<Page>();
     if (updateZoom)
-        fitToWindow();
+        fitWindow();
     update();
 }
 
@@ -1196,7 +1196,7 @@ bool Viewer::measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, 
 //
 // Fit image to window without scrollbars
 //
-void Viewer::fitToWindow()
+void Viewer::fitWindow()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
 
