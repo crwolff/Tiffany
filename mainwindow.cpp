@@ -266,12 +266,12 @@ void MainWindow::buildToolBar()
 
     // Dropper button
     QMenu *dropperMenu = new QMenu();
+    dropperMenu->addAction(ui->removeAct);
     dropperMenu->addAction(ui->dropperAct);
     dropperMenu->addAction(ui->floodAct);
-    dropperMenu->addAction(ui->removeAct);
     PopupQToolButton *dropperToolButton = new PopupQToolButton();
     dropperToolButton->setMenu(dropperMenu);
-    dropperToolButton->setDefaultAction(ui->dropperAct);
+    dropperToolButton->setDefaultAction(ui->removeAct);
     ui->toolBar->addWidget(dropperToolButton);
 
     // Dropper button threshold widgets
