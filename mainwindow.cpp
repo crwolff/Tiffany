@@ -80,6 +80,7 @@ void MainWindow::connectSignalSlots()
 
     // Mode button
     QObject::connect( ui->chngModeAct, &QAction::toggled, [this](bool checked) { Config::multiPage = checked; });
+    QObject::connect( ui->chngModeAct, &QAction::toggled, [this]() { this->ui->viewer->setTool(Viewer::Select); });
 
     // Pencil menu
     QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
@@ -170,6 +171,8 @@ void MainWindow::buildToolBar()
 
     // Delete actions
     ui->toolBar->addAction(ui->deleteAct);
+    ui->toolBar->addAction(ui->blankAct);
+    ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
 
     // Rotate button
     QMenu *rotateMenu = new QMenu();
@@ -266,12 +269,10 @@ void MainWindow::buildToolBar()
     dropperMenu->addAction(ui->dropperAct);
     dropperMenu->addAction(ui->floodAct);
     dropperMenu->addAction(ui->removeAct);
-    dropperMenu->addAction(ui->blankAct);
     PopupQToolButton *dropperToolButton = new PopupQToolButton();
     dropperToolButton->setMenu(dropperMenu);
     dropperToolButton->setDefaultAction(ui->dropperAct);
     ui->toolBar->addWidget(dropperToolButton);
-    ui->blankAct->setText(QApplication::translate("MainWindow", "&Blank\nPage", nullptr));
 
     // Dropper button threshold widgets
     dropperThresholdWidget = new SpinWidget(0, 255, Config::dropperThreshold, 5, "Dropper", ui->toolBar);
