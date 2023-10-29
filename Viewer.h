@@ -17,7 +17,7 @@ public:
     ~Viewer();
 
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid, Deskew };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -32,6 +32,7 @@ public slots:
     void doRemoveBG();
     void doDespeckle();
     void doDevoid();
+    void doDeskew();
 
     void blinker();
     void zoomIn();
@@ -42,6 +43,7 @@ public slots:
     void fillWindow();
 
 signals:
+    void setDeskewSig(float val);
     void updateIconSig();
     void zoomSig();
 
@@ -110,6 +112,9 @@ private:
     QList<QImage> copyImageList;
 
     QImage pageMask;
+    QImage deskewImg;
+    int gridOffsetX = 0;
+    int gridOffsetY = 0;
 };
 
 #endif

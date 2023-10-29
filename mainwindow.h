@@ -7,6 +7,7 @@
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include "Widgets/ColorQToolButton.h"
+#include "Widgets/DoubleSpinWidget.h"
 #include "Widgets/PopupQToolButton.h"
 #include "Widgets/SpinWidget.h"
 
@@ -50,6 +51,8 @@ private:
     QAction *despeckleSpin;
     SpinWidget *devoidWidget;
     QAction *devoidSpin;
+    DoubleSpinWidget *deskewWidget;
+    QAction *deskewSpin;
 
     ColorQToolButton colorToolButton;
 };

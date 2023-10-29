@@ -5,6 +5,7 @@
 #include "Utils/QImage2OCV.h"
 #include <QDebug>
 #include <QPainter>
+#include <leptonica/allheaders.h>
 
 // Constuctors
 Page::Page()
@@ -269,5 +270,61 @@ void Page::applyMask(QImage mask, QColor color)
     mask.setColor( 0, color.rgba() );
     QPainter p(&m_img);
     p.drawImage(QPoint(0,0), mask);
+    p.end();
+}
+
+//
+// Rotate the image by a small amount
+//
+QImage Page::deskew(float angle)
+{
+    QTransform tmat = QTransform().rotate(angle);
+    return m_img.transformed(tmat, Qt::SmoothTransformation);
+}
+
+//
+// Calculate deskew angle
+//
+float Page::calcDeskew()
+{
+    QImage tmpImage = m_img;
+    if (tmpImage.format() != QImage::Format_Grayscale8)
+        tmpImage = tmpImage.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(tmpImage);
+
+    // Convert to binary
+    cv::Mat bin;
+    cv::threshold(mat, bin, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+
+    // Convert to PIX
+    PIX *pixS = pixCreate(bin.size().width, bin.size().height, 1);
+    for(int i=0; i<bin.rows; i++)
+        for(int j=0; j<bin.cols; j++)
+            pixSetPixel(pixS, j, i, (l_uint32) bin.at<uchar>(i,j) & 1);
+
+    // Find skew angle
+    l_float32 angle, conf;
+    float retval;
+    if (pixFindSkew(pixS, &angle, &conf))
+        retval = 0.0;
+    else
+        retval = angle;
+    pixDestroy(&pixS);
+    return retval;
+}
+
+//
+// Apply the deskew image
+//
+void Page::applyDeskew(QImage img)
+{
+    // Paint the deskew image rotated about the center
+    // Note: This code is identical to paintEvent
+    QPainter p(&m_img);
+    QRect rect(img.rect());
+    rect.moveCenter(m_img.rect().center());
+    p.drawImage(rect.topLeft(), img);
     p.end();
 }

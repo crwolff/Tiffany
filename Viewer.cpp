@@ -252,6 +252,13 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             doDevoid();
             flag = true;
         }
+        else if (leftMode == Deskew)
+        {
+            // Auto-deskew on mouse click
+            Config::deskewAngle = currPage.calcDeskew();
+            emit setDeskewSig(Config::deskewAngle);
+            flag = true;
+        }
     }
 
     // If right mouse button was released
@@ -432,9 +439,21 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (keyMatches(event, QKeySequence::Paste) != None)
     {
-        // Don't optimize location since Ctrl may already be down
-        pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), false);
-        setupPaste();
+        if (!deskewImg.isNull())
+        {
+            currPage.push();
+            currPage.applyDeskew(deskewImg);
+            currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit updateIconSig();
+            deskewImg = QImage();
+            update();
+        }
+        else
+        {
+            // Don't optimize location since Ctrl may already be down
+            pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), false);
+            setupPaste();
+        }
         flag = true;
     }
     else if (pasting)
@@ -458,6 +477,41 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             pasteLoc = pasteLocator(mapFromGlobal(cursor().pos()), ctrl);
         update();
         flag = true;
+    }
+    else if (!deskewImg.isNull())
+    {
+        if (key == Qt::Key_Down)
+        {
+            gridOffsetY++;
+            while (gridOffsetY > 50)
+                gridOffsetY -= 50;
+            update();
+            flag = true;
+        }
+        else if (key == Qt::Key_Up)
+        {
+            gridOffsetY--;
+            while (gridOffsetY < 0)
+                gridOffsetY += 50;
+            update();
+            flag = true;
+        }
+        else if (key == Qt::Key_Right)
+        {
+            gridOffsetX++;
+            while (gridOffsetX > 50)
+                gridOffsetX -= 50;
+            update();
+            flag = true;
+        }
+        else if (key == Qt::Key_Left)
+        {
+            gridOffsetX--;
+            while (gridOffsetX < 0)
+                gridOffsetX += 50;
+            update();
+            flag = true;
+        }
     }
 
     // Event was handled
@@ -522,6 +576,21 @@ void Viewer::paintEvent(QPaintEvent *)
         else if (!pageMask.isNull())
         {
             p.drawImage(QPoint(0,0), pageMask);
+        }
+        else if (!deskewImg.isNull())
+        {
+            // Draw deskewed image rotated about the center
+            QRect rect(deskewImg.rect());
+            rect.moveCenter(currPage.m_img.rect().center());
+            p.drawImage(rect.topLeft(), deskewImg);
+
+            // Draw alignment grid
+            p.setTransform(QTransform());           // Reset to view coordinates
+            p.setOpacity(0.5);
+            for(int idx=gridOffsetX + (width() % 50)/2; idx < width(); idx += 50)
+                p.drawLine(idx, 0, idx, height());
+            for(int idx=gridOffsetY + (height() % 50)/2; idx < height(); idx += 50)
+                p.drawLine(0, idx, width(), idx);
         }
         else if (shiftPencil)
         {
@@ -599,6 +668,7 @@ void Viewer::updatePage(bool updateZoom)
 void Viewer::setTool(LeftMode tool)
 {
     leftMode = tool;
+    resetTools();
     if ((tool == Pencil) || (tool == Eraser))
     {
         pencil180 = false;
@@ -608,9 +678,15 @@ void Viewer::setTool(LeftMode tool)
         setCursor(DropperCursor);
     else if ((tool == Despeckle) || (tool == Devoid))
         setCursor(DespeckleCursor);
+    else if (tool == Deskew)
+    {
+        setCursor(Qt::CrossCursor);
+        Config::deskewAngle = currPage.calcDeskew();
+        emit setDeskewSig(Config::deskewAngle);
+    }
     else
         setCursor(Qt::ArrowCursor);
-    resetTools();
+    update();
 }
 
 //
@@ -619,8 +695,8 @@ void Viewer::setTool(LeftMode tool)
 void Viewer::resetTools()
 {
     pasting = false;
+    deskewImg = QImage();
     pageMask = QImage();
-    update();
 }
 
 //
@@ -840,6 +916,7 @@ void Viewer::doDropper()
     // Get pixel under cursor
     QRgb pixel = currPage.m_img.pixel(loc);
     blinkTimer->stop();
+    deskewImg = QImage();
     pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
     blinkTimer->start(300);
     update();
@@ -859,6 +936,7 @@ void Viewer::doFlood()
     loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
 
     blinkTimer->stop();
+    deskewImg = QImage();
     pageMask = currPage.floodFill(loc, Config::floodThreshold);
     blinkTimer->start(300);
     update();
@@ -873,13 +951,14 @@ void Viewer::doRemoveBG()
         return;
 
     blinkTimer->stop();
+    deskewImg = QImage();
     pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
     blinkTimer->start(300);
     update();
 }
 
 //
-// Execute speckle removal in response to mouse click or threshold change
+// Execute speckle removal in response to mouse click or area change
 //
 void Viewer::doDespeckle()
 {
@@ -887,13 +966,14 @@ void Viewer::doDespeckle()
         return;
 
     blinkTimer->stop();
+    deskewImg = QImage();
     pageMask = currPage.despeckle(Config::despeckleArea, false);
     blinkTimer->start(300);
     update();
 }
 
 //
-// Execute void removal in response to mouse click or threshold change
+// Execute void removal in response to mouse click or area change
 //
 void Viewer::doDevoid()
 {
@@ -901,8 +981,22 @@ void Viewer::doDevoid()
         return;
 
     blinkTimer->stop();
+    deskewImg = QImage();
     pageMask = currPage.despeckle(Config::devoidArea, true);
     blinkTimer->start(300);
+    update();
+}
+
+//
+// Update image based on deskew angle
+//
+void Viewer::doDeskew()
+{
+    if (leftMode != Deskew)
+        return;
+
+    pageMask = QImage();
+    deskewImg = currPage.deskew(Config::deskewAngle);
     update();
 }
 

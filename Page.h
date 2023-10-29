@@ -24,6 +24,9 @@ public:
     QImage despeckle(int blobSize, bool invert);
     QImage floodFill(QPoint loc, int threshold);
     void applyMask(QImage mask, QColor color);
+    QImage deskew(float angle);
+    float calcDeskew();
+    void applyDeskew(QImage img);
 
     // Flag if image was changed
     unsigned int m_modified = 0;

@@ -29,6 +29,7 @@ public slots:
     void removeBG();
     void despeckle();
     void devoid();
+    void deskew();
     void rotateCW();
     void rotateCCW();
     void rotate180();

@@ -119,6 +119,12 @@ void MainWindow::connectSignalSlots()
     QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::devoidArea = val; this->ui->viewer->doDevoid(); });
 
+    // Deskew menu
+    QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
+    QObject::connect( ui->deskewAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deskew );
+    QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+            [this](double val){ Config::deskewAngle = val; this->ui->viewer->doDeskew(); });
+
     // Color button
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
@@ -135,6 +141,7 @@ void MainWindow::connectSignalSlots()
 
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
     QObject::connect( ui->viewer, &Viewer::zoomSig, zoomToolButton, &QToolButton::click );
+    QObject::connect( ui->viewer, &Viewer::setDeskewSig, deskewWidget->spinBox, &QDoubleSpinBox::setValue);
 }
 
 //
@@ -276,6 +283,11 @@ void MainWindow::buildToolBar()
     devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Void Size", ui->toolBar);
     devoidSpin = ui->toolBar->addWidget(devoidWidget);
     devoidSpin->setVisible(false);
+
+    // Deskew button and widget
+    ui->toolBar->addAction(ui->deskewAct);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
+    ui->toolBar->addWidget(deskewWidget);
 
     // Color button
     colorToolButton.setDefaultAction(ui->colorAct);
