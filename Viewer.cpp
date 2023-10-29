@@ -678,8 +678,16 @@ void Viewer::setTool(LeftMode tool)
     }
     else if ((tool == ColorSelect) || (tool == FloodFill))
         setCursor(DropperCursor);
-    else if ((tool == Despeckle) || (tool == Devoid))
+    else if (tool == Despeckle)
+    {
         setCursor(DespeckleCursor);
+        doDespeckle();
+    }
+    else if (tool == Devoid)
+    {
+        setCursor(DespeckleCursor);
+        doDevoid();
+    }
     else if (tool == RemoveBG)
         doRemoveBG();
     else if (tool == Deskew)
