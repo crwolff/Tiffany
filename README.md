@@ -11,6 +11,7 @@ A Specialized tool for editing scanned documents.
     * Save - Replace changed files in selection
     * Save To -  Save all files in selection to new directory
 * Delete - Remove selection from list (doesn't remove from directory)
+* Blank Page - Fill page with background and insert foreground colored text into center
 * Rotate
     * Rotate CW - Rotates selected images 90 degrees
     * Rotate CCW - Rotates selected images -90 degrees
@@ -27,6 +28,11 @@ A Specialized tool for editing scanned documents.
     * Zoom Fill - Adjust zoom so entire window is filled
     * Fit Width - Adjust zoom so full width of window is filled
     * Fit Height - Adjust zoom so full height of window is filled
+* Color button
+    * Click upper left to set background color
+    * Click upper right to swap foreground/background colors
+    * Click lower left to reset colors to Black/White
+    * Click lower right to set foreground color
 * Mode
     * (S)ingle Page Mode - Buttons only operate on active page. Highlighted pixels blink between
       foreground and background colors. ^X (Cut) replaces the selected pixels with the background
@@ -42,16 +48,10 @@ A Specialized tool for editing scanned documents.
     * Dropper - Select all pixels within threshold of selected color
     * Flood Fill - Select all adjacent pixels within threshold of selected color
     * BG Remove - Select all pixels within threshold of White
-    * Blank Page - Fill page with background and insert foreground colored text into center
 * Despeckle button - Adjacent spinbox controls blob size
     * Despeckle - Select all groups of non-white pixels below a certain size
     * Devoid - Select all groups of non-black pixels below a certain size
-
-* Color button
-    * Click upper left to set background color
-    * Click upper right to swap foreground/background colors
-    * Click lower left to reset colors to Black/White
-    * Click lower right to set foreground color
+* Deskew button - Rotate page so text is horizontal
 
 Right Mouse Button:
 * Zoom to rectangle
