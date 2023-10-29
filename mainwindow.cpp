@@ -91,26 +91,31 @@ void MainWindow::connectSignalSlots()
 
     // Dropper menu
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::ColorSelect); });
-    QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val){ Config::dropperThreshold = val; });
+    QObject::connect( dropperThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::dropperThreshold = val; this->ui->viewer->doDropper(); });
     QObject::connect( ui->dropperAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
 
     QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::FloodFill); });
-    QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val){ Config::floodThreshold = val; });
+    QObject::connect( floodThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::floodThreshold = val; this->ui->viewer->doFlood(); });
     QObject::connect( ui->floodAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
 
     QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::RemoveBG); });
-    QObject::connect( bgRemoveThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val){ Config::bgRemoveThreshold = val; });
+    QObject::connect( bgRemoveThresholdWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::bgRemoveThreshold = val; this->ui->viewer->doRemoveBG(); });
     QObject::connect( ui->removeAct, &QAction::triggered, [this]() { this->makeDropperVisible(4); });
     QObject::connect( ui->removeAct, &QAction::triggered, ui->bookmarks, &Bookmarks::removeBG );
 
     // Despeckle menu
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
-    QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val){ Config::despeckleArea = val; });
+    QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::despeckleArea = val; this->ui->viewer->doDespeckle(); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::despeckle );
 
     QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Devoid); });
-    QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged), [this](int val){ Config::devoidArea = val; });
+    QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::devoidArea = val; this->ui->viewer->doDevoid(); });
     QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
     QObject::connect( ui->devoidAct, &QAction::triggered, ui->bookmarks, &Bookmarks::devoid );
 

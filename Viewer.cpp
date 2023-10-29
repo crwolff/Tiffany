@@ -227,54 +227,29 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         }
         else if (leftMode == ColorSelect)
         {
-            // Legalize point to inside image
-            QPoint loc = scrnToPageOffs.map(event->pos());
-            loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
-            loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
-
-            // Get pixel under cursor
-            QRgb pixel = currPage.m_img.pixel(loc);
-            blinkTimer->stop();
-            pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
-            blinkTimer->start(300);
-            update();
+            leftOrigin = event->pos();
+            doDropper();
             flag = true;
         }
         else if (leftMode == FloodFill)
         {
-            // Legalize point to inside image
-            QPoint loc = scrnToPageOffs.map(event->pos());
-            loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
-            loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
-
-            blinkTimer->stop();
-            pageMask = currPage.floodFill(loc, Config::floodThreshold);
-            blinkTimer->start(300);
-            update();
+            leftOrigin = event->pos();
+            doFlood();
             flag = true;
         }
         else if (leftMode == RemoveBG)
         {
-            blinkTimer->stop();
-            pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
-            blinkTimer->start(300);
-            update();
+            doRemoveBG();
             flag = true;
         }
         else if (leftMode == Despeckle)
         {
-            blinkTimer->stop();
-            pageMask = currPage.despeckle(Config::despeckleArea, false);
-            blinkTimer->start(300);
-            update();
+            doDespeckle();
             flag = true;
         }
         else if (leftMode == Devoid)
         {
-            blinkTimer->stop();
-            pageMask = currPage.despeckle(Config::devoidArea, true);
-            blinkTimer->start(300);
-            update();
+            doDevoid();
             flag = true;
         }
     }
@@ -847,6 +822,88 @@ QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
         return QPoint( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
     }
     return QPoint( loc.x(), loc.y() );
+}
+
+//
+// Execute color select in response to mouse click or threshold change
+//
+void Viewer::doDropper()
+{
+    if (leftMode != ColorSelect)
+        return;
+
+    // Legalize point to inside image
+    QPoint loc = scrnToPageOffs.map(leftOrigin);
+    loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
+    loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
+
+    // Get pixel under cursor
+    QRgb pixel = currPage.m_img.pixel(loc);
+    blinkTimer->stop();
+    pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
+    blinkTimer->start(300);
+    update();
+}
+
+//
+// Execute flood fill in response to mouse click or threshold change
+//
+void Viewer::doFlood()
+{
+    if (leftMode != FloodFill)
+        return;
+
+    // Legalize point to inside image
+    QPoint loc = scrnToPageOffs.map(leftOrigin);
+    loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
+    loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
+
+    blinkTimer->stop();
+    pageMask = currPage.floodFill(loc, Config::floodThreshold);
+    blinkTimer->start(300);
+    update();
+}
+
+//
+// Execute background removal in response to mouse click or threshold change
+//
+void Viewer::doRemoveBG()
+{
+    if (leftMode != RemoveBG)
+        return;
+
+    blinkTimer->stop();
+    pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
+    blinkTimer->start(300);
+    update();
+}
+
+//
+// Execute speckle removal in response to mouse click or threshold change
+//
+void Viewer::doDespeckle()
+{
+    if (leftMode != Despeckle)
+        return;
+
+    blinkTimer->stop();
+    pageMask = currPage.despeckle(Config::despeckleArea, false);
+    blinkTimer->start(300);
+    update();
+}
+
+//
+// Execute void removal in response to mouse click or threshold change
+//
+void Viewer::doDevoid()
+{
+    if (leftMode != Devoid)
+        return;
+
+    blinkTimer->stop();
+    pageMask = currPage.despeckle(Config::devoidArea, true);
+    blinkTimer->start(300);
+    update();
 }
 
 //
