@@ -10,5 +10,4 @@
 
 cv::Mat QImage2OCV(QImage &img);
 QImage OCV2QImage(cv::Mat &inMat);
-QImage OCV2QImage(cv::Mat &inMat, QImage &ref);
 #endif
