@@ -256,6 +256,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
         {
             // Auto-deskew on mouse click
             Config::deskewAngle = currPage.calcDeskew();
+            emit setDeskewSig(Config::deskewAngle + 0.05);
             emit setDeskewSig(Config::deskewAngle);
             flag = true;
         }
@@ -379,9 +380,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             blinkTimer->stop();
             currPage.push();
             currPage.applyMask(pageMask, Config::bgColor);
-            pageMask = QImage();
             currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit updateIconSig();
+            resetTools();
             update();
         }
         else if (leftBand->isHidden())
@@ -405,9 +406,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             blinkTimer->stop();
             currPage.push();
             currPage.applyMask(pageMask, Config::fgColor);
-            pageMask = QImage();
             currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit updateIconSig();
+            resetTools();
             update();
         }
         else if (leftBand->isHidden())
@@ -445,7 +446,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             currPage.applyDeskew(deskewImg);
             currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
             emit updateIconSig();
-            deskewImg = QImage();
+            resetTools();
             update();
         }
         else
@@ -469,8 +470,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             }
             else
             {
-                copyImage = QImage();
-                pasting = false;
+                resetTools();
             }
         }
         else
@@ -667,6 +667,15 @@ void Viewer::updatePage(bool updateZoom)
 //
 void Viewer::setTool(LeftMode tool)
 {
+    if (Config::multiPage)
+    {
+        leftMode = Select;
+        resetTools();
+        setCursor(Qt::ArrowCursor);
+        update();
+        return;
+    }
+
     leftMode = tool;
     resetTools();
     if ((tool == Pencil) || (tool == Eraser))
@@ -678,10 +687,13 @@ void Viewer::setTool(LeftMode tool)
         setCursor(DropperCursor);
     else if ((tool == Despeckle) || (tool == Devoid))
         setCursor(DespeckleCursor);
+    else if (tool == RemoveBG)
+        doRemoveBG();
     else if (tool == Deskew)
     {
         setCursor(Qt::CrossCursor);
         Config::deskewAngle = currPage.calcDeskew();
+        emit setDeskewSig(Config::deskewAngle + 0.05);
         emit setDeskewSig(Config::deskewAngle);
     }
     else
@@ -916,7 +928,7 @@ void Viewer::doDropper()
     // Get pixel under cursor
     QRgb pixel = currPage.m_img.pixel(loc);
     blinkTimer->stop();
-    deskewImg = QImage();
+    resetTools();
     pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
     blinkTimer->start(300);
     update();
@@ -936,7 +948,7 @@ void Viewer::doFlood()
     loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
 
     blinkTimer->stop();
-    deskewImg = QImage();
+    resetTools();
     pageMask = currPage.floodFill(loc, Config::floodThreshold);
     blinkTimer->start(300);
     update();
@@ -951,7 +963,7 @@ void Viewer::doRemoveBG()
         return;
 
     blinkTimer->stop();
-    deskewImg = QImage();
+    resetTools();
     pageMask = currPage.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
     blinkTimer->start(300);
     update();
@@ -966,7 +978,7 @@ void Viewer::doDespeckle()
         return;
 
     blinkTimer->stop();
-    deskewImg = QImage();
+    resetTools();
     pageMask = currPage.despeckle(Config::despeckleArea, false);
     blinkTimer->start(300);
     update();
@@ -981,7 +993,7 @@ void Viewer::doDevoid()
         return;
 
     blinkTimer->stop();
-    deskewImg = QImage();
+    resetTools();
     pageMask = currPage.despeckle(Config::devoidArea, true);
     blinkTimer->start(300);
     update();
@@ -995,7 +1007,7 @@ void Viewer::doDeskew()
     if (leftMode != Deskew)
         return;
 
-    pageMask = QImage();
+    resetTools();
     deskewImg = currPage.deskew(Config::deskewAngle);
     update();
 }
