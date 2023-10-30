@@ -1,18 +1,19 @@
 # Tiffany [![Development build](https://github.com/crwolff/Tiffany/actions/workflows/build_all.yml/badge.svg)](https://github.com/crwolff/Tiffany/actions/workflows/build_all.yml)
 
 
-A Specialized tool for editing scanned documents.
+A Specialized tool for editing scanned documents. Some buttons will perform the operation
+on all pages selected in the bookmarks tab. These are indicated with (button<sup>m</sup>).
 
 * Open - Open files
     * Open - Open new files at end of list
     * Insert - Insert new files before selection
     * Replace - Replace all selected items with new files
-* Save - Save files
+* Save<sup>m</sup> - Save files
     * Save - Replace changed files in selection
     * Save To -  Save all files in selection to new directory
-* Delete - Remove selection from list (doesn't remove from directory)
-* Blank Page - Fill page with background and insert foreground colored text into center
-* Rotate
+* Delete<sup>m</sup> - Remove selection from list (doesn't remove from directory)
+* Blank Page<sup>m</sup> - Fill page with background and insert foreground colored text into center
+* Rotate<sup>m</sup>
     * Rotate CW - Rotates selected images 90 degrees
     * Rotate CCW - Rotates selected images -90 degrees
     * Rotate 180 - Turns selected images upside down
@@ -29,17 +30,10 @@ A Specialized tool for editing scanned documents.
     * Fit Width - Adjust zoom so full width of window is filled
     * Fit Height - Adjust zoom so full height of window is filled
 * Color button
-    * Click upper left to set background color
-    * Click upper right to swap foreground/background colors
-    * Click lower left to reset colors to Black/White
-    * Click lower right to set foreground color
-* Mode
-    * (S)ingle Page Mode - Buttons only operate on active page. Highlighted pixels blink between
-      foreground and background colors. ^X (Cut) replaces the selected pixels with the background
-      color. ^S replaces the selected pixels with the foreground color.
-    * (M)ulti-page Mode - Certain buttons operate on all selected pages. All selected pixels are
-      automatically replaced with the background color. Colors can be swapped (see Color Button)
-      to automatically replace with foreground color.
+    * Click upper left of icon to set background color
+    * Click upper right of icon to swap foreground/background colors
+    * Click lower left of icon to reset colors to Black/White
+    * Click lower right of icon to set foreground color
 * Pointer - Draw selection rectangle
 * Pencil/Eraser - Draw (foreground) or Erase (background) in various pen widths
     * Hold shift to draw straight lines
@@ -47,11 +41,16 @@ A Specialized tool for editing scanned documents.
 * Dropper button - Adjacent spinbox controls thresholds for different functions
     * Dropper - Select all pixels within threshold of selected color
     * Flood Fill - Select all adjacent pixels within threshold of selected color
-    * BG Remove - Select all pixels within threshold of White
+    * BG Remove<sup>m</sup> - Select all pixels within threshold of White
 * Despeckle button - Adjacent spinbox controls blob size
-    * Despeckle - Select all groups of non-white pixels below a certain size
-    * Devoid - Select all groups of non-black pixels below a certain size
-* Deskew button - Rotate page so text is horizontal
+    * Despeckle<sup>m</sup> - Select all groups of non-white pixels below a certain size
+    * Devoid<sup>m</sup> - Select all groups of non-black pixels below a certain size
+* Deskew<sup>m</sup> - Rotate page so text is horizontal
+* Format button - Converts image format
+    * Binary<sup>m</sup> - Converts image to binary using Otsu's global threshold (good for large dark areas)
+    * Adaptive<sup>m</sup> - Converts image to binary using an adaptive threshold (usually good)
+    * Grayscale<sup>m</sup> - Converts image to grayscale
+    * Dithered<sup>m</sup> - Converts image to dithered binary (good for grayscale images)
 
 Right Mouse Button:
 * Zoom to rectangle

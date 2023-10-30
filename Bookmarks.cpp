@@ -35,6 +35,14 @@ void Bookmarks::leaveEvent(QEvent *event)
 void Bookmarks::itemSelectionChanged()
 {
     QList<QListWidgetItem*> items = selectedItems();
+
+    // Set mode
+    if (items.count() > 1)
+        Config::multiPage = true;
+    else
+        Config::multiPage = false;
+
+    // Tell viewer what page to show
     if (items.count() > 0)
         emit changePageSig(items.last());
     else

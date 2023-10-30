@@ -78,10 +78,6 @@ void MainWindow::connectSignalSlots()
     // Color button
     QObject::connect( ui->colorAct, &QAction::triggered, this, &MainWindow::colorMagic );
 
-    // Mode button
-    QObject::connect( ui->chngModeAct, &QAction::toggled, [this](bool checked) { Config::multiPage = checked; });
-    QObject::connect( ui->chngModeAct, &QAction::toggled, [this]() { this->ui->viewer->setTool(Viewer::Select); });
-
     // Pencil menu
     QObject::connect( ui->pointerAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Select); });
     QObject::connect( ui->pencilAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Pencil); });
@@ -242,16 +238,6 @@ void MainWindow::buildToolBar()
     colorToolButton.setDefaultAction(ui->colorAct);
     colorToolButton.setIcon(Config::fgColor, Config::bgColor);
     ui->toolBar->addWidget(&colorToolButton);
-
-    // Mode select button
-    ui->toolBar->addAction(ui->chngModeAct);
-
-    // Add a vertical bar
-    QFrame* separator = new QFrame(this);
-    separator -> setFrameShape(QFrame::VLine);
-    separator -> setFrameShadow(QFrame::Plain);
-    separator -> setContentsMargins(3, 0, 3, 0);
-    ui->toolBar->addWidget(separator);
 
     // Tools
     ui->toolBar->addAction(ui->pointerAct);
