@@ -1,19 +1,12 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
-#include "PageData.h"
-#include <QWidget>
-#include <QClipboard>
-#include <QColor>
-#include <QFont>
+#include "Page.h"
 #include <QImage>
 #include <QListWidget>
-#include <QMutex>
 #include <QScrollArea>
 #include <QTimer>
-#include <opencv2/core/types.hpp>
-#include <tesseract/baseapi.h>
-#include <leptonica/allheaders.h>
+#include <QWidget>
 
 class Viewer : public QWidget
 {
@@ -23,53 +16,40 @@ public:
     Viewer(QWidget * parent = NULL);
     ~Viewer();
 
-    QColor foregroundColor = Qt::black;
-    QColor backgroundColor = Qt::white;
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, ColorSelect, FloodFill, Pencil, Eraser, Deskew, Despeckle, Devoid, LocateRef, PlaceRef };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid, Deskew };
     enum RightMode { Idle, Zoom, Pan };
+    enum MatchCode { None, Exact, Shifted, Ctrled };
 
 public slots:
-    void blinker();
     void changePage(QListWidgetItem *curr);
-    void updateViewer();
+    void updatePage(bool updateZoom);
     void setTool(LeftMode tool);
-    void blankPage();
-    void setDropperThreshold(int val);
-    void colorSelect();
-    void setFloodThreshold(int val);
-    void floodFill();
-    void setDeskew(double val);
-    void calcDeskew();
-    void deskew();
-    void deskewThread();
-    void setDespeckle(int val);
-    void setDevoid(int val);
-    void despeckle();
-    void devoid();
-    void despeckleThread(PageData page, int size);
+    void resetTools();
+
+    void doDropper();
+    void doFlood();
+    void doRemoveBG();
+    void doDespeckle();
+    void doDevoid();
+    void doDeskew();
     void toGrayscale();
-    void setBlurRadius(int val);
-    void setKernelSize(int val);
     void toBinary();
     void toAdaptive();
     void toDithered();
-    void binarization(bool adaptive);
-    void binThread(QListWidgetItem *listItem, int blur, int kernel, bool adaptive);
-    void undoEdit();
-    void redoEdit();
+
+    void blinker();
     void zoomIn();
     void zoomOut();
-    void fitToWindow();
+    void fitWindow();
     void fitWidth();
     void fitHeight();
     void fillWindow();
 
 signals:
-    void statusSig(QString descr);
-    void zoomSig(float scale);
-    void imageChangedSig();
-    void setDeskewWidget(float val);
+    void setDeskewSig(float val);
+    void updateIconSig();
+    void zoomSig();
 
 protected:
     void enterEvent(QEvent *event) override;
@@ -79,70 +59,66 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void keyReleaseEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     QSize sizeHint() const override;
 
 private:
-    QMutex mutex;
+    MatchCode keyMatches(QKeyEvent *event, QKeySequence::StandardKey matchKey);
     void drawLine(QPoint start, QPoint finish, QColor color);
     void drawDot(QPoint loc, QColor color);
-    void cropArea(QRect rect);
-    void fillArea(QRect rect, bool outside);
-    void applyMask(QImage &mask);
-    void applyDeskew();
-    void copySelection();
-    QPointF pasteOptimizer(qreal &imgW, qreal &imgH, QPointF &loc);
-    void pasteSelection(bool ctrl, bool shft);
+    void fillArea(QRect rect, QColor color, bool outside);
+    void doCopy(QRect box);
+    void setupPaste();
+    void doPaste(bool transparent);
+    QPoint pasteLocator(QPoint mouse, bool optimize);
+
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
-    void regionOCR();
-    void doWarp();
-    void pushImage(QListWidgetItem *listItem, PageData &page);
     void updateScrollBars();
     void adjustScrollBars(float factor);
-    bool measureAll(PageData &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+    bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
+    void setScaleFactor(float val);
 
-    QListWidgetItem *currListItem = NULL;
-    PageData currPage;
-    QImage fgMask;
-    QImage bgMask;
-    QImage deskewImg;
-    bool blink = false;
-    float scaleFactor = 1.0;
-    float scaleBase = 1.0;
+    QPoint leftOrigin;
+    QPoint rightOrigin;
+    QCursor lastCursor;
+    QListWidgetItem *currItem = nullptr;
+    Page currPage;
+    float scaleFactor;
+    QTransform pageToScrn;
+    QTransform scrnToPage;
+    QTransform scrnToPageOffs;
     QScrollArea *scrollArea = NULL;
-    QRubberBand *rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
-    QPoint origin;
-    bool pasting = false;
-    QPoint pasteLoc;
-    bool pasteCtrl;
-    QImage copyImage;
-    QList<QImage> copyImageList;
-    QCursor LastCursor;
-    QCursor PencilCursor;
-    QCursor Pencil180Cursor;
-    bool pencil180 = false;
-    QCursor DropperCursor;
-    QCursor DespeckleCursor;
+    QRubberBand *leftBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QPoint LMRBstart;   // Left mouse rubberBand start
+    QPoint LMRBend;
+    QRubberBand *rightBand = new QRubberBand(QRubberBand::Rectangle, this);
+    QPoint RMRBstart;
+    QPoint RMRBend;
     QImage logo;
-    QPointF dropperLoc = QPointF(0,0);
-    QPointF floodLoc = QPointF(0,0);
-    QColor currColor = Qt::black;
-    bool shiftPencil = false;
-    QPoint drawLoc;
-    bool binMode = false;
-    tesseract::TessBaseAPI *tessApi = nullptr;
-    QClipboard *clipboard = nullptr;
-    int warpCount = 0;
-    std::vector<cv::Point2f> warpCorner = std::vector<cv::Point2f>(4,cv::Point2f());
-    std::vector<cv::Point2f> warpBefore = std::vector<cv::Point2f>(4,cv::Point2f());
-    std::vector<cv::Point2f> warpAfter = std::vector<cv::Point2f>(4,cv::Point2f());
-
     LeftMode leftMode = Select;
     RightMode rightMode = Idle;
+
+    QCursor PencilCursor;
+    QCursor Pencil180Cursor;
+    QCursor DropperCursor;
+    QCursor DespeckleCursor;
+
+    bool pencil180;
+    bool shiftPencil = false;
+    QPoint drawLoc;
+    QColor currColor;
+
+    bool pasting = false;
+    QPoint pasteLoc;
+    QImage copyImage;
+    QList<QImage> copyImageList;
+
+    QImage pageMask;
+    QImage deskewImg;
     int gridOffsetX = 0;
     int gridOffsetY = 0;
-    bool shiftLocate = false;
 };
 
 #endif

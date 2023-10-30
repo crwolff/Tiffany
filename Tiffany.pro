@@ -29,12 +29,15 @@ UI_DIR = ./.build
 QT += widgets gui concurrent
 
 # Input
-HEADERS += mainwindow.h Bookmarks.h Viewer.h QImage2OCV.h Config.h 
-HEADERS += PageData.h UndoBuffer.h ViewData.h 
-HEADERS += Widgets/PopupQToolButton.h Widgets/ColorQToolButton.h Widgets/SpinWidget.h Widgets/DoubleSpinWidget.h
+HEADERS += mainwindow.h Bookmarks.h Config.h Page.h Viewer.h
+HEADERS += Utils/QImage2OCV.h
+HEADERS += Widgets/ColorQToolButton.h Widgets/DoubleSpinWidget.h Widgets/OddSpinBox.h Widgets/OddSpinWidget.h
+HEADERS += Widgets/PopupQToolButton.h Widgets/SpinWidget.h
 FORMS += mainWin.ui
-SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Viewer.cpp QImage2OCV.cpp Config.cpp
-SOURCES += Widgets/PopupQToolButton.cpp Widgets/ColorQToolButton.cpp Widgets/SpinWidget.cpp Widgets/DoubleSpinWidget.cpp
+SOURCES += main.cpp mainwindow.cpp Bookmarks.cpp Config.cpp Page.cpp Viewer.cpp
+SOURCES += Utils/QImage2OCV.cpp
+SOURCES += Widgets/ColorQToolButton.cpp Widgets/DoubleSpinWidget.cpp Widgets/OddSpinBox.cpp Widgets/OddSpinWidget.cpp
+SOURCES += Widgets/PopupQToolButton.cpp Widgets/SpinWidget.cpp
 RESOURCES += rsrc.qrc
 
 # OpenCV

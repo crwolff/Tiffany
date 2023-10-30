@@ -42,12 +42,6 @@ cv::Mat QImage2OCV(QImage &img)
 //
 QImage OCV2QImage(cv::Mat &mat)
 {
-    QImage ref;
-    return OCV2QImage(mat, ref);
-}
-
-QImage OCV2QImage(cv::Mat &mat, QImage &ref)
-{
     QImage::Format fmt;
 
     // Pick destination format
@@ -71,15 +65,5 @@ QImage OCV2QImage(cv::Mat &mat, QImage &ref)
     QImage image(mat.data, mat.cols, mat.rows, static_cast<int>(mat.step), fmt);
     if (mat.type() == CV_8UC3)
         image = image.rgbSwapped();
-
-    // Copy metadata
-    if (!ref.isNull())
-    {
-        image.setDotsPerMeterX(ref.dotsPerMeterX());
-        image.setDotsPerMeterY(ref.dotsPerMeterY());
-        for (const auto& i : ref.textKeys())
-            image.setText(i, ref.text(i));
-    }
-
     return image.copy();
 }

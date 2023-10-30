@@ -1,15 +1,12 @@
 #include "Bookmarks.h"
-#include "UndoBuffer.h"
-#include "ViewData.h"
-#include "QImage2OCV.h"
-#include <QColor>
+#include "Config.h"
 #include <QDebug>
 #include <QFileDialog>
 #include <QImage>
 #include <QImageWriter>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QPainter>
-#include <QTransform>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)
 {
@@ -38,6 +35,14 @@ void Bookmarks::leaveEvent(QEvent *event)
 void Bookmarks::itemSelectionChanged()
 {
     QList<QListWidgetItem*> items = selectedItems();
+
+    // Set mode
+    if (items.count() > 1)
+        Config::multiPage = true;
+    else
+        Config::multiPage = false;
+
+    // Tell viewer what page to show
     if (items.count() > 0)
         emit changePageSig(items.last());
     else
@@ -76,29 +81,28 @@ void Bookmarks::readFiles(QString cmd)
     emit progressSig("Reading...", filenames.count());
 
     // Open each file in turn and add to listWidget
-    PageData p;
     int progress = 1;
     for(int idx=0; idx < filenames.count(); idx++)
     {
         // Read image and add to listwidget
-        p = PageData(filenames.at(idx));
-        if (p.isNull())
+        Page page = Page(filenames.at(idx));
+        if (page.m_img.isNull())
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
             // Cannot paint on indexed8, so convert to RGB
-            if (p.format() == QImage::Format_Indexed8)
-                p = p.convertToFormat(QImage::Format_RGB32);
+            if (page.m_img.format() == QImage::Format_Indexed8)
+                page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
 
             // If image has 2 colors, but they aren't black and white, promote to RGB
-            if ((p.format() == QImage::Format_Mono) && (p.colorCount() == 2))
+            if ((page.m_img.format() == QImage::Format_Mono) && (page.m_img.colorCount() == 2))
             {
-                if ((p.color(0) == 0xFFFFFFFF) && (p.color(1) == 0xFF000000))
+                if ((page.m_img.color(0) == 0xFFFFFFFF) && (page.m_img.color(1) == 0xFF000000))
                     ;
-                else if ((p.color(0) == 0xFF000000) && (p.color(1) == 0xFFFFFFFF))
+                else if ((page.m_img.color(0) == 0xFF000000) && (page.m_img.color(1) == 0xFFFFFFFF))
                     ;
                 else
-                    p = p.convertToFormat(QImage::Format_RGB32);
+                    page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
             }
 
             // Remove the next item to be replaced
@@ -108,10 +112,8 @@ void Bookmarks::readFiles(QString cmd)
             // Build list item and insert
             QListWidgetItem *newItem = new QListWidgetItem();
             newItem->setToolTip(filenames.at(idx));
-            newItem->setData(Qt::UserRole, QVariant::fromValue(p));
-            newItem->setData(Qt::UserRole+1, QVariant::fromValue(UndoBuffer()));
-            newItem->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
-            newItem->setIcon(makeIcon(p, p.modified()));
+            newItem->setData(Qt::UserRole, QVariant::fromValue(page));
+            newItem->setIcon(makeIcon(page.m_img, page.modified()));
             QString txt = QFileInfo(filenames.at(idx)).fileName();
             int suffix = txt.lastIndexOf(".");
             if (suffix > 0)
@@ -197,25 +199,16 @@ bool Bookmarks::saveCommon(QListWidgetItem* itemPtr, QString &fileName, QString 
     }
 
     // Save image to <fileName>
-    PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
+    Page page = itemPtr->data(Qt::UserRole).value<Page>();
     QImageWriter writer(fileName);
-    writer.setCompression(100);     // TIF is LZW, no Group 4 option
-    if (writer.write(image) == false)
+    //writer.setCompression(100);     // TIF is LZW, no Group 4 option
+    if (writer.write(page.m_img) == false)
         return false;
 
-    // Clear file change marks
-    image.setChanges(0);
-    image.setRotation(0);
-    image.setMirrors(0);
-
     // Update item
-    itemPtr->setData(Qt::UserRole, QVariant::fromValue(image));
-    itemPtr->setIcon(makeIcon(image, false));
-
-    // Flush undo buffer
-    UndoBuffer ub = itemPtr->data(Qt::UserRole+1).value<UndoBuffer>();
-    ub.flush();
-    itemPtr->setData(Qt::UserRole+1, QVariant::fromValue(ub));
+    page.flush();
+    itemPtr->setData(Qt::UserRole, QVariant::fromValue(page));
+    itemPtr->setIcon(makeIcon(page.m_img, false));
 
     // No errors
     return true;
@@ -243,8 +236,8 @@ void Bookmarks::saveFiles()
     foreach(QListWidgetItem* itemPtr, selection)
     {
         // Skip if unchanged
-        PageData image = itemPtr->data(Qt::UserRole).value<PageData>();
-        if (!image.modified())
+        Page page = itemPtr->data(Qt::UserRole).value<Page>();
+        if (!page.modified())
             continue;
 
         // Get the filenames
@@ -262,9 +255,6 @@ void Bookmarks::saveFiles()
 
     // Cleanup status bar
     emit progressSig("", -1);
-
-    // Signal redraw
-    emit updateViewerSig();
 
     // Report errors
     if (writeErr != 0)
@@ -316,9 +306,6 @@ void Bookmarks::saveToDir()
     // Cleanup status bar
     emit progressSig("", -1);
 
-    // Signal redraw
-    emit updateViewerSig();
-
     // Report errors
     if (writeErr != 0)
         QMessageBox::information(this, "Tiffany", QString("%1 files couldn't be written").arg(writeErr));
@@ -331,8 +318,8 @@ bool Bookmarks::anyModified()
 {
     for(int idx=0; idx<count(); idx++)
     {
-        PageData image = item(idx)->data(Qt::UserRole).value<PageData>();
-        if (image.modified())
+        Page page = item(idx)->data(Qt::UserRole).value<Page>();
+        if (page.modified())
             return true;
     }
     return false;
@@ -365,8 +352,8 @@ void Bookmarks::deleteSelection()
     foreach(QListWidgetItem* item, items)
     {
         // Skip if changed
-        PageData image = item->data(Qt::UserRole).value<PageData>();
-        if (image.modified())
+        Page page = item->data(Qt::UserRole).value<Page>();
+        if (page.modified())
         {
             QMessageBox::StandardButton resBtn = QMessageBox::question( this, "Tiffany",
                     item->toolTip() + " has been modified, are you sure?\n",
@@ -379,9 +366,406 @@ void Bookmarks::deleteSelection()
         else
             delete item;
     }
-    // Select a new item since we deleted the rest
+    // Since entire selection was deleted, select whatever the listwidget picked as current
     if (currentItem() != nullptr)
         currentItem()->setSelected(true);
+}
+
+//
+// Erase selected pages and insert 'Blank' into center
+//
+void Bookmarks::blankPage()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+    {
+        QListWidgetItem* last = selection.last();
+        selection.clear();
+        selection.append(last);
+    }
+
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Page Contents"),
+                                         "", QLineEdit::Normal,
+                                         "BLANK", &ok);
+    if (ok)
+    {
+        // Add progress to status bar
+        emit progressSig("Blanking...", selection.count());
+
+        // Blank each page in turn
+        int progress = 1;
+        foreach(QListWidgetItem* item, selection)
+        {
+            Page page = item->data(Qt::UserRole).value<Page>();
+            page.push();
+            QImage img = page.m_img;
+
+            // Erase and draw text
+            QPainter p(&img);
+            p.fillRect(img.rect(), Config::bgColor);
+            p.setPen(Config::fgColor);
+            p.setFont(Config::textFont);
+            p.drawText(img.rect(), Qt::AlignCenter, text);
+            p.end();
+
+            // Update list with new image
+            page.m_img = img;
+            item->setData(Qt::UserRole, QVariant::fromValue(page));
+            item->setIcon(makeIcon(page.m_img, page.modified()));
+
+            // Update progress
+            emit progressSig("", progress);
+            progress = progress + 1;
+        }
+        // Cleanup status bar
+        emit progressSig("", -1);
+
+        // Update Viewer
+        emit updatePageSig(false);
+    }
+}
+
+//
+// Remove background from multiple pages
+//
+void Bookmarks::removeBG()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Background...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage mask = page.colorSelect(QColor(Qt::white).rgb(), Config::bgRemoveThreshold);
+        page.push();
+        page.applyMask(mask, Config::bgColor);
+
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Remove speckles
+//
+void Bookmarks::despeckle()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Despeckle...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage mask = page.despeckle(Config::despeckleArea, false);
+        page.push();
+        page.applyMask(mask, Config::bgColor);
+
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Remove voids
+//
+void Bookmarks::devoid()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Devoid...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        QImage mask = page.despeckle(Config::despeckleArea, true);
+        page.push();
+        page.applyMask(mask, Config::bgColor);
+
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Deskew pages
+//
+void Bookmarks::deskew()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Deskew...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        float angle = page.calcDeskew();
+        QImage img = page.deskew(angle);
+        page.push();
+        page.applyDeskew(img);
+
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to grayscale
+//
+void Bookmarks::toGrayscale()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Grayscale...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        page.toGrayscale();
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using Otsu's algorithm
+//
+void Bookmarks::toBinary()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Binary...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
+        page.push();
+        page.toBinary(false);
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using adaptive threshold
+//
+void Bookmarks::toAdaptive()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Adaptive...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
+        page.push();
+        page.toBinary(true);
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using diffuse dithering
+//
+void Bookmarks::toDithered()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Dithering...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
+        page.push();
+        page.toDithered();
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
 }
 
 //
@@ -395,42 +779,41 @@ void Bookmarks::rotateSelection(int rot)
     QTransform tmat = QTransform().rotate(rot * 90.0);
 
     // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
     {
-        // Add progress to status bar
-        emit progressSig("Rotating...", items.count());
-
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
-        {
-            // Rotate old image and update rotation flag
-            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
-            PageData rotImage = oldImage.transformed(tmat, Qt::SmoothTransformation);
-            rotImage.copyOtherData(oldImage);
-            rotImage.setRotation(oldImage.rotation() + rot);
-
-            // Push old image into the undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.push(oldImage);
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(rotImage));
-            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
-            item->setIcon(makeIcon(rotImage, rotImage.modified()));
-
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
-        }
-
-        // Cleanup status bar
-        emit progressSig("", -1);
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
     }
 
-    // Signal redraw
-    itemSelectionChanged();
+    // Add progress to status bar
+    emit progressSig("Rotating...", selection.count());
+
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        QImage img = page.m_img;
+
+        // Rotate image based on transform
+        img = img.transformed(tmat, Qt::SmoothTransformation);
+
+        // Update list with new image
+        page.m_img = img;
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(true);
 }
 
 //
@@ -466,42 +849,41 @@ void Bookmarks::rotate180()
 void Bookmarks::mirrorSelection(int dir)
 {
     // Get list of all selected items
-    QList<QListWidgetItem*> items = selectedItems();
-    if (items.count() > 0)
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
     {
-        // Add progress to status bar
-        emit progressSig("Mirroring...", items.count());
-
-        int progress = 1;
-        foreach(QListWidgetItem* item, items)
-        {
-            // Rotate old image and update mirror flag
-            PageData oldImage = item->data(Qt::UserRole).value<PageData>();
-            PageData mirImage = oldImage.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
-            mirImage.copyOtherData(oldImage);
-            mirImage.setMirrors(oldImage.mirrors() ^ dir);
-
-            // Push old image into the undo buffer
-            UndoBuffer ub = item->data(Qt::UserRole+1).value<UndoBuffer>();
-            ub.push(oldImage);
-            item->setData(Qt::UserRole+1, QVariant::fromValue(ub));
-
-            // Update item
-            item->setData(Qt::UserRole, QVariant::fromValue(mirImage));
-            item->setData(Qt::UserRole+2, QVariant::fromValue(ViewData()));
-            item->setIcon(makeIcon(mirImage, mirImage.modified()));
-
-            // Update progress
-            emit progressSig("", progress);
-            progress = progress + 1;
-        }
-
-        // Cleanup status bar
-        emit progressSig("", -1);
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
     }
 
-    // Signal redraw
-    itemSelectionChanged();
+    // Add progress to status bar
+    emit progressSig("Rotating...", selection.count());
+
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        QImage img = page.m_img;
+
+        // Mirror image
+        img = img.mirrored(((dir & 1) == 1), ((dir & 2) == 2));
+
+        // Update list with new image
+        page.m_img = img;
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
 }
 
 //
@@ -521,19 +903,21 @@ void Bookmarks::mirrorVert()
 }
 
 //
-// Make a new icon after editting in Viewer
+// Make a new icon after editing in Viewer
 //
 void Bookmarks::updateIcon()
 {
-    QListWidgetItem *item = currentItem();
-    PageData image = item->data(Qt::UserRole).value<PageData>();
-    item->setIcon(makeIcon(image, image.modified()));
+    // Get active item
+    QList<QListWidgetItem*> items = selectedItems();
+    QListWidgetItem* item = items.last();
+    Page page = item->data(Qt::UserRole).value<Page>();
+    item->setIcon(makeIcon(page.m_img, page.modified()));
 }
 
 //
 // Make an icon from the image and add a marker if it has changed
 //
-QIcon Bookmarks::makeIcon(PageData &image, bool flag)
+QIcon Bookmarks::makeIcon(QImage &image, bool flag)
 {
     // Fill background
     QImage qimg(100, 100, QImage::Format_RGB32);
@@ -589,3 +973,50 @@ QIcon Bookmarks::makeIcon(PageData &image, bool flag)
     QIcon icon = QIcon(QPixmap::fromImage(qimg));
     return icon;
 }
+
+//
+// Undo last change
+//     TODO Should this apply to current page only or all selected?
+//
+void Bookmarks::undoEdit()
+{
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() == 0)
+        return;
+
+    // Get active item
+    QListWidgetItem* item = items.last();
+    Page page = item->data(Qt::UserRole).value<Page>();
+
+    // Revert last edit
+    bool flag = page.undo();
+    item->setData(Qt::UserRole, QVariant::fromValue(page));
+    item->setIcon(makeIcon(page.m_img, page.modified()));
+
+    // Update Viewer
+    emit updatePageSig(flag);
+}
+
+//
+// Redo last undo
+//     TODO Should this apply to current page only or all selected?
+//
+void Bookmarks::redoEdit()
+{
+    QList<QListWidgetItem*> items = selectedItems();
+    if (items.count() == 0)
+        return;
+
+    // Get active item
+    QListWidgetItem* item = items.last();
+    Page page = item->data(Qt::UserRole).value<Page>();
+
+    // Revert last edit
+    bool flag = page.redo();
+    item->setData(Qt::UserRole, QVariant::fromValue(page));
+    item->setIcon(makeIcon(page.m_img, page.modified()));
+
+    // Update Viewer
+    emit updatePageSig(flag);
+}
+

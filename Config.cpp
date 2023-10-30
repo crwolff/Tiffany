@@ -6,6 +6,7 @@
 
 namespace Config
 {
+    int bgRemoveThreshold;
     int dropperThreshold;
     int floodThreshold;
     double deskewAngle;
@@ -13,17 +14,23 @@ namespace Config
     int devoidArea;
     int brushSize;
     int blurRadius;
+    int adaptiveBlurRadius;
     int kernelSize;
     QFont textFont;
-    QPointF locate1 = QPointF(0,0);
-    QPointF locate2 = QPointF(0,0);
+    QPointF locate1;
+    QPointF locate2;
+
+    QColor fgColor;
+    QColor bgColor;
+    bool multiPage;
 
     // Load settings file
     void LoadConfig()
     {
         QSettings settings;
 
-        dropperThreshold = settings.value("dropperThreshold", 20).toInt();
+        bgRemoveThreshold = settings.value("bgRemoveThreshold", 40).toInt();
+        dropperThreshold = settings.value("dropperThreshold", 40).toInt();
         floodThreshold = settings.value("floodThreshold", 50).toInt();
         deskewAngle = settings.value("deskewAngle", 0.0).toDouble();
         despeckleArea = settings.value("despeckleArea", 20).toInt();
@@ -40,6 +47,9 @@ namespace Config
         blurRadius = settings.value("blurRadius", 5).toInt();
         if (blurRadius % 2 != 1)
             blurRadius++;
+        adaptiveBlurRadius = settings.value("adaptiveBlurRadius", 5).toInt();
+        if (adaptiveBlurRadius % 2 != 1)
+            adaptiveBlurRadius++;
         kernelSize = settings.value("kernelSize", 23).toInt();
         if (kernelSize % 2 != 1)
             kernelSize++;
@@ -47,12 +57,18 @@ namespace Config
         textFont.fromString(font);
         locate1 = settings.value("locate1", QPointF(0,0)).toPointF();
         locate2 = settings.value("locate2", QPointF(0,0)).toPointF();
+
+        // Not loaded or saved
+        fgColor = Qt::black;
+        bgColor = Qt::white;
+        multiPage = false;
     }
 
     // Save settings file
     void SaveConfig()
     {
         QSettings settings;
+        settings.setValue("bgRemoveThreshold", bgRemoveThreshold);
         settings.setValue("dropperThreshold", dropperThreshold);
         settings.setValue("floodThreshold", floodThreshold);
         settings.setValue("deskewAngle", deskewAngle);
@@ -60,6 +76,7 @@ namespace Config
         settings.setValue("devoidArea", devoidArea);
         settings.setValue("brushSize", brushSize);
         settings.setValue("blurRadius", blurRadius);
+        settings.setValue("adaptiveBlurRadius", adaptiveBlurRadius);
         settings.setValue("kernelSize", kernelSize);
         settings.setValue("font", textFont.toString());
         settings.setValue("locate1", locate1);

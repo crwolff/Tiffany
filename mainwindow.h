@@ -6,10 +6,11 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QVBoxLayout>
-#include "Widgets/PopupQToolButton.h"
 #include "Widgets/ColorQToolButton.h"
-#include "Widgets/SpinWidget.h"
 #include "Widgets/DoubleSpinWidget.h"
+#include "Widgets/OddSpinWidget.h"
+#include "Widgets/PopupQToolButton.h"
+#include "Widgets/SpinWidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,39 +23,45 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    ColorQToolButton colorToolButton;
 
 public slots:
+    void colorMagic();
+    void fontSelect();
     void updateProgress(QString descr, int val);
     void setStatus(QString descr);
-    void updateActions(float scale);
     void about();
     void closeEvent (QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
     void connectSignalSlots();
-    void makeVisible(int mask);
     void buildToolBar();
-    void colorMagic();
-    void fontSelect();
-
-    QAction *toolSizeButton;
+    void makeDropperVisible(int mask);
+    void makeDespeckleVisible(int mask);
+    void makeBlurVisible(int mask);
     QLabel *statusLabel;
     QProgressBar *progressBar;
+
+    PopupQToolButton *zoomToolButton;
+    SpinWidget *bgRemoveThresholdWidget;
+    QAction *bgRemoveThresholdSpin;
     SpinWidget *dropperThresholdWidget;
     QAction *dropperThresholdSpin;
     SpinWidget *floodThresholdWidget;
     QAction *floodThresholdSpin;
-    DoubleSpinWidget *deskewWidget;
-    QAction *deskewSpin;
     SpinWidget *despeckleWidget;
     QAction *despeckleSpin;
     SpinWidget *devoidWidget;
     QAction *devoidSpin;
-    SpinWidget *blurWidget;
+    DoubleSpinWidget *deskewWidget;
+    QAction *deskewSpin;
+    OddSpinWidget *blurWidget;
     QAction *blurSpin;
-    SpinWidget *kernelWidget;
+    OddSpinWidget *adaptiveBlurWidget;
+    QAction *adaptiveBlurSpin;
+    OddSpinWidget *kernelWidget;
     QAction *kernelSpin;
+
+    ColorQToolButton colorToolButton;
 };
 #endif // MAINWINDOW_H
