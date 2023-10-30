@@ -43,6 +43,9 @@ public:
     // The main image
     QImage m_img;
 
+private:
+    void toBinaryThread(bool adaptive, int blur, int kernel);
+
     // Undo buffers
 #define MAX_UNDO 8
     QList<QImage> m_undo;

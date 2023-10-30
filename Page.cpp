@@ -3,8 +3,10 @@
 #include "Config.h"
 #include "Page.h"
 #include "Utils/QImage2OCV.h"
+#include <QApplication>
 #include <QDebug>
 #include <QPainter>
+#include <QtConcurrent/QtConcurrent>
 #include <leptonica/allheaders.h>
 
 // Constuctors
@@ -352,6 +354,21 @@ void Page::toGrayscale()
 //
 void Page::toBinary(bool adaptive)
 {
+    // Run this in a thread to avoid lagging the UI
+    QFuture<void> future = QtConcurrent::run(this, &Page::toBinaryThread, adaptive, Config::blurRadius, Config::kernelSize);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+}
+
+//
+// Convert to binary thread
+//
+void Page::toBinaryThread(bool adaptive, int blur, int kernel)
+{
     // If last operation converted to mono, undo it
     if ((m_img.format() == QImage::Format_Mono) && (peek().format() != QImage::Format_Mono))
         undo();
@@ -366,14 +383,14 @@ void Page::toBinary(bool adaptive)
     if (true)
     {
         cv::Mat tmp;
-        cv::GaussianBlur(mat, tmp, cv::Size(Config::blurRadius, Config::blurRadius), 0);
+        cv::GaussianBlur(mat, tmp, cv::Size(blur, blur), 0);
         mat = tmp;
     }
 
     if (adaptive)   // Adaptive threshold - this hollows out diodes, etc
     {
         cv::Mat tmp;
-        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, Config::kernelSize, 2);
+        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, kernel, 2);
         mat = tmp;
     }
     else            // Otsu's global threshold calculation
