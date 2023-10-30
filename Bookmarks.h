@@ -30,6 +30,10 @@ public slots:
     void despeckle();
     void devoid();
     void deskew();
+    void toGrayscale();
+    void toBinary();
+    void toAdaptive();
+    void toDithered();
     void rotateCW();
     void rotateCCW();
     void rotate180();

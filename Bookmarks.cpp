@@ -590,6 +590,162 @@ void Bookmarks::deskew()
 }
 
 //
+// Convert to grayscale
+//
+void Bookmarks::toGrayscale()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Grayscale...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        page.toGrayscale();
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using Otsu's algorithm
+//
+void Bookmarks::toBinary()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Binary...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        page.toBinary(false);
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using adaptive threshold
+//
+void Bookmarks::toAdaptive()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Adaptive...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        page.toBinary(true);
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
+// Convert to binary using diffuse dithering
+//
+void Bookmarks::toDithered()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+        return;
+
+    // Add progress to status bar
+    emit progressSig("Dithering...", selection.count());
+
+    // Blank each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        Page page = item->data(Qt::UserRole).value<Page>();
+        page.push();
+        page.toDithered();
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
 // Rotate selected items
 //  1 = 90
 //  2 = 180

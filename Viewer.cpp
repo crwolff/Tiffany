@@ -1013,6 +1013,74 @@ void Viewer::doDeskew()
 }
 
 //
+// Convert to grayscale
+//
+void Viewer::toGrayscale()
+{
+    if (currPage.m_img.isNull())
+        return;
+    if (Config::multiPage)
+        return;
+
+    currPage.push();
+    currPage.toGrayscale();
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
+}
+
+//
+// Convert to binary using Otsu's algorithm
+//
+void Viewer::toBinary()
+{
+    if (currPage.m_img.isNull())
+        return;
+    if (Config::multiPage)
+        return;
+
+    currPage.push();
+    currPage.toBinary(false);
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
+}
+
+//
+// Convert to binary using adaptive threshold
+//
+void Viewer::toAdaptive()
+{
+    if (currPage.m_img.isNull())
+        return;
+    if (Config::multiPage)
+        return;
+
+    currPage.push();
+    currPage.toBinary(true);
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
+}
+
+//
+// Convert to binary using diffuse dithering
+//
+void Viewer::toDithered()
+{
+    if (currPage.m_img.isNull())
+        return;
+    if (Config::multiPage)
+        return;
+
+    currPage.push();
+    currPage.toDithered();
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
+}
+
+//
 // Blink mask to make it easier to see
 //
 void Viewer::blinker()

@@ -123,6 +123,25 @@ void MainWindow::connectSignalSlots()
     QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::devoidArea = val; this->ui->viewer->doDevoid(); });
 
+    // Format conversion menu
+    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
+    QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
+
+    QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
+    QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
+    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::blurRadius = val; this->ui->viewer->toBinary(); });
+
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
+    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::blurRadius = val; this->ui->viewer->toAdaptive(); });
+    QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::kernelSize = val; this->ui->viewer->toAdaptive(); });
+
+    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toDithered );
+    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toDithered );
+
     // Deskew menu
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
     QObject::connect( ui->deskewAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deskew );
@@ -306,6 +325,23 @@ void MainWindow::buildToolBar()
     ui->toolBar->addAction(ui->deskewAct);
     deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
     ui->toolBar->addWidget(deskewWidget);
+
+    // Format conversion button and widgets
+    QMenu *reFormatMenu = new QMenu();
+    reFormatMenu->addAction(ui->binaryAct);
+    reFormatMenu->addAction(ui->adaptiveBinaryAct);
+    reFormatMenu->addAction(ui->ditheredBinaryAct);
+    reFormatMenu->addAction(ui->grayscaleAct);
+    PopupQToolButton *reFormatToolButton = new PopupQToolButton();
+    reFormatToolButton->setMenu(reFormatMenu);
+    reFormatToolButton->setDefaultAction(ui->binaryAct);
+    ui->toolBar->addWidget(reFormatToolButton);
+    blurWidget = new OddSpinWidget(1, 31, Config::blurRadius, 2, "Blur Size", ui->toolBar);
+    blurSpin = ui->toolBar->addWidget(blurWidget);
+    kernelWidget = new OddSpinWidget(3, 149, Config::kernelSize, 2, "Kernel Size", ui->toolBar);
+    kernelSpin = ui->toolBar->addWidget(kernelWidget);
+    ui->adaptiveBinaryAct->setText(QApplication::translate("MainWindow", "Adaptive\nBinary", nullptr));
+    ui->ditheredBinaryAct->setText(QApplication::translate("MainWindow", "Dithered\nBinary", nullptr));
 
     // Right justify remaining icons
     QWidget* spacer = new QWidget();

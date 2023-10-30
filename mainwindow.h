@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include "Widgets/ColorQToolButton.h"
 #include "Widgets/DoubleSpinWidget.h"
+#include "Widgets/OddSpinWidget.h"
 #include "Widgets/PopupQToolButton.h"
 #include "Widgets/SpinWidget.h"
 
@@ -53,6 +54,10 @@ private:
     QAction *devoidSpin;
     DoubleSpinWidget *deskewWidget;
     QAction *deskewSpin;
+    OddSpinWidget *blurWidget;
+    QAction *blurSpin;
+    OddSpinWidget *kernelWidget;
+    QAction *kernelSpin;
 
     ColorQToolButton colorToolButton;
 };

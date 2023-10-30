@@ -33,6 +33,10 @@ public slots:
     void doDespeckle();
     void doDevoid();
     void doDeskew();
+    void toGrayscale();
+    void toBinary();
+    void toAdaptive();
+    void toDithered();
 
     void blinker();
     void zoomIn();

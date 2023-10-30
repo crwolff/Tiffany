@@ -27,6 +27,9 @@ public:
     QImage deskew(float angle);
     float calcDeskew();
     void applyDeskew(QImage img);
+    void toGrayscale();
+    void toBinary(bool adaptive);
+    void toDithered();
 
     // Flag if image was changed
     unsigned int m_modified = 0;

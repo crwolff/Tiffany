@@ -328,3 +328,64 @@ void Page::applyDeskew(QImage img)
     p.drawImage(rect.topLeft(), img);
     p.end();
 }
+
+//
+// Convert current image to grayscale
+//
+void Page::toGrayscale()
+{
+    m_img = m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+}
+
+//
+// Convert to binary
+//
+void Page::toBinary(bool adaptive)
+{
+    // Convert to grayscale
+    QImage img = m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat = QImage2OCV(img);
+
+    // Gausian filter to clean up noise
+    if (true)
+    {
+        cv::Mat tmp;
+        cv::GaussianBlur(mat, tmp, cv::Size(Config::blurRadius, Config::blurRadius), 0);
+        mat = tmp;
+    }
+
+    if (adaptive)   // Adaptive threshold - this hollows out diodes, etc
+    {
+        cv::Mat tmp;
+        cv::adaptiveThreshold(mat, tmp, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, Config::kernelSize, 2);
+        mat = tmp;
+    }
+    else            // Otsu's global threshold calculation
+    {
+        cv::Mat tmp;
+        cv::threshold(mat, tmp, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+        mat = tmp;
+    }
+
+    // Convert back to QImage and reformat
+    img = OCV2QImage(mat);
+    img = img.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::ThresholdDither|Qt::AvoidDither);
+
+    // Copy metadata
+    img.setDotsPerMeterX(m_img.dotsPerMeterX());
+    img.setDotsPerMeterY(m_img.dotsPerMeterY());
+    for (const auto& i : m_img.textKeys())
+        img.setText(i, m_img.text(i));
+
+    m_img = img;
+}
+
+//
+// Convert current image to dithered binary
+//
+void Page::toDithered()
+{
+    m_img = m_img.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::DiffuseDither);
+}
