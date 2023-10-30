@@ -659,6 +659,11 @@ void Bookmarks::toBinary()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
         page.push();
         page.toBinary(false);
         item->setData(Qt::UserRole, QVariant::fromValue(page));
@@ -698,6 +703,11 @@ void Bookmarks::toAdaptive()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
         page.push();
         page.toBinary(true);
         item->setData(Qt::UserRole, QVariant::fromValue(page));
@@ -737,6 +747,11 @@ void Bookmarks::toDithered()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
+
+        // If last operation converted to mono, undo it
+        if ((page.m_img.format() == QImage::Format_Mono) && (page.peek().format() != QImage::Format_Mono))
+            page.undo();
+
         page.push();
         page.toDithered();
         item->setData(Qt::UserRole, QVariant::fromValue(page));

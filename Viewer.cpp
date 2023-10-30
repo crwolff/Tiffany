@@ -1039,6 +1039,10 @@ void Viewer::toBinary()
     if (Config::multiPage)
         return;
 
+    // If last operation converted to mono, undo it
+    if ((currPage.m_img.format() == QImage::Format_Mono) && (currPage.peek().format() != QImage::Format_Mono))
+        currPage.undo();
+
     currPage.push();
     currPage.toBinary(false);
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
@@ -1056,6 +1060,10 @@ void Viewer::toAdaptive()
     if (Config::multiPage)
         return;
 
+    // If last operation converted to mono, undo it
+    if ((currPage.m_img.format() == QImage::Format_Mono) && (currPage.peek().format() != QImage::Format_Mono))
+        currPage.undo();
+
     currPage.push();
     currPage.toBinary(true);
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
@@ -1072,6 +1080,10 @@ void Viewer::toDithered()
         return;
     if (Config::multiPage)
         return;
+
+    // If last operation converted to mono, undo it
+    if ((currPage.m_img.format() == QImage::Format_Mono) && (currPage.peek().format() != QImage::Format_Mono))
+        currPage.undo();
 
     currPage.push();
     currPage.toDithered();

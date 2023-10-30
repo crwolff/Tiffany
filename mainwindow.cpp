@@ -132,9 +132,9 @@ void MainWindow::connectSignalSlots()
 
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
-    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeBlurVisible(3); });
-    QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
-            [this](int val){ Config::blurRadius = val; this->ui->viewer->toAdaptive(); });
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeBlurVisible(2); });
+    QObject::connect( adaptiveBlurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
+            [this](int val){ Config::adaptiveBlurRadius = val; this->ui->viewer->toAdaptive(); });
     QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::kernelSize = val; this->ui->viewer->toAdaptive(); });
 
@@ -311,11 +311,17 @@ void MainWindow::buildToolBar()
     ui->toolBar->addWidget(reFormatToolButton);
     blurWidget = new OddSpinWidget(1, 31, Config::blurRadius, 2, "Blur Size", ui->toolBar);
     blurSpin = ui->toolBar->addWidget(blurWidget);
+    blurSpin->setVisible(true);
+    blurSpin->setEnabled(true);
+    adaptiveBlurWidget = new OddSpinWidget(1, 31, Config::adaptiveBlurRadius, 2, "Blur Size", ui->toolBar);
+    adaptiveBlurSpin = ui->toolBar->addWidget(adaptiveBlurWidget);
+    adaptiveBlurSpin->setVisible(false);
+    adaptiveBlurSpin->setEnabled(false);
     kernelWidget = new OddSpinWidget(3, 149, Config::kernelSize, 2, "Kernel Size", ui->toolBar);
     kernelSpin = ui->toolBar->addWidget(kernelWidget);
+    kernelSpin->setEnabled(false);
     ui->adaptiveBinaryAct->setText(QApplication::translate("MainWindow", "Adaptive\nBinary", nullptr));
     ui->ditheredBinaryAct->setText(QApplication::translate("MainWindow", "Dithered\nBinary", nullptr));
-    makeBlurVisible(1);
 
     // Despeckle button
     QMenu *despeckleMenu = new QMenu();
@@ -370,11 +376,36 @@ void MainWindow::makeDespeckleVisible(int mask)
 
 //
 // Enable blur/kernel based on active tool
+//    0 - both disabled
+//    1 - binary blur only
+//    2 - adaptive
 //
 void MainWindow::makeBlurVisible(int mask)
 {
-    blurSpin->setEnabled((mask & 1) != 0);
-    kernelSpin->setEnabled((mask & 2) != 0);
+    if (mask == 0)
+    {
+        blurSpin->setEnabled(false);
+        blurSpin->setVisible(true);
+        adaptiveBlurSpin->setEnabled(false);
+        adaptiveBlurSpin->setVisible(false);
+        kernelSpin->setEnabled(false);
+    }
+    else if (mask == 1)
+    {
+        blurSpin->setEnabled(true);
+        blurSpin->setVisible(true);
+        adaptiveBlurSpin->setEnabled(false);
+        adaptiveBlurSpin->setVisible(false);
+        kernelSpin->setEnabled(false);
+    }
+    else if (mask == 2)
+    {
+        blurSpin->setEnabled(false);
+        blurSpin->setVisible(false);
+        adaptiveBlurSpin->setEnabled(true);
+        adaptiveBlurSpin->setVisible(true);
+        kernelSpin->setEnabled(true);
+    }
 }
 
 //

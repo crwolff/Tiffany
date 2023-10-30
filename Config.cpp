@@ -14,6 +14,7 @@ namespace Config
     int devoidArea;
     int brushSize;
     int blurRadius;
+    int adaptiveBlurRadius;
     int kernelSize;
     QFont textFont;
     QPointF locate1;
@@ -46,6 +47,9 @@ namespace Config
         blurRadius = settings.value("blurRadius", 5).toInt();
         if (blurRadius % 2 != 1)
             blurRadius++;
+        adaptiveBlurRadius = settings.value("adaptiveBlurRadius", 5).toInt();
+        if (adaptiveBlurRadius % 2 != 1)
+            adaptiveBlurRadius++;
         kernelSize = settings.value("kernelSize", 23).toInt();
         if (kernelSize % 2 != 1)
             kernelSize++;
@@ -72,6 +76,7 @@ namespace Config
         settings.setValue("devoidArea", devoidArea);
         settings.setValue("brushSize", brushSize);
         settings.setValue("blurRadius", blurRadius);
+        settings.setValue("adaptiveBlurRadius", adaptiveBlurRadius);
         settings.setValue("kernelSize", kernelSize);
         settings.setValue("font", textFont.toString());
         settings.setValue("locate1", locate1);

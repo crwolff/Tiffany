@@ -369,10 +369,6 @@ void Page::toBinary(bool adaptive)
 //
 void Page::toBinaryThread(bool adaptive, int blur, int kernel)
 {
-    // If last operation converted to mono, undo it
-    if ((m_img.format() == QImage::Format_Mono) && (peek().format() != QImage::Format_Mono))
-        undo();
-
     // Convert to grayscale
     QImage img = m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
 
@@ -418,9 +414,5 @@ void Page::toBinaryThread(bool adaptive, int blur, int kernel)
 //
 void Page::toDithered()
 {
-    // If last operation converted to mono, undo it
-    if ((m_img.format() == QImage::Format_Mono) && (peek().format() != QImage::Format_Mono))
-        undo();
-
     m_img = m_img.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::DiffuseDither);
 }

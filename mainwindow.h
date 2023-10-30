@@ -57,6 +57,8 @@ private:
     QAction *deskewSpin;
     OddSpinWidget *blurWidget;
     QAction *blurSpin;
+    OddSpinWidget *adaptiveBlurWidget;
+    QAction *adaptiveBlurSpin;
     OddSpinWidget *kernelWidget;
     QAction *kernelSpin;
 

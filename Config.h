@@ -18,6 +18,7 @@ namespace Config
     extern int devoidArea;
     extern int brushSize;
     extern int blurRadius;
+    extern int adaptiveBlurRadius;
     extern int kernelSize;
     extern QFont textFont;
     extern QPointF locate1;
