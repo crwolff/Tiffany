@@ -354,8 +354,11 @@ void Page::toGrayscale()
 //
 void Page::toBinary(bool adaptive)
 {
+    int blur = adaptive ? Config::adaptiveBlurRadius : Config::blurRadius;
+    int kernel = Config::kernelSize;
+
     // Run this in a thread to avoid lagging the UI
-    QFuture<void> future = QtConcurrent::run(this, &Page::toBinaryThread, adaptive, Config::blurRadius, Config::kernelSize);
+    QFuture<void> future = QtConcurrent::run(this, &Page::toBinaryThread, adaptive, blur, kernel);
     while (!future.isFinished())
     {
         QApplication::processEvents();
