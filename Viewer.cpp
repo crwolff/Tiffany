@@ -604,6 +604,7 @@ void Viewer::changePage(QListWidgetItem *curr)
     // Save current view
     if (currItem != nullptr)
     {
+        currPage = currItem->data(Qt::UserRole).value<Page>();
         currPage.scaleFactor = scaleFactor;
         currPage.horizontalScroll = scrollArea->horizontalScrollBar()->value();
         currPage.verticalScroll = scrollArea->verticalScrollBar()->value();
