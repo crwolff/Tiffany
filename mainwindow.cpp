@@ -273,6 +273,11 @@ void MainWindow::buildToolBar()
         toolSizeToolButton->setDefaultAction(ui->pix1Act);
     ui->toolBar->addWidget(toolSizeToolButton);
 
+    // Deskew button and widget
+    ui->toolBar->addAction(ui->deskewAct);
+    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
+    ui->toolBar->addWidget(deskewWidget);
+
     // Dropper button
     QMenu *dropperMenu = new QMenu();
     dropperMenu->addAction(ui->removeAct);
@@ -294,28 +299,6 @@ void MainWindow::buildToolBar()
     floodThresholdSpin = ui->toolBar->addWidget(floodThresholdWidget);
     floodThresholdSpin->setVisible(false);
 
-    // Despeckle button
-    QMenu *despeckleMenu = new QMenu();
-    despeckleMenu->addAction(ui->despeckleAct);
-    despeckleMenu->addAction(ui->devoidAct);
-    PopupQToolButton *despeckleToolButton = new PopupQToolButton();
-    despeckleToolButton->setMenu(despeckleMenu);
-    despeckleToolButton->setDefaultAction(ui->despeckleAct);
-    ui->toolBar->addWidget(despeckleToolButton);
-
-    // Despeckle button size widgets
-    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 5, "Blob Size", ui->toolBar);
-    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
-    despeckleSpin->setVisible(true);
-    devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Void Size", ui->toolBar);
-    devoidSpin = ui->toolBar->addWidget(devoidWidget);
-    devoidSpin->setVisible(false);
-
-    // Deskew button and widget
-    ui->toolBar->addAction(ui->deskewAct);
-    deskewWidget = new DoubleSpinWidget(-45.0, 45.0, Config::deskewAngle, 0.05, "Skew", ui->toolBar);
-    ui->toolBar->addWidget(deskewWidget);
-
     // Format conversion button and widgets
     QMenu *reFormatMenu = new QMenu();
     reFormatMenu->addAction(ui->binaryAct);
@@ -333,6 +316,23 @@ void MainWindow::buildToolBar()
     ui->adaptiveBinaryAct->setText(QApplication::translate("MainWindow", "Adaptive\nBinary", nullptr));
     ui->ditheredBinaryAct->setText(QApplication::translate("MainWindow", "Dithered\nBinary", nullptr));
     makeBlurVisible(1);
+
+    // Despeckle button
+    QMenu *despeckleMenu = new QMenu();
+    despeckleMenu->addAction(ui->despeckleAct);
+    despeckleMenu->addAction(ui->devoidAct);
+    PopupQToolButton *despeckleToolButton = new PopupQToolButton();
+    despeckleToolButton->setMenu(despeckleMenu);
+    despeckleToolButton->setDefaultAction(ui->despeckleAct);
+    ui->toolBar->addWidget(despeckleToolButton);
+
+    // Despeckle button size widgets
+    despeckleWidget = new SpinWidget(1, 100, Config::despeckleArea, 5, "Blob Size", ui->toolBar);
+    despeckleSpin = ui->toolBar->addWidget(despeckleWidget);
+    despeckleSpin->setVisible(true);
+    devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Void Size", ui->toolBar);
+    devoidSpin = ui->toolBar->addWidget(devoidWidget);
+    devoidSpin->setVisible(false);
 
     // Right justify remaining icons
     QWidget* spacer = new QWidget();
