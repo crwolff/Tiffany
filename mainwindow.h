@@ -38,6 +38,7 @@ private:
     void buildToolBar();
     void makeDropperVisible(int mask);
     void makeDespeckleVisible(int mask);
+    void makeBlurVisible(int mask);
     QLabel *statusLabel;
     QProgressBar *progressBar;
 

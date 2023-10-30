@@ -122,14 +122,17 @@ void MainWindow::connectSignalSlots()
     // Format conversion menu
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->viewer, &Viewer::toGrayscale );
     QObject::connect( ui->grayscaleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toGrayscale );
+    QObject::connect( ui->grayscaleAct, &QAction::triggered, [this]() { this->makeBlurVisible(0); });
 
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->viewer, &Viewer::toBinary );
     QObject::connect( ui->binaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toBinary );
+    QObject::connect( ui->binaryAct, &QAction::triggered, [this]() { this->makeBlurVisible(1); });
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::blurRadius = val; this->ui->viewer->toBinary(); });
 
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toAdaptive );
     QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toAdaptive );
+    QObject::connect( ui->adaptiveBinaryAct, &QAction::triggered, [this]() { this->makeBlurVisible(3); });
     QObject::connect( blurWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::blurRadius = val; this->ui->viewer->toAdaptive(); });
     QObject::connect( kernelWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
@@ -137,6 +140,7 @@ void MainWindow::connectSignalSlots()
 
     QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->viewer, &Viewer::toDithered );
     QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, ui->bookmarks, &Bookmarks::toDithered );
+    QObject::connect( ui->ditheredBinaryAct, &QAction::triggered, [this]() { this->makeBlurVisible(0); });
 
     // Deskew menu
     QObject::connect( ui->deskewAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Deskew); });
@@ -328,6 +332,7 @@ void MainWindow::buildToolBar()
     kernelSpin = ui->toolBar->addWidget(kernelWidget);
     ui->adaptiveBinaryAct->setText(QApplication::translate("MainWindow", "Adaptive\nBinary", nullptr));
     ui->ditheredBinaryAct->setText(QApplication::translate("MainWindow", "Dithered\nBinary", nullptr));
+    makeBlurVisible(1);
 
     // Right justify remaining icons
     QWidget* spacer = new QWidget();
@@ -361,6 +366,15 @@ void MainWindow::makeDespeckleVisible(int mask)
 {
     despeckleSpin->setVisible((mask & 1) != 0);
     devoidSpin->setVisible((mask & 2) != 0);
+}
+
+//
+// Enable blur/kernel based on active tool
+//
+void MainWindow::makeBlurVisible(int mask)
+{
+    blurSpin->setEnabled((mask & 1) != 0);
+    kernelSpin->setEnabled((mask & 2) != 0);
 }
 
 //
