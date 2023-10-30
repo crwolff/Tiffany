@@ -20,6 +20,7 @@ public:
     void push();
     bool undo();
     bool redo();
+    QImage peek();
     QImage colorSelect(QRgb target, int threshold);
     QImage despeckle(int blobSize, bool invert);
     QImage floodFill(QPoint loc, int threshold);

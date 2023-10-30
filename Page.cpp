@@ -90,6 +90,16 @@ bool Page::redo()
 }
 
 //
+// Peek at last image
+//
+QImage Page::peek()
+{
+    if (m_undo.count() > 0)
+        return m_undo.first();
+    return QImage();
+}
+
+//
 // Select all pixels near the cursor's color
 //
 QImage Page::colorSelect(QRgb target, int threshold)
@@ -342,6 +352,10 @@ void Page::toGrayscale()
 //
 void Page::toBinary(bool adaptive)
 {
+    // If last operation converted to mono, undo it
+    if ((m_img.format() == QImage::Format_Mono) && (peek().format() != QImage::Format_Mono))
+        undo();
+
     // Convert to grayscale
     QImage img = m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
 
@@ -387,5 +401,9 @@ void Page::toBinary(bool adaptive)
 //
 void Page::toDithered()
 {
+    // If last operation converted to mono, undo it
+    if ((m_img.format() == QImage::Format_Mono) && (peek().format() != QImage::Format_Mono))
+        undo();
+
     m_img = m_img.convertToFormat(QImage::Format_Mono, Qt::MonoOnly|Qt::DiffuseDither);
 }
