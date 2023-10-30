@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 //
 MainWindow::~MainWindow()
 {
-//    Config::SaveConfig();
+    Config::SaveConfig();
     delete ui;
 }
 
