@@ -90,9 +90,14 @@ void Bookmarks::readFiles(QString cmd)
             QMessageBox::information(this, "Tiffany", QString("Cannot load %1.").arg(filenames.at(idx)));
         else
         {
-            // Cannot paint on indexed8, so convert to RGB
+            // Cannot paint on indexed8, so convert to better format
             if (page.m_img.format() == QImage::Format_Indexed8)
-                page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
+            {
+                if (page.m_img.allGray())
+                    page.m_img = page.m_img.convertToFormat(QImage::Format_Grayscale8);
+                else
+                    page.m_img = page.m_img.convertToFormat(QImage::Format_RGB32);
+            }
 
             // If image has 2 colors, but they aren't black and white, promote to RGB
             if ((page.m_img.format() == QImage::Format_Mono) && (page.m_img.colorCount() == 2))
