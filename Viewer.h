@@ -17,7 +17,7 @@ public:
     ~Viewer();
 
     QTimer *blinkTimer = new QTimer();
-    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid, Deskew };
+    enum LeftMode { Select, Pencil, Eraser, ColorSelect, FloodFill, RemoveBG, Despeckle, Devoid, Deskew, LocateRef, PlaceRef };
     enum RightMode { Idle, Zoom, Pan };
     enum MatchCode { None, Exact, Shifted, Ctrled };
 
@@ -119,6 +119,8 @@ private:
     QImage deskewImg;
     int gridOffsetX = 0;
     int gridOffsetY = 0;
+
+    bool locateShift;
 };
 
 #endif

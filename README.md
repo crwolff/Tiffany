@@ -83,6 +83,10 @@ Keyboard:
     * Pressing Delete while pasting removes current image from copied item list
 * Shift-Paste - Transparent paste
     * Hold shift while clicking to paste white regions (\>#F0F0F0) as transparent
+* '^R'/'^E' - Page alignment
+    * '^R' and Shift-'^R' - Saves the next left click as the reference
+    * '^E' and Shift-'^E' - Shifts the image so the left click location aligns with the reference
+    * Holding shift during command accesses a second reference
 
 ## To compile:
 ```

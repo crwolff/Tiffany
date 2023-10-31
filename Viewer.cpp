@@ -252,6 +252,51 @@ void Viewer::mouseReleaseEvent(QMouseEvent *event)
             doDevoid();
             flag = true;
         }
+        else if (leftMode == LocateRef)
+        {
+            // Legalize point to inside image
+            QPoint loc = scrnToPageOffs.map(leftOrigin);
+            loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
+            loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
+
+            // Save location
+            if (locateShift)
+                Config::locate2 = loc;
+            else
+                Config::locate1 = loc;
+
+            // Reset tool to exit mode
+            setTool(Select);
+            flag = true;
+        }
+        else if (leftMode == PlaceRef)
+        {
+            // Legalize point to inside image
+            QPoint loc = scrnToPageOffs.map(leftOrigin);
+            loc.setX(std::min( std::max(loc.x(), 0), currPage.m_img.width()-1) );
+            loc.setY(std::min( std::max(loc.y(), 0), currPage.m_img.height()-1) );
+
+            // Compute delta
+            QPointF delta;
+            if (locateShift)
+                delta = Config::locate2 - loc;
+            else
+                delta = Config::locate1 - loc;
+
+            // Paint shift image over original
+            currPage.push();
+            QImage img = currPage.m_img;
+            QPainter p(&currPage.m_img);
+            p.fillRect(currPage.m_img.rect(), Config::bgColor);
+            p.drawImage(delta, img);
+            p.end();
+
+            // Update icon
+            currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+            emit updateIconSig();
+            update();
+            flag = true;
+        }
     }
 
     // If right mouse button was released
@@ -457,6 +502,18 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             pencil180 = !pencil180;
             setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
         }
+    }
+    else if (key == Qt::Key_R)
+    {
+        locateShift = shft;
+        setTool(LocateRef);
+        flag = true;
+    }
+    else if (key == Qt::Key_E)
+    {
+        locateShift = shft;
+        setTool(PlaceRef);
+        flag = true;
     }
     else if (pasting)
     {
@@ -705,6 +762,8 @@ void Viewer::setTool(LeftMode tool)
         emit setDeskewSig(Config::deskewAngle + 0.05);
         emit setDeskewSig(Config::deskewAngle);
     }
+    else if ((tool == PlaceRef) || (tool == LocateRef))
+        setCursor(Qt::CrossCursor);
     else
         setCursor(Qt::ArrowCursor);
     update();
