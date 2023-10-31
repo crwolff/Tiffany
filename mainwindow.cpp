@@ -108,13 +108,13 @@ void MainWindow::connectSignalSlots()
 
     // Despeckle menu
     QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Despeckle); });
-    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeDropperVisible(1); });
+    QObject::connect( ui->despeckleAct, &QAction::triggered, [this]() { this->makeDespeckleVisible(1); });
     QObject::connect( ui->despeckleAct, &QAction::triggered, ui->bookmarks, &Bookmarks::despeckle );
     QObject::connect( despeckleWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::despeckleArea = val; this->ui->viewer->doDespeckle(); });
 
     QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->ui->viewer->setTool(Viewer::Devoid); });
-    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeDropperVisible(2); });
+    QObject::connect( ui->devoidAct, &QAction::triggered, [this]() { this->makeDespeckleVisible(2); });
     QObject::connect( ui->devoidAct, &QAction::triggered, ui->bookmarks, &Bookmarks::devoid );
     QObject::connect( devoidWidget->spinBox, QOverload<int>::of(&QSpinBox::valueChanged),
             [this](int val){ Config::devoidArea = val; this->ui->viewer->doDevoid(); });
