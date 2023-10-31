@@ -2,11 +2,13 @@
 #define VIEWER_H
 
 #include "Page.h"
+#include <QClipboard>
 #include <QImage>
 #include <QListWidget>
 #include <QScrollArea>
 #include <QTimer>
 #include <QWidget>
+#include <tesseract/baseapi.h>
 
 class Viewer : public QWidget
 {
@@ -72,6 +74,7 @@ private:
     void setupPaste();
     void doPaste(bool transparent);
     QPoint pasteLocator(QPoint mouse, bool optimize);
+    void doRegionOCR(QRect rect);
 
     void zoomArea(QRect rect);
     void zoomWheel(QPoint pos, float factor);
@@ -121,6 +124,9 @@ private:
     int gridOffsetY = 0;
 
     bool locateShift;
+
+    tesseract::TessBaseAPI *tessApi = nullptr;
+    QClipboard *clipboard = nullptr;
 };
 
 #endif

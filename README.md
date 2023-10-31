@@ -87,6 +87,7 @@ Keyboard:
     * '^R' and Shift-'^R' - Saves the next left click as the reference
     * '^E' and Shift-'^E' - Shifts the image so the left click location aligns with the reference
     * Holding shift during command accesses a second reference
+* '^T' - OCR selection region into the clipboard
 
 ## To compile:
 ```

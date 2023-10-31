@@ -1,6 +1,7 @@
 #include "Config.h"
 #include "Viewer.h"
 #include "Utils/QImage2OCV.h"
+#include <QApplication>
 #include <QDebug>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -29,6 +30,11 @@ Viewer::Viewer(QWidget * parent) : QWidget(parent)
 
 Viewer::~Viewer()
 {
+    if (tessApi != nullptr)
+    {
+        tessApi->End();
+        delete tessApi;
+    }
 }
 
 // Capture/Release keyboard
@@ -497,19 +503,32 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (key == Qt::Key_T)
     {
-        if ((leftMode == Pencil) || (leftMode == Eraser))
+        if (ctrl)
+        {
+            if (leftBand->isHidden())
+            {
+                QMessageBox::information(this, "OCR", "Area must be selected");
+            }
+            else
+            {
+                leftBand->hide();
+                doRegionOCR(QRect(LMRBstart, LMRBend).normalized());
+            }
+        }
+        else if ((leftMode == Pencil) || (leftMode == Eraser))
         {
             pencil180 = !pencil180;
             setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
         }
+        flag = true;
     }
-    else if (key == Qt::Key_R)
+    else if (ctrl && (key == Qt::Key_R))
     {
         locateShift = shft;
         setTool(LocateRef);
         flag = true;
     }
-    else if (key == Qt::Key_E)
+    else if (ctrl && (key == Qt::Key_E))
     {
         locateShift = shft;
         setTool(PlaceRef);
@@ -1158,6 +1177,56 @@ void Viewer::toDithered()
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
     emit updateIconSig();
     update();
+}
+
+//
+// OCR selection rectangle
+//
+void Viewer::doRegionOCR(QRect rect)
+{
+    if (currPage.m_img.isNull())
+        return;
+
+    // Initialize the Tesseract API
+    if (tessApi == nullptr)
+    {
+        tessApi = new tesseract::TessBaseAPI();
+        if ((tessApi == nullptr) || (tessApi->Init(NULL, "eng")))
+        {
+            QMessageBox::information(this, "OCR", "Could not initialized OCR engine");
+            return;
+        }
+    }
+
+    // Initialize the clipboard
+    if (clipboard == nullptr)
+        clipboard = QGuiApplication::clipboard();
+
+    // Set cursor
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+
+    // Copy region of interest
+    QImage img = currPage.m_img.copy(rect);
+
+    // Convert to grayscale
+    if (img.format() != QImage::Format_Grayscale8)
+        img = img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+
+    // Convert to OpenCV
+    cv::Mat mat, bw;
+    mat = QImage2OCV(img);
+    cv::threshold(mat, bw, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+
+    // OCR the selection
+    //tessApi->SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    tessApi->SetImage(bw.data, bw.cols, bw.rows, 1, bw.step);
+    int res = 0.5 + img.dotsPerMeterX() / 39.3701;
+    if ((res == 200) || (res == 300) || (res == 400) || (res == 600))
+        tessApi->SetSourceResolution(res);
+    clipboard->setText(tessApi->GetUTF8Text());
+
+    // Restore cursor
+    QGuiApplication::restoreOverrideCursor();
 }
 
 //
