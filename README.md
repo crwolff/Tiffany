@@ -38,6 +38,7 @@ on all pages selected in the bookmarks tab. These are indicated with (button<sup
 * Pencil/Eraser - Draw (foreground) or Erase (background) in various pen widths
     * Hold shift to draw straight lines
     * Left click without moving to draw dot
+    * 'T' toggles the pencil orientation
 * Dropper button - Adjacent spinbox controls thresholds for different functions
     * Dropper - Select all pixels within threshold of selected color
     * Flood Fill - Select all adjacent pixels within threshold of selected color

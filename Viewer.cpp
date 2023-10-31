@@ -450,6 +450,14 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         flag = true;
     }
+    else if (key == Qt::Key_T)
+    {
+        if ((leftMode == Pencil) || (leftMode == Eraser))
+        {
+            pencil180 = !pencil180;
+            setCursor(pencil180 ? Pencil180Cursor : PencilCursor);
+        }
+    }
     else if (pasting)
     {
         if (keyMatches(event, QKeySequence::Delete) == Exact)
