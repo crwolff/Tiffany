@@ -32,7 +32,6 @@ namespace Config
         bgRemoveThreshold = settings.value("bgRemoveThreshold", 40).toInt();
         dropperThreshold = settings.value("dropperThreshold", 40).toInt();
         floodThreshold = settings.value("floodThreshold", 50).toInt();
-        deskewAngle = settings.value("deskewAngle", 0.0).toDouble();
         despeckleArea = settings.value("despeckleArea", 20).toInt();
         devoidArea = settings.value("devoidArea", 20).toInt();
         brushSize = settings.value("brushSize", 1).toInt();
@@ -59,6 +58,7 @@ namespace Config
         locate2 = settings.value("locate2", QPointF(0,0)).toPointF();
 
         // Not loaded or saved
+        deskewAngle = 0.0;
         fgColor = Qt::black;
         bgColor = Qt::white;
         multiPage = false;
@@ -71,7 +71,6 @@ namespace Config
         settings.setValue("bgRemoveThreshold", bgRemoveThreshold);
         settings.setValue("dropperThreshold", dropperThreshold);
         settings.setValue("floodThreshold", floodThreshold);
-        settings.setValue("deskewAngle", deskewAngle);
         settings.setValue("despeckleArea", despeckleArea);
         settings.setValue("devoidArea", devoidArea);
         settings.setValue("brushSize", brushSize);
