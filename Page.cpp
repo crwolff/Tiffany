@@ -168,7 +168,7 @@ QImage Page::colorSelect(QRgb target, int threshold)
 //
 // Run this in a separate thread to keep from blocking the UI
 //
-QImage Page::despeckle(int blobSize, bool invert)
+QImage Page::despeckle(int blobSize, bool invert, int *blobs)
 {
     // Invert for devoid
     QImage img = m_img;
@@ -197,6 +197,7 @@ QImage Page::despeckle(int blobSize, bool invert)
     mask.fill(1);
 
     // Build mask of blobs smaller than limit
+    int cnt = 0;
     for(int idx=1; idx<nLabels; idx++)
     {
         // Check if this blob is small enough
@@ -217,8 +218,11 @@ QImage Page::despeckle(int blobSize, bool invert)
                         maskPtr[col] = 0;
                 }
             }
+            cnt++;
         }
     }
+    if (blobs != nullptr)
+        *blobs = cnt;
     return mask;
 }
 

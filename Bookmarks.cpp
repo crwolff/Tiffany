@@ -483,6 +483,8 @@ void Bookmarks::removeBG()
 //
 void Bookmarks::despeckle()
 {
+    int blobs;
+
     // Get list of all selected items
     QList<QListWidgetItem*> selection = selectedItems();
     if (selection.count() == 0)
@@ -501,12 +503,14 @@ void Bookmarks::despeckle()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
-        QImage mask = page.despeckle(Config::despeckleArea, false);
-        page.push();
-        page.applyMask(mask, Config::bgColor);
-
-        item->setData(Qt::UserRole, QVariant::fromValue(page));
-        item->setIcon(makeIcon(page.m_img, page.modified()));
+        QImage mask = page.despeckle(Config::despeckleArea, false, &blobs);
+        if (blobs > 0)
+        {
+            page.push();
+            page.applyMask(mask, Config::bgColor);
+            item->setData(Qt::UserRole, QVariant::fromValue(page));
+            item->setIcon(makeIcon(page.m_img, page.modified()));
+        }
 
         // Update progress
         emit progressSig("", progress);
@@ -524,6 +528,8 @@ void Bookmarks::despeckle()
 //
 void Bookmarks::devoid()
 {
+    int blobs;
+
     // Get list of all selected items
     QList<QListWidgetItem*> selection = selectedItems();
     if (selection.count() == 0)
@@ -542,12 +548,14 @@ void Bookmarks::devoid()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
-        QImage mask = page.despeckle(Config::despeckleArea, true);
-        page.push();
-        page.applyMask(mask, Config::bgColor);
-
-        item->setData(Qt::UserRole, QVariant::fromValue(page));
-        item->setIcon(makeIcon(page.m_img, page.modified()));
+        QImage mask = page.despeckle(Config::despeckleArea, true, &blobs);
+        if (blobs > 0)
+        {
+            page.push();
+            page.applyMask(mask, Config::fgColor);
+            item->setData(Qt::UserRole, QVariant::fromValue(page));
+            item->setIcon(makeIcon(page.m_img, page.modified()));
+        }
 
         // Update progress
         emit progressSig("", progress);
