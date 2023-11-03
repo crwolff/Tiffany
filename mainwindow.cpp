@@ -153,15 +153,16 @@ void MainWindow::connectSignalSlots()
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
 
     // Interconnects
-    QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
     QObject::connect( ui->bookmarks, &QListWidget::itemSelectionChanged, ui->bookmarks, &Bookmarks::itemSelectionChanged );
     QObject::connect( ui->bookmarks, &Bookmarks::changePageSig, ui->viewer, &Viewer::changePage );
     QObject::connect( ui->bookmarks, &Bookmarks::updatePageSig, ui->viewer, &Viewer::updatePage );
-    QObject::connect( ui->viewer, &Viewer::updateIconSig, ui->bookmarks, &Bookmarks::updateIcon );
-
     QObject::connect( ui->bookmarks, &Bookmarks::progressSig, this, &MainWindow::updateProgress );
+
+    QObject::connect( ui->viewer->blinkTimer, &QTimer::timeout, ui->viewer, &Viewer::blinker );
+    QObject::connect( ui->viewer, &Viewer::updateIconSig, ui->bookmarks, &Bookmarks::updateIcon );
     QObject::connect( ui->viewer, &Viewer::zoomSig, zoomToolButton, &QToolButton::click );
     QObject::connect( ui->viewer, &Viewer::setDeskewSig, deskewWidget->spinBox, &QDoubleSpinBox::setValue);
+    QObject::connect( ui->viewer, &Viewer::statusSig, this, &MainWindow::setStatus );
 }
 
 //

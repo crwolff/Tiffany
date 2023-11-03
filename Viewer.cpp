@@ -796,6 +796,7 @@ void Viewer::resetTools()
     pasting = false;
     deskewImg = QImage();
     pageMask = QImage();
+    emit statusSig("");
 }
 
 //
@@ -1061,12 +1062,15 @@ void Viewer::doRemoveBG()
 //
 void Viewer::doDespeckle()
 {
+    int blobs;
+
     if (leftMode != Despeckle)
         return;
 
     blinkTimer->stop();
     resetTools();
-    pageMask = currPage.despeckle(Config::despeckleArea, false);
+    pageMask = currPage.despeckle(Config::despeckleArea, false, &blobs);
+    emit statusSig(QStringLiteral("%1 blobs").arg(blobs));
     blinkTimer->start(300);
     update();
 }
@@ -1076,12 +1080,15 @@ void Viewer::doDespeckle()
 //
 void Viewer::doDevoid()
 {
+    int blobs;
+
     if (leftMode != Devoid)
         return;
 
     blinkTimer->stop();
     resetTools();
-    pageMask = currPage.despeckle(Config::devoidArea, true);
+    pageMask = currPage.despeckle(Config::devoidArea, true, &blobs);
+    emit statusSig(QStringLiteral("%1 blobs").arg(blobs));
     blinkTimer->start(300);
     update();
 }

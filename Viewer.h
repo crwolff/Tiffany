@@ -52,6 +52,7 @@ signals:
     void setDeskewSig(float val);
     void updateIconSig();
     void zoomSig();
+    void statusSig(QString descr);
 
 protected:
     void enterEvent(QEvent *event) override;
