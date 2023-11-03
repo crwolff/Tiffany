@@ -676,6 +676,20 @@ void Viewer::paintEvent(QPaintEvent *)
             p.setPen(QPen(currColor, Config::brushSize, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
             p.drawLine(start, finish);
         }
+        else if (leftMode == LocateRef)
+        {
+            // Draw alignment grid
+            p.setTransform(QTransform());           // Reset to view coordinates
+            for(int idx=1; idx<16; idx++)
+            {
+                if ((idx % 4) == 0)
+                    p.setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                else
+                    p.setPen(QPen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                p.drawLine(width()*idx/16.0, 0, width()*idx/16.0, height());
+                p.drawLine(0, height()*idx/16.0, width(), height()*idx/16.0);
+            }
+        }
     }
     p.end();
 }
