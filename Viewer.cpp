@@ -811,6 +811,7 @@ void Viewer::resetTools()
     deskewImg = QImage();
     pageMask = QImage();
     emit statusSig("");
+    update();
 }
 
 //
@@ -896,6 +897,32 @@ void Viewer::doCopy(QRect box)
     copyImageList.prepend(copyImage);
     if (copyImageList.size() > 12)
         copyImageList.removeLast();
+
+    // Display average RGB of copied region
+    if (1)
+    {
+        qreal redAvg = 0.0;
+        qreal grnAvg = 0.0;
+        qreal bluAvg = 0.0;
+
+        // Average pixels in copied image
+        for(int i=0; i<copyImage.height(); i++)
+        {
+            QRgb *srcPtr = (QRgb *)copyImage.scanLine(i);
+            for(int j=0; j<copyImage.width(); j++)
+            {
+                QRgb val = *srcPtr++;
+                redAvg += qRed(val) * qRed(val);
+                grnAvg += qGreen(val) * qGreen(val);
+                bluAvg += qBlue(val) * qBlue(val);
+            }
+        }
+        int count = copyImage.height() * copyImage.width();
+        redAvg = sqrt(redAvg/count);
+        grnAvg = sqrt(grnAvg/count);
+        bluAvg = sqrt(bluAvg/count);
+        emit statusSig(QStringLiteral("RGB(%1, %2, %3)").arg(int(redAvg + 0.5)).arg(int(grnAvg + 0.5)).arg(int(bluAvg + 0.5)));
+    }
 }
 
 //
