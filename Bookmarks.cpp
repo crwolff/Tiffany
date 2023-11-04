@@ -548,7 +548,7 @@ void Bookmarks::devoid()
     foreach(QListWidgetItem* item, selection)
     {
         Page page = item->data(Qt::UserRole).value<Page>();
-        QImage mask = page.despeckle(Config::despeckleArea, true, &blobs);
+        QImage mask = page.despeckle(Config::devoidArea, true, &blobs);
         if (blobs > 0)
         {
             page.push();
