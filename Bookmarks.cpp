@@ -678,7 +678,7 @@ void Bookmarks::toBinary()
             page.undo();
 
         page.push();
-        page.toBinary(false);
+        page.toBinary(false, Config::blurRadius);
         item->setData(Qt::UserRole, QVariant::fromValue(page));
         item->setIcon(makeIcon(page.m_img, page.modified()));
 
@@ -722,7 +722,7 @@ void Bookmarks::toAdaptive()
             page.undo();
 
         page.push();
-        page.toBinary(true);
+        page.toBinary(true, Config::adaptiveBlurRadius, Config::kernelSize);
         item->setData(Qt::UserRole, QVariant::fromValue(page));
         item->setIcon(makeIcon(page.m_img, page.modified()));
 

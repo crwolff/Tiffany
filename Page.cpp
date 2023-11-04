@@ -1,6 +1,5 @@
 // Page.cpp
 
-#include "Config.h"
 #include "Page.h"
 #include "Utils/QImage2OCV.h"
 #include <QApplication>
@@ -108,7 +107,7 @@ QImage Page::colorSelect(QRgb target, int threshold)
 {
     // Initialize mask
     QImage mask(m_img.size(), QImage::Format_Indexed8);
-    mask.setColor( 0, Config::fgColor.rgba() );
+    mask.setColor( 0, qRgba(0,0,0,0));  // Place holder - replaced in blinker/applyMask
     mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
 
     // Find targets within threshold of target
@@ -192,7 +191,7 @@ QImage Page::despeckle(int blobSize, bool invert, int *blobs)
 
     // Initialize mask
     QImage mask(img.size(), QImage::Format_Indexed8);
-    mask.setColor( 0, Config::fgColor.rgba() );
+    mask.setColor( 0, qRgba(0,0,0,0));  // Place holder - replaced in blinker/applyMask
     mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
     mask.fill(1);
 
@@ -259,7 +258,7 @@ QImage Page::floodFill(QPoint loc, int threshold)
 
     // Initialize mask
     QImage mask(img.size(), QImage::Format_Indexed8);
-    mask.setColor( 0, Config::fgColor.rgba() );
+    mask.setColor( 0, qRgba(0,0,0,0));  // Place holder - replaced in blinker/applyMask
     mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
 
     // Scan through page seeking matches
@@ -356,11 +355,8 @@ void Page::toGrayscale()
 //
 // Convert to binary
 //
-void Page::toBinary(bool adaptive)
+void Page::toBinary(bool adaptive, int blur, int kernel)
 {
-    int blur = adaptive ? Config::adaptiveBlurRadius : Config::blurRadius;
-    int kernel = Config::kernelSize;
-
     // Run this in a thread to avoid lagging the UI
     QFuture<void> future = QtConcurrent::run(this, &Page::toBinaryThread, adaptive, blur, kernel);
     while (!future.isFinished())

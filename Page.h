@@ -29,7 +29,7 @@ public:
     float calcDeskew();
     void applyDeskew(QImage img);
     void toGrayscale();
-    void toBinary(bool adaptive);
+    void toBinary(bool adaptive, int blur, int kernel=1);
     void toDithered();
 
     // Flag if image was changed

@@ -1179,7 +1179,7 @@ void Viewer::toBinary()
         currPage.undo();
 
     currPage.push();
-    currPage.toBinary(false);
+    currPage.toBinary(false, Config::blurRadius);
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
     emit updateIconSig();
     update();
@@ -1200,7 +1200,7 @@ void Viewer::toAdaptive()
         currPage.undo();
 
     currPage.push();
-    currPage.toBinary(true);
+    currPage.toBinary(true, Config::adaptiveBlurRadius, Config::kernelSize);
     currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
     emit updateIconSig();
     update();
