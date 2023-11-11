@@ -54,8 +54,10 @@ namespace Config
             kernelSize++;
         QString font = settings.value("font", "Courier New,20,-1,5,50,0,0,0,0,0").toString();
         textFont.fromString(font);
-        locate1 = settings.value("locate1", QPointF(0,0)).toPointF();
-        locate2 = settings.value("locate2", QPointF(0,0)).toPointF();
+        QString val1 = settings.value("locate1", "0,0").toString();
+        locate1 = QPointF(val1.split(",")[0].toFloat(),val1.split(",")[1].toFloat());
+        QString val2 = settings.value("locate2", "0,0").toString();
+        locate2 = QPointF(val2.split(",")[0].toFloat(),val2.split(",")[1].toFloat());
 
         // Not loaded or saved
         deskewAngle = 0.0;
@@ -78,7 +80,7 @@ namespace Config
         settings.setValue("adaptiveBlurRadius", adaptiveBlurRadius);
         settings.setValue("kernelSize", kernelSize);
         settings.setValue("font", textFont.toString());
-        settings.setValue("locate1", locate1);
-        settings.setValue("locate2", locate2);
+        settings.setValue("locate1", QStringLiteral("%1,%2").arg(locate1.x()).arg(locate1.y()));
+        settings.setValue("locate2", QStringLiteral("%1,%2").arg(locate2.x()).arg(locate2.y()));
     }
 }
