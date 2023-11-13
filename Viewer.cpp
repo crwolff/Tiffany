@@ -899,7 +899,7 @@ void Viewer::doCopy(QRect box)
         copyImageList.removeLast();
 
     // Display average RGB of copied region
-    if (1)
+    if (copyImage.format() == QImage::Format_RGB32)
     {
         qreal redAvg = 0.0;
         qreal grnAvg = 0.0;
