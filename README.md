@@ -88,6 +88,10 @@ Keyboard:
     * '^E' and Shift-'^E' - Shifts the image so the left click location aligns with the reference
     * Holding shift during command accesses a second reference
 * '^T' - OCR selection region into the clipboard
+* '^W' - Recolor region (used to change text in specific areas with a different color)
+    * Converts image to RGB
+    * Replaces black pixels with foreground color
+    * Replaces white pixels with background color
 
 ## To compile:
 ```

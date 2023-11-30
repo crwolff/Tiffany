@@ -75,6 +75,7 @@ private:
     void setupPaste();
     void doPaste(bool transparent);
     QPoint pasteLocator(QPoint mouse, bool optimize);
+    void doRecolor(QRect box);
     void doRegionOCR(QRect rect);
 
     void zoomArea(QRect rect);

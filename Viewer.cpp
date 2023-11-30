@@ -534,6 +534,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         setTool(PlaceRef);
         flag = true;
     }
+    else if (ctrl && (key == Qt::Key_W))
+    {
+        leftBand->hide();
+        doRecolor(QRect(LMRBstart, LMRBend).normalized());
+    }
     else if (pasting)
     {
         if (keyMatches(event, QKeySequence::Delete) == Exact)
@@ -1039,6 +1044,33 @@ QPoint Viewer::pasteLocator(QPoint mouse, bool optimize)
         return QPoint( loc.x() + matchLoc.x - win, loc.y() + matchLoc.y - win );
     }
     return QPoint( loc.x(), loc.y() );
+}
+
+//
+// Recolor the region
+//
+void Viewer::doRecolor(QRect box)
+{
+    currPage.push();
+    if (currPage.m_img.format() != QImage::Format_RGB32)
+        currPage.m_img = currPage.m_img.convertToFormat(QImage::Format_RGB32);
+
+    // Scan through rectangle, replacing black with foreground/white with background
+    for(int y=box.top(); y<box.bottom(); y++)
+    {
+        QRgb *srcPtr = (QRgb *)currPage.m_img.scanLine(y) + box.left();
+        for(int x=box.left(); x<box.right(); x++)
+        {
+            QRgb val = *srcPtr;
+            if ((qRed(val) >= 128) && (qGreen(val) >= 128) && (qBlue(val) >= 128))
+                *srcPtr++ = Config::bgColor.rgba();
+            else
+                *srcPtr++ = Config::fgColor.rgba();
+        }
+    }
+    currItem->setData(Qt::UserRole, QVariant::fromValue(currPage));
+    emit updateIconSig();
+    update();
 }
 
 //
