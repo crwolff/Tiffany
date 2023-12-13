@@ -1055,11 +1055,17 @@ void Viewer::doRecolor(QRect box)
     if (currPage.m_img.format() != QImage::Format_RGB32)
         currPage.m_img = currPage.m_img.convertToFormat(QImage::Format_RGB32);
 
+    // clip region to image dimensions
+    int top = std::max(box.top(), 0);
+    int bottom = std::min(box.bottom(), currPage.m_img.height());
+    int left = std::max(box.left(), 0);
+    int right = std::min(box.right(), currPage.m_img.width());
+
     // Scan through rectangle, replacing black with foreground/white with background
-    for(int y=box.top(); y<box.bottom(); y++)
+    for(int y=top; y<bottom; y++)
     {
-        QRgb *srcPtr = (QRgb *)currPage.m_img.scanLine(y) + box.left();
-        for(int x=box.left(); x<box.right(); x++)
+        QRgb *srcPtr = (QRgb *)currPage.m_img.scanLine(y) + left;
+        for(int x=left; x<right; x++)
         {
             QRgb val = *srcPtr;
             if ((qRed(val) >= 128) && (qGreen(val) >= 128) && (qBlue(val) >= 128))
