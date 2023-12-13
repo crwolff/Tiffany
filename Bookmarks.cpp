@@ -814,6 +814,8 @@ void Bookmarks::rotateSelection(int rot)
 
         // Update list with new image
         page.m_img = img;
+        if (rot != 2)
+            page.scaleFactor = 0.0; // Assume the pages dimensions have changed
         item->setData(Qt::UserRole, QVariant::fromValue(page));
         item->setIcon(makeIcon(page.m_img, page.modified()));
 
