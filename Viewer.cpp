@@ -756,6 +756,7 @@ void Viewer::updatePage(bool updateZoom)
     currPage = currItem->data(Qt::UserRole).value<Page>();
     if (updateZoom)
         fitWindow();
+    resetTools();
     update();
 }
 
