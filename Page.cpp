@@ -293,6 +293,19 @@ void Page::applyMask(QImage mask, QColor color)
 //
 QImage Page::deskew(float angle)
 {
+    // Run this in a thread to avoid lagging the UI
+    QFuture<QImage> future = QtConcurrent::run(this, &Page::deskewThread, angle);
+    while (!future.isFinished())
+    {
+        QApplication::processEvents();
+        QThread::msleep(1); //yield
+    }
+    future.waitForFinished();
+    return future.result();
+}
+
+QImage Page::deskewThread(float angle)
+{
     QTransform tmat = QTransform().rotate(angle);
     return m_img.transformed(tmat, Qt::SmoothTransformation);
 }

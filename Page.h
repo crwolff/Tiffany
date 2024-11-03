@@ -44,6 +44,7 @@ public:
     QImage m_img;
 
 private:
+    QImage deskewThread(float angle);
     void toBinaryThread(bool adaptive, int blur, int kernel);
 
     // Undo buffers
