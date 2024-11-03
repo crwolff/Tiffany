@@ -1181,7 +1181,12 @@ void Viewer::doDeskew()
     if (leftMode != Deskew)
         return;
 
+    // resetTools erases current deskewImg causes annoying flicker
+    QImage tmp = deskewImg;
     resetTools();
+    deskewImg = tmp;
+
+    // Compute new deskew image
     deskewImg = currPage.deskew(Config::deskewAngle);
     update();
 }
