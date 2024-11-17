@@ -157,7 +157,7 @@ void Bookmarks::readFiles(QString cmd)
     emit progressSig("", -1);
 
     // Select first item read in
-    setCurrentRow(firstIdx);
+    setCurrentRow(firstIdx, QItemSelectionModel::ClearAndSelect);
 }
 
 //
