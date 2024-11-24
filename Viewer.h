@@ -88,6 +88,7 @@ private:
     QPoint leftOrigin;
     QPoint rightOrigin;
     QCursor lastCursor;
+    QPoint cursorPos;
     QListWidgetItem *currItem = nullptr;
     Page currPage;
     float scaleFactor;

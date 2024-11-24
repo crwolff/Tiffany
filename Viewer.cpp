@@ -142,6 +142,12 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         update();
         flag = true;
     }
+    else if (leftMode == PlaceRef)
+    {
+        cursorPos = event->pos();
+        update();
+        flag = true;
+    }
 
     // If left mouse button is pressed
     if (event->buttons() & Qt::LeftButton)
@@ -532,6 +538,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         locateShift = shft;
         setTool(PlaceRef);
+        setMouseTracking(true);
         flag = true;
     }
     else if (ctrl && (key == Qt::Key_W))
@@ -688,12 +695,20 @@ void Viewer::paintEvent(QPaintEvent *)
             for(int idx=1; idx<16; idx++)
             {
                 if ((idx % 4) == 0)
-                    p.setPen(QPen(Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                    p.setPen(QPen(locateShift ? Qt::blue : Qt::red, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
                 else
-                    p.setPen(QPen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+                    p.setPen(QPen(locateShift ? Qt::blue : Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
                 p.drawLine(width()*idx/16.0, 0, width()*idx/16.0, height());
                 p.drawLine(0, height()*idx/16.0, width(), height()*idx/16.0);
             }
+        }
+        else if (leftMode == PlaceRef)
+        {
+            // Draw oversized cursor
+            p.setTransform(QTransform());           // Reset to view coordinates
+            p.setPen(QPen(locateShift ? Qt::blue : Qt::red, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+            p.drawLine(0, cursorPos.y(), width(), cursorPos.y());
+            p.drawLine(cursorPos.x(), 0, cursorPos.x(), height());
         }
     }
     p.end();
