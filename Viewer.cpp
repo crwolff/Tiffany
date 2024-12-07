@@ -753,6 +753,9 @@ void Viewer::changePage(QListWidgetItem *curr)
     {
         currItem = nullptr;
         currPage = Page();
+        setScaleFactor(1.0);
+        updateGeometry();
+        updateScrollBars();
     }
 
     // Cleanup
