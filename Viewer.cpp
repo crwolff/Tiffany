@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QScrollBar>
@@ -922,6 +923,7 @@ void Viewer::doCopy(QRect box)
     copyImageList.prepend(copyImage);
     if (copyImageList.size() > 12)
         copyImageList.removeLast();
+    clipboard->setImage(copyImage);
 
     // Display average RGB of copied region
     if (copyImage.format() == QImage::Format_RGB32)
@@ -955,6 +957,26 @@ void Viewer::doCopy(QRect box)
 //
 void Viewer::setupPaste()
 {
+    const QMimeData *mimeData = clipboard->mimeData();
+
+    // Is there an image in the clipboard
+    if (mimeData->hasImage())
+    {
+        if (!clipboard->ownsClipboard())    // we didn't put it there
+        {
+            QImage tmp = clipboard->image();
+            if (copyImageList.indexOf(tmp) == -1)
+            {
+                // Get image from clipboard and add to list
+                copyImage = tmp;
+                copyImageList.prepend(copyImage);
+                if (copyImageList.size() > 12)
+                    copyImageList.removeLast();
+            }
+        }
+    }
+
+    // Fail if nothing to copy
     if (copyImage.isNull())
         return;
 
