@@ -396,6 +396,8 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     if (key == Qt::Key_Escape)
     {
         resetTools();
+        if (leftMode == Deskew)
+            setTool(Select);
         flag = true;
     }
     else if (key == Qt::Key_F)
