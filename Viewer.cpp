@@ -559,6 +559,7 @@ void Viewer::keyPressEvent(QKeyEvent *event)
             }
             else
             {
+                copyImage = QImage();
                 resetTools();
             }
         }
