@@ -24,6 +24,7 @@ public slots:
     bool anyModified();
     void selectEven();
     void selectOdd();
+    void selectModified();
     void deleteSelection();
     void blankPage();
     void removeBG();

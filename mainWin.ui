@@ -94,6 +94,7 @@
      <string>&amp;Edit</string>
     </property>
     <addaction name="selectAllAct"/>
+    <addaction name="selectModAct"/>
     <addaction name="selectOddAct"/>
     <addaction name="selectEvenAct"/>
     <addaction name="separator"/>
@@ -228,6 +229,11 @@
   <action name="selectAllAct">
    <property name="text">
     <string>Select &amp;All</string>
+   </property>
+  </action>
+  <action name="selectModAct">
+   <property name="text">
+    <string>Select &amp;Modified</string>
    </property>
   </action>
   <action name="selectOddAct">

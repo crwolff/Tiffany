@@ -349,6 +349,19 @@ void Bookmarks::selectOdd()
 }
 
 //
+// Select all modified items
+//
+void Bookmarks::selectModified()
+{
+    Page tmp;
+    for(int idx=0; idx < count(); idx++)
+    {
+        tmp = item(idx)->data(Qt::UserRole).value<Page>();
+        item(idx)->setSelected( tmp.modified() );
+    }
+}
+
+//
 // Delete all selected items
 //
 void Bookmarks::deleteSelection()

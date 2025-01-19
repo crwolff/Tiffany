@@ -52,6 +52,7 @@ void MainWindow::connectSignalSlots()
 
     // Edit menu
     QObject::connect( ui->selectAllAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectAll );
+    QObject::connect( ui->selectModAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectModified );
     QObject::connect( ui->selectEvenAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectEven );
     QObject::connect( ui->selectOddAct, &QAction::triggered, ui->bookmarks, &Bookmarks::selectOdd );
     QObject::connect( ui->deleteAct, &QAction::triggered, ui->bookmarks, &Bookmarks::deleteSelection );
