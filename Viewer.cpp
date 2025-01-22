@@ -1,7 +1,6 @@
 #include "Config.h"
 #include "Viewer.h"
 #include "Utils/QImage2OCV.h"
-#include <QApplication>
 #include <QDebug>
 #include <QMessageBox>
 #include <QMimeData>
@@ -1332,10 +1331,6 @@ void Viewer::doRegionOCR(QRect rect)
             return;
         }
     }
-
-    // Initialize the clipboard
-    if (clipboard == nullptr)
-        clipboard = QGuiApplication::clipboard();
 
     // Set cursor
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);

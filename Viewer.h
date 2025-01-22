@@ -2,6 +2,7 @@
 #define VIEWER_H
 
 #include "Page.h"
+#include <QApplication>
 #include <QClipboard>
 #include <QImage>
 #include <QListWidget>
@@ -129,7 +130,7 @@ private:
     bool locateShift;
 
     tesseract::TessBaseAPI *tessApi = nullptr;
-    QClipboard *clipboard = nullptr;
+    QClipboard *clipboard = QGuiApplication::clipboard();
 };
 
 #endif
