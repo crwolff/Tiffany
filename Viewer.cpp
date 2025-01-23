@@ -35,6 +35,12 @@ Viewer::~Viewer()
         tessApi->End();
         delete tessApi;
     }
+    if (clipboard->ownsClipboard()) // Get rid of data in clipboard
+    {
+        clipboard->clear(QClipboard::Clipboard);
+        clipboard->clear(QClipboard::Selection);
+        clipboard->clear(QClipboard::FindBuffer);
+    }
 }
 
 // Capture/Release keyboard
