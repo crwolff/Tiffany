@@ -358,6 +358,40 @@ void Page::applyDeskew(QImage img)
 }
 
 //
+// Center image in page
+//
+void Page::doCenter(QColor bg)
+{
+    // Convert to grayscale
+    QImage img;
+    if (m_img.format() != QImage::Format_Grayscale8)
+        img = m_img.convertToFormat(QImage::Format_Grayscale8, Qt::ThresholdDither);
+    else
+        img = m_img;
+
+    // Convert to openCV
+    cv::Mat orig = QImage2OCV(img);
+
+    // Invert
+    cv::Mat inverted;
+    cv::bitwise_not(orig, inverted);
+
+    // Calculate bounding box
+    cv::Rect box = cv::boundingRect(inverted);
+
+    // Calculate margins
+    int left = (m_img.width() - box.width) / 2 - box.x;
+    int top = (m_img.height() - box.height) / 2 - box.y;
+
+    // Paint image onto m_img with calculated offset
+    QImage tmp = m_img;
+    QPainter p(&m_img);
+    p.fillRect(m_img.rect(), bg);
+    p.drawImage(QPoint(left, top), tmp);
+    p.end();
+}
+
+//
 // Convert current image to grayscale
 //
 void Page::toGrayscale()

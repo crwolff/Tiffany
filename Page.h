@@ -28,6 +28,7 @@ public:
     QImage deskew(float angle);
     float calcDeskew();
     void applyDeskew(QImage img);
+    void doCenter(QColor bg);
     void toGrayscale();
     void toBinary(bool adaptive, int blur, int kernel=1);
     void toDithered();

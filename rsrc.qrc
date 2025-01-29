@@ -44,5 +44,6 @@
     <file>assets/mirror_vert.svg</file>
     <file>assets/remove.svg</file>
     <file>assets/help.svg</file>
+    <file>assets/center.svg</file>
   </qresource>
 </RCC>

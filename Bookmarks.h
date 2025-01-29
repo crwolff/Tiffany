@@ -35,6 +35,7 @@ public slots:
     void toBinary();
     void toAdaptive();
     void toDithered();
+    void centerPage();
     void rotateCW();
     void rotateCCW();
     void rotate180();

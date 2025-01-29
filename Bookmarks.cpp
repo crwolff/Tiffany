@@ -795,6 +795,55 @@ void Bookmarks::toDithered()
 }
 
 //
+// Center image on page
+//
+void Bookmarks::centerPage()
+{
+    // Get list of all selected items
+    QList<QListWidgetItem*> selection = selectedItems();
+    if (selection.count() == 0)
+    {
+        QMessageBox::information(this, "Tiffany", "Nothing selected");
+        return;
+    }
+    if (!Config::multiPage)
+    {
+        QListWidgetItem* last = selection.last();
+        selection.clear();
+        selection.append(last);
+    }
+
+    // Add progress to status bar
+    emit progressSig("Centering...", selection.count());
+
+    // Center each page in turn
+    int progress = 1;
+    foreach(QListWidgetItem* item, selection)
+    {
+        // Get page
+        Page page = item->data(Qt::UserRole).value<Page>();
+
+        // Work
+        page.push();
+        page.doCenter(Config::bgColor);
+
+        // Update list with new image
+        item->setData(Qt::UserRole, QVariant::fromValue(page));
+        item->setIcon(makeIcon(page.m_img, page.modified()));
+
+        // Update progress
+        emit progressSig("", progress);
+        progress = progress + 1;
+    }
+
+    // Cleanup status bar
+    emit progressSig("", -1);
+
+    // Update Viewer
+    emit updatePageSig(false);
+}
+
+//
 // Rotate selected items
 //  1 = 90
 //  2 = 180

@@ -618,6 +618,15 @@
     <string>Vertical Mirror</string>
    </property>
   </action>
+  <action name="centerAct">
+   <property name="icon">
+    <iconset resource="rsrc.qrc">
+     <normaloff>:/images/assets/center.svg</normaloff>:/images/assets/center.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Center Image</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

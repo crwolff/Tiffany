@@ -149,6 +149,9 @@ void MainWindow::connectSignalSlots()
     QObject::connect( deskewWidget->spinBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
             [this](double val){ Config::deskewAngle = val; this->ui->viewer->doDeskew(); });
 
+    // Center Image button
+    QObject::connect( ui->centerAct, &QAction::triggered, ui->bookmarks, &Bookmarks::centerPage );
+
     // Help menu
     QObject::connect( ui->aboutAct, &QAction::triggered, this, &MainWindow::about );
     QObject::connect( ui->aboutQtAct, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -341,6 +344,10 @@ void MainWindow::buildToolBar()
     devoidWidget = new SpinWidget(1, 100, Config::devoidArea, 5, "Void Size", ui->toolBar);
     devoidSpin = ui->toolBar->addWidget(devoidWidget);
     devoidSpin->setVisible(false);
+
+    // Center button
+    ui->toolBar->addAction(ui->centerAct);
+    ui->centerAct->setText(QApplication::translate("MainWindow", "&Center\nImage", nullptr));
 
     // Right justify remaining icons
     QWidget* spacer = new QWidget();
