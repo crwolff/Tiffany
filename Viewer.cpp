@@ -196,6 +196,11 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
         else
         {
             RMRBend = scrnToPage.map(event->pos());
+
+            // Legalize point to inside image
+            RMRBend.setX( std::min( std::max(RMRBend.x(), 0), currPage.m_img.width()-1) );
+            RMRBend.setY( std::min( std::max(RMRBend.y(), 0), currPage.m_img.height()-1) );
+
             rightBand->setGeometry(QRect(pageToScrn.map(RMRBstart), pageToScrn.map(RMRBend)).normalized());
         }
         flag = true;
