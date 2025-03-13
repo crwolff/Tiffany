@@ -27,13 +27,66 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: assets
+          name: LinAssets
           path: Tiffany
+          retention-days: 2
+
+  BuildMing64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+                git
+                cmake
+                make 
+                msys2-runtime-devel 
+                mingw-w64-ucrt-x86_64-7zip
+                mingw-w64-ucrt-x86_64-gcc 
+                mingw-w64-ucrt-x86_64-pkg-config 
+                mingw-w64-ucrt-x86_64-qt5-base 
+                mingw-w64-ucrt-x86_64-qt5-imageformats
+                mingw-w64-ucrt-x86_64-qt5-svg 
+                mingw-w64-ucrt-x86_64-qt5-tools 
+                mingw-w64-ucrt-x86_64-tesseract-ocr 
+                mingw-w64-ucrt-x86_64-tesseract-data-eng 
+                mingw-w64-ucrt-x86_64-opencv
+
+      - name: WinStall
+        run: choco install 7zip
+
+      - name: CI-Build
+        shell: msys2 {0}
+        run: |
+          export CC=gcc
+          qmake Tiffany.pro
+          make 
+          mkdir -p Tiffany/bin Tiffany/bin/tessdata Tiffany/bin/platforms Tiffany/bin/iconengines Tiffany/bin/imageformats
+          cp /ucrt64/share/qt5/plugins/platforms/qwindows.dll Tiffany/bin/platforms/
+          cp /ucrt64/share/qt5/plugins/iconengines/*.dll Tiffany/bin/iconengines/
+          cp /ucrt64/share/qt5/plugins/imageformats/*.dll Tiffany/bin/imageformats/
+          cp debug/Tiffany.exe Tiffany/bin/
+          cp `ldd debug/Tiffany.exe Tiffany/bin/*/* | grep ' => /ucrt64/' | sed -e 's/.*=> //' -e 's/ (.*//' | sort | uniq` Tiffany/bin/
+          cp /ucrt64/share/tessdata/eng.traineddata Tiffany/bin/tessdata/
+          echo "bin\Tiffany.exe" > Tiffany/Tiffany.bat
+          7z.exe a Tiffany.7z Tiffany
+          cat "/c/Program Files/7-Zip/7z.sfx" Tiffany.7z > Tiffany.7z.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinAssets
+          path: |
+              Tiffany.7z
+              Tiffany.7z.exe
           retention-days: 2
 
   UpdateAssets:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
-    needs: [BuildLinux]
+    needs: [BuildLinux, BuildMing64]
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
@@ -52,6 +105,6 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            assets/Tiffany*
+            LinAssets/Tiffany*
+            WinAssets/Tiffany*
             LICENSE
-
