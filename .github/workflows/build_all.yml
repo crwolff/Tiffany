@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WinAssets
-          path: Tiffany.exe
+          path: debug/Tiffany.exe
           retention-days: 2
 
   UpdateAssets:
