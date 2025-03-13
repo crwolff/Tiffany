@@ -7,6 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPainterPath>
 
 Bookmarks::Bookmarks(QWidget * parent) : QListWidget(parent)
 {
