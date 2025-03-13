@@ -1,8 +1,5 @@
 name: Development Build
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   BuildLinux:
@@ -27,13 +24,51 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: assets
+          name: LinAssets
           path: Tiffany
+          retention-days: 2
+
+  BuildMing64:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+                git
+                cmake
+                make 
+                msys2-runtime-devel 
+                mingw-w64-ucrt-x86_64-gcc 
+                mingw-w64-ucrt-x86_64-pkg-config 
+                mingw-w64-ucrt-x86_64-qt5-base 
+                mingw-w64-ucrt-x86_64-qt5-svg 
+                mingw-w64-ucrt-x86_64-qt5-tools 
+                mingw-w64-ucrt-x86_64-tesseract-ocr 
+                mingw-w64-ucrt-x86_64-tesseract-data-eng 
+                mingw-w64-ucrt-x86_64-opencv
+
+      - name: CI-Build
+        run: |
+          export CC=gcc
+          qmake Tiffany.pro
+          make 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinAssets
+          path: Tiffany.exe
           retention-days: 2
 
   UpdateAssets:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
-    needs: [BuildLinux]
+    needs: [BuildLinux, BuildMing64]
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
@@ -52,6 +87,7 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            assets/Tiffany*
+            LinAssets/Tiffany*
+            WinAssets/Tiffany*
             LICENSE
 
