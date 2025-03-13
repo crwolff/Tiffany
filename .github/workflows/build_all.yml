@@ -31,6 +31,7 @@ jobs:
   BuildMing64:
     runs-on: windows-latest
     defaults:
+      run: choco install 7zip
       run:
         shell: msys2 {0}
     steps:
@@ -44,9 +45,11 @@ jobs:
                 cmake
                 make 
                 msys2-runtime-devel 
+                mingw-w64-ucrt-x86_64-7zip
                 mingw-w64-ucrt-x86_64-gcc 
                 mingw-w64-ucrt-x86_64-pkg-config 
                 mingw-w64-ucrt-x86_64-qt5-base 
+                mingw-w64-ucrt-x86_64-qt5-imageformats
                 mingw-w64-ucrt-x86_64-qt5-svg 
                 mingw-w64-ucrt-x86_64-qt5-tools 
                 mingw-w64-ucrt-x86_64-tesseract-ocr 
@@ -58,12 +61,24 @@ jobs:
           export CC=gcc
           qmake Tiffany.pro
           make 
+          mkdir -p Tiffany/bin Tiffany/bin/tessdata Tiffany/bin/platforms Tiffany/bin/iconengines Tiffany/bin/imageformats
+          cp /ucrt64/share/qt5/plugins/platforms/qwindows.dll Tiffany/bin/platforms/
+          cp /ucrt64/share/qt5/plugins/iconengines Tiffany/bin/iconengines/
+          cp /ucrt64/share/qt5/plugins/imageformats Tiffany/bin/imageformats/
+          cp `ldd debug/Tiffany.exe Tiffany/bin/*/* | grep ' => /ucrt64/' | sed -e 's/.*=> //' -e 's/ (.*//' | sort | uniq` Tiffany/bin/
+          cp debug/Tiffany.exe Tiffany/bin/
+          cp /ucrt64/share/tessdata/eng.traineddata Tiffany/bin/tessdata/
+          echo "bin\Tiffany.exe" > Tiffany/Tiffany.bat
+          7z.exe a Tiffany.7z Tiffany
+          cat "/c/Program Files/7-Zip/7z.sfx" Tiffany.7z > Tiffany.7z.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: WinAssets
-          path: debug/Tiffany.exe
+          path: |
+              Tiffany.7z
+              Tiffany.7z.exe
           retention-days: 2
 
   UpdateAssets:
