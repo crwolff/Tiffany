@@ -101,7 +101,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Ubuntu 20.04"
+          automatic_release_tag: "Linux"
           prerelease: true
           title: "Linux Development Build"
           files: |
@@ -112,7 +112,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Windows (Mingw64)"
+          automatic_release_tag: "Windows"
           prerelease: true
           title: "Msys2 Development Build"
           files: |
