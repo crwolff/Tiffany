@@ -97,14 +97,25 @@ jobs:
       - name: Fetch artifacts
         uses: actions/download-artifact@v4
 
-      - name: Upload latest pre-release
+      - name: Upload Linux latest pre-release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          automatic_release_tag: "Ubuntu 20.04"
           prerelease: true
-          title: "Development Build"
+          title: "Linux Development Build"
           files: |
             LinAssets/Tiffany*
+            LICENSE
+
+      - name: Upload Windows latest pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "Windows (Mingw64)"
+          prerelease: true
+          title: "Msys2 Development Build"
+          files: |
             WinAssets/Tiffany*
             LICENSE
+
