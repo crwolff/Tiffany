@@ -405,9 +405,9 @@ void Viewer::keyPressEvent(QKeyEvent *event)
 
     if (key == Qt::Key_Escape)
     {
-        resetTools();
         if (leftMode == Deskew)
             setTool(Select);
+        resetTools();
         flag = true;
     }
     else if (key == Qt::Key_F)
@@ -775,6 +775,9 @@ void Viewer::changePage(QListWidgetItem *curr)
     // Cleanup
     leftBand->hide();
     rightBand->hide();
+    setTool(Select);
+    resetTools();
+
     update();
 }
 
