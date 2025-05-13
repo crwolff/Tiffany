@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QtConcurrent/QtConcurrent>
 #include <leptonica/allheaders.h>
+#include <math.h>
 
 // Constuctors
 Page::Page()
@@ -161,6 +162,74 @@ QImage Page::colorSelect(QRgb target, int threshold)
     }
     else
         return QImage();
+    return mask;
+}
+
+//
+// Select all colorful pixels
+//
+QImage Page::deColor(int threshold)
+{
+    // Initialize mask
+    QImage mask(m_img.size(), QImage::Format_Indexed8);
+    mask.setColor( 0, qRgba(0,0,0,0));  // Place holder - replaced in blinker/applyMask
+    mask.setColor( 1, qRgba(0,0,0,0));  // Transparent
+
+    // Find targets within threshold of target
+    if ((m_img.format() == QImage::Format_RGB32) || (m_img.format() == QImage::Format_ARGB32))
+    {
+        int t = threshold * 2;
+        // Scan through page seeking matches
+        for(int i=0; i<m_img.height(); i++)
+        {
+            QRgb *srcPtr = (QRgb *)m_img.scanLine(i);
+            uchar *maskPtr = reinterpret_cast<uchar*>(mask.scanLine(i));
+            for(int j=0; j<m_img.width(); j++)
+            {
+                QRgb val = *srcPtr++;
+                int red = qRed(val);
+                int grn = qGreen(val);
+                int blu = qBlue(val);
+                // Calculate distance between pixel and gray line (0,0,0)->(255,255,255)
+                //
+                // d = norm(cross(p2-p1, p1-p0)) / norm(p2-p1)
+                // where:
+                // p0 = [r,g,b]
+                // p1 = [0,0,0]
+                // p2 = [1,1,1]
+                // and
+                // norm = sqrt(x^2 + y^2 + z^2)
+                // cross(a, b) = [ ay*bz - az*by, az*bx - ax*bz, ax*by - ay*bx ]
+                //
+                // Simplifying:
+                // d = norm(cross(p2, -p0)) / sqrt(3)
+                //
+                // Expanding:
+                // d = norm( [ p2[y] * -p0[z] - p2[z] * -p0[y], p2[z] * -p0[x] - p2[x] * -p0[z], p2[x] * -p0[y] - p2[y] * -p0[x] ] ) / sqrt(3)
+                //
+                // Since all p2 is '1':
+                // d = norm( [ -p0[z] - -p0[y], -p0[x] - -p0[z], -p0[y] - -p0[x] ] ) / sqrt(3)
+                //
+                // Simplify:
+                // d = norm( [ p0[y] - p0[z], p0[z] - p0[x], p0[x] - p0[y] ] ) / sqrt(3)
+                //
+                // Finally:
+                // d = norm( [ g - b, b - r, r - g ] ) / sqrt(3)
+                //
+                float d = sqrt((grn - blu)*(grn - blu) + (blu - red)*(blu - red) + (red - grn)*(red - grn));
+                d = d / 1.732;
+                if ( d < t )
+                    *maskPtr++ = 1;
+                else
+                    *maskPtr++ = 0;
+                //
+                //if ((red * 2 > grn + blu + t) || (grn * 2 > red + blu + t) || (blu * 2 > red + grn + t))
+                //    *maskPtr++ = 0;
+                //else
+                //    *maskPtr++ = 1;
+            }
+        }
+    }
     return mask;
 }
 

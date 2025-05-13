@@ -10,6 +10,7 @@ namespace Config
     int dropperThreshold;
     int floodThreshold;
     double deskewAngle;
+    int deColorDist;
     int despeckleArea;
     int devoidArea;
     int brushSize;
@@ -32,6 +33,7 @@ namespace Config
         bgRemoveThreshold = settings.value("bgRemoveThreshold", 40).toInt();
         dropperThreshold = settings.value("dropperThreshold", 40).toInt();
         floodThreshold = settings.value("floodThreshold", 50).toInt();
+        deColorDist = settings.value("deColorDist", 20).toInt();
         despeckleArea = settings.value("despeckleArea", 20).toInt();
         devoidArea = settings.value("devoidArea", 20).toInt();
         brushSize = settings.value("brushSize", 1).toInt();
@@ -73,6 +75,7 @@ namespace Config
         settings.setValue("bgRemoveThreshold", bgRemoveThreshold);
         settings.setValue("dropperThreshold", dropperThreshold);
         settings.setValue("floodThreshold", floodThreshold);
+        settings.setValue("deColorDist", deColorDist);
         settings.setValue("despeckleArea", despeckleArea);
         settings.setValue("devoidArea", devoidArea);
         settings.setValue("brushSize", brushSize);

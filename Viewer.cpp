@@ -2,6 +2,7 @@
 #include "Viewer.h"
 #include "Utils/QImage2OCV.h"
 #include <QDebug>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
@@ -558,6 +559,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     {
         leftBand->hide();
         doRecolor(QRect(LMRBstart, LMRBend).normalized());
+    }
+    else if (ctrl && (key == Qt::Key_Y))
+    {
+        deColor();
+        flag = true;
     }
     else if (pasting)
     {
@@ -1154,6 +1160,21 @@ void Viewer::doDropper()
     blinkTimer->stop();
     resetTools();
     pageMask = currPage.colorSelect(pixel, Config::dropperThreshold);
+    blinkTimer->start(300);
+    update();
+}
+
+//
+// Execute de-color operation
+//
+void Viewer::deColor()
+{
+    bool ok;
+    blinkTimer->stop();
+    resetTools();
+    Config::deColorDist = QInputDialog::getInt(this, "De-color distance",
+                "Value", Config::deColorDist, 0, 1024, 1, &ok);
+    pageMask = currPage.deColor(Config::deColorDist);
     blinkTimer->start(300);
     update();
 }

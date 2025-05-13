@@ -14,6 +14,7 @@ namespace Config
     extern int dropperThreshold;
     extern int floodThreshold;
     extern double deskewAngle;
+    extern int deColorDist;
     extern int despeckleArea;
     extern int devoidArea;
     extern int brushSize;

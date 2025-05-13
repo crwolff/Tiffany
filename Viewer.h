@@ -31,6 +31,7 @@ public slots:
     void resetTools();
 
     void doDropper();
+    void deColor();
     void doFlood();
     void doRemoveBG();
     void doDespeckle();
