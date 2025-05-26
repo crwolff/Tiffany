@@ -93,6 +93,18 @@ Keyboard:
     * Replaces black pixels with foreground color
     * Replaces white pixels with background color
 
+## Dependencies
+```
+Qt5:
+    qt5-base-dev                - Develepment libraries
+    libqt5svg5-dev              - For icons
+    qt5-image-formats-plugins   - So Qt knowns how to read image files
+Qt6:
+    qt6-base-dev                - Develepment libraries
+    libqt6svg6-dev              - For icons
+    qt6-image-formats-plugins   - So Qt knowns how to read image files
+```
+
 ## To compile:
 ```
 % qmake
