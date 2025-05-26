@@ -355,9 +355,9 @@ void Viewer::wheelEvent(QWheelEvent *event)
         return;
 
     if (event->angleDelta().y() > 0)
-        zoomWheel(event->pos(), 1.25);
+        zoomWheel(event->position(), 1.25);
     else
-        zoomWheel(event->pos(), 0.8);
+        zoomWheel(event->position(), 0.8);
     event->accept();
 }
 
@@ -1527,7 +1527,7 @@ void Viewer::zoomArea(QRect rect)
 //
 // Zoom to wheel event
 //
-void Viewer::zoomWheel(QPoint pos, float factor)
+void Viewer::zoomWheel(QPointF pos, float factor)
 {
     if (currPage.m_img.isNull())
         return;

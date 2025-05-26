@@ -81,7 +81,7 @@ private:
     void doRegionOCR(QRect rect);
 
     void zoomArea(QRect rect);
-    void zoomWheel(QPoint pos, float factor);
+    void zoomWheel(QPointF pos, float factor);
     void updateScrollBars();
     void adjustScrollBars(float factor);
     bool measureAll(Page &page, int &scrollBarSize, int &viewW, int &viewH, int &imageW, int &imageH);
