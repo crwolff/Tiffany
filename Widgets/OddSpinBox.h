@@ -3,7 +3,11 @@
 
 #include <QSpinBox>
 
-class QRegExpValidator;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  class QRegularExpressionValidator;
+#else
+  class QRegExpValidator;
+#endif
 
 class OddSpinBox : public QSpinBox
 {
@@ -15,7 +19,11 @@ protected:
     QValidator::State validate(QString &text, int &pos) const;
 
 private:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QRegularExpressionValidator *validator;
+#else
     QRegExpValidator *validator;
+#endif
 };
 
 #endif

@@ -45,7 +45,11 @@ Viewer::~Viewer()
 }
 
 // Capture/Release keyboard
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void Viewer::enterEvent(QEnterEvent *event)
+#else
 void Viewer::enterEvent(QEvent *event)
+#endif
 {
     setFocus();
     event->accept();

@@ -363,7 +363,11 @@ void Page::applyMask(QImage mask, QColor color)
 QImage Page::deskew(float angle)
 {
     // Run this in a thread to avoid lagging the UI
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QFuture<QImage> future = QtConcurrent::run(&Page::deskewThread, this, angle);
+#else
     QFuture<QImage> future = QtConcurrent::run(this, &Page::deskewThread, angle);
+#endif
     while (!future.isFinished())
     {
         QApplication::processEvents();
@@ -474,7 +478,11 @@ void Page::toGrayscale()
 void Page::toBinary(bool adaptive, int blur, int kernel)
 {
     // Run this in a thread to avoid lagging the UI
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QFuture<void> future = QtConcurrent::run(&Page::toBinaryThread, this, adaptive, blur, kernel);
+#else
     QFuture<void> future = QtConcurrent::run(this, &Page::toBinaryThread, adaptive, blur, kernel);
+#endif
     while (!future.isFinished())
     {
         QApplication::processEvents();
