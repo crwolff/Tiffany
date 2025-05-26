@@ -216,8 +216,8 @@ QImage Page::deColor(int threshold)
                 // Finally:
                 // d = norm( [ g - b, b - r, r - g ] ) / sqrt(3)
                 //
-                float d = sqrt((grn - blu)*(grn - blu) + (blu - red)*(blu - red) + (red - grn)*(red - grn));
-                d = d / 1.732;
+                float d = (grn - blu)*(grn - blu) + (blu - red)*(blu - red) + (red - grn)*(red - grn);
+                d = sqrt(d) / 1.732;
                 if ( d < t )
                     *maskPtr++ = 1;
                 else
