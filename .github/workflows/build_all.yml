@@ -102,7 +102,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Linux"
+          automatic_release_tag: "Linux Qt6"
           prerelease: true
           title: "Linux Qt6 Development Build"
           files: |
@@ -113,7 +113,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Windows"
+          automatic_release_tag: "Windows Qt6"
           prerelease: true
           title: "Msys2 Qt6 Development Build"
           files: |
