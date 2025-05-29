@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - qt6
 
 jobs:
   BuildLinux:
@@ -16,12 +17,12 @@ jobs:
       - name: Install Qt and dependencies
         run: |
           sudo apt update
-          sudo apt install qtbase5-dev qtbase5-dev-tools libopencv-dev libtesseract-dev
+          sudo apt install qt6-base-dev qt6-base-dev-tools libopencv-dev libtesseract-dev libgl-dev
 
       - name: Build
         run: |
           export CC=gcc
-          qmake Tiffany.pro
+          qmake6 Tiffany.pro
           make 
 
       - name: Upload artifact
@@ -47,10 +48,10 @@ jobs:
                 mingw-w64-ucrt-x86_64-7zip
                 mingw-w64-ucrt-x86_64-gcc 
                 mingw-w64-ucrt-x86_64-pkg-config 
-                mingw-w64-ucrt-x86_64-qt5-base 
-                mingw-w64-ucrt-x86_64-qt5-imageformats
-                mingw-w64-ucrt-x86_64-qt5-svg 
-                mingw-w64-ucrt-x86_64-qt5-tools 
+                mingw-w64-ucrt-x86_64-qt6-base 
+                mingw-w64-ucrt-x86_64-qt6-imageformats
+                mingw-w64-ucrt-x86_64-qt6-svg 
+                mingw-w64-ucrt-x86_64-qt6-tools 
                 mingw-w64-ucrt-x86_64-tesseract-ocr 
                 mingw-w64-ucrt-x86_64-tesseract-data-eng 
                 mingw-w64-ucrt-x86_64-opencv
@@ -62,12 +63,12 @@ jobs:
         shell: msys2 {0}
         run: |
           export CC=gcc
-          qmake Tiffany.pro
+          qmake6 Tiffany.pro
           make 
           mkdir -p Tiffany/bin Tiffany/bin/tessdata Tiffany/bin/platforms Tiffany/bin/iconengines Tiffany/bin/imageformats
-          cp /ucrt64/share/qt5/plugins/platforms/qwindows.dll Tiffany/bin/platforms/
-          cp /ucrt64/share/qt5/plugins/iconengines/*.dll Tiffany/bin/iconengines/
-          cp /ucrt64/share/qt5/plugins/imageformats/*.dll Tiffany/bin/imageformats/
+          cp /ucrt64/share/qt6/plugins/platforms/qwindows.dll Tiffany/bin/platforms/
+          cp /ucrt64/share/qt6/plugins/iconengines/*.dll Tiffany/bin/iconengines/
+          cp /ucrt64/share/qt6/plugins/imageformats/*.dll Tiffany/bin/imageformats/
           cp debug/Tiffany.exe Tiffany/bin/
           cp `ldd debug/Tiffany.exe Tiffany/bin/*/* | grep ' => /ucrt64/' | sed -e 's/.*=> //' -e 's/ (.*//' | sort | uniq` Tiffany/bin/
           cp /ucrt64/share/tessdata/eng.traineddata Tiffany/bin/tessdata/
@@ -101,9 +102,9 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Linux"
+          automatic_release_tag: "Linux_Qt6"
           prerelease: true
-          title: "Linux Development Build"
+          title: "Linux Qt6 Development Build"
           files: |
             LinAssets/Tiffany*
             LICENSE
@@ -112,9 +113,9 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Windows"
+          automatic_release_tag: "Windows_Qt6"
           prerelease: true
-          title: "Msys2 Development Build"
+          title: "Msys2 Qt6 Development Build"
           files: |
             WinAssets/Tiffany*
             LICENSE
