@@ -3,10 +3,35 @@ on:
   push:
     branches:
       - main
-      - qt6
 
 jobs:
-  BuildLinux:
+  BuildLinuxQt5:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt and dependencies
+        run: |
+          sudo apt update
+          sudo apt install qtbase5-dev qtbase5-dev-tools libopencv-dev libtesseract-dev
+
+      - name: Build
+        run: |
+          export CC=gcc
+          qmake Tiffany.pro
+          make 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinAssetsQt5
+          path: Tiffany
+          retention-days: 2
+
+  BuildLinuxQt6:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -28,11 +53,64 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LinAssets
+          name: LinAssetsQt6
           path: Tiffany
           retention-days: 2
 
-  BuildMing64:
+  BuildMingQt5:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+                git
+                cmake
+                make 
+                msys2-runtime-devel 
+                mingw-w64-ucrt-x86_64-7zip
+                mingw-w64-ucrt-x86_64-gcc 
+                mingw-w64-ucrt-x86_64-pkg-config 
+                mingw-w64-ucrt-x86_64-qt5-base 
+                mingw-w64-ucrt-x86_64-qt5-imageformats
+                mingw-w64-ucrt-x86_64-qt5-svg 
+                mingw-w64-ucrt-x86_64-qt5-tools 
+                mingw-w64-ucrt-x86_64-tesseract-ocr 
+                mingw-w64-ucrt-x86_64-tesseract-data-eng 
+                mingw-w64-ucrt-x86_64-opencv
+
+      - name: WinStall
+        run: choco install 7zip
+
+      - name: CI-Build
+        shell: msys2 {0}
+        run: |
+          export CC=gcc
+          qmake Tiffany.pro
+          make 
+          mkdir -p Tiffany/bin Tiffany/bin/tessdata Tiffany/bin/platforms Tiffany/bin/iconengines Tiffany/bin/imageformats
+          cp /ucrt64/share/qt5/plugins/platforms/qwindows.dll Tiffany/bin/platforms/
+          cp /ucrt64/share/qt5/plugins/iconengines/*.dll Tiffany/bin/iconengines/
+          cp /ucrt64/share/qt5/plugins/imageformats/*.dll Tiffany/bin/imageformats/
+          cp debug/Tiffany.exe Tiffany/bin/
+          cp `ldd debug/Tiffany.exe Tiffany/bin/*/* | grep ' => /ucrt64/' | sed -e 's/.*=> //' -e 's/ (.*//' | sort | uniq` Tiffany/bin/
+          cp /ucrt64/share/tessdata/eng.traineddata Tiffany/bin/tessdata/
+          echo "bin\Tiffany.exe" > Tiffany/Tiffany.bat
+          7z.exe a Tiffany.7z Tiffany
+          cat "/c/Program Files/7-Zip/7z.sfx" Tiffany.7z > Tiffany.7z.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinAssetsQt5
+          path: |
+              Tiffany.7z
+              Tiffany.7z.exe
+          retention-days: 2
+
+  BuildMingQt6:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -79,15 +157,39 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WinAssets
+          name: WinAssetsQt6
           path: |
               Tiffany.7z
               Tiffany.7z.exe
           retention-days: 2
 
-  UpdateAssets:
+  UpdateAssets1:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
-    needs: [BuildLinux, BuildMing64]
+    needs: BuildLinuxQt5
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload Linux latest pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "Linux_Qt5"
+          prerelease: true
+          title: "Linux Qt5 Development Build"
+          files: |
+            LinAssetsQt5/Tiffany*
+            LICENSE
+
+  UpdateAssets2:
+    if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
+    needs: BuildLinuxQt6
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -106,8 +208,45 @@ jobs:
           prerelease: true
           title: "Linux Qt6 Development Build"
           files: |
-            LinAssets/Tiffany*
+            LinAssetsQt6/Tiffany*
             LICENSE
+
+  UpdateAssets3:
+    if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
+    needs: BuildMingQt5
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload Windows latest pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "Windows_Qt5"
+          prerelease: true
+          title: "Msys2 Qt5 Development Build"
+          files: |
+            WinAssetsQt5/Tiffany*
+            LICENSE
+
+  UpdateAssets4:
+    if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
+    needs: BuildMingQt6
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@v4
 
       - name: Upload Windows latest pre-release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -117,6 +256,6 @@ jobs:
           prerelease: true
           title: "Msys2 Qt6 Development Build"
           files: |
-            WinAssets/Tiffany*
+            WinAssetsQt6/Tiffany*
             LICENSE
 
