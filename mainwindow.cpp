@@ -424,13 +424,13 @@ void MainWindow::colorMagic()
 {
     if (colorToolButton.mode == "Foreground")
     {
-        QColor tmp = QColorDialog::getColor(Config::fgColor, nullptr, "Foreground");
+        QColor tmp = QColorDialog::getColor(Config::fgColor, nullptr, "Foreground", QColorDialog::DontUseNativeDialog);
         if (tmp.isValid())
             Config::fgColor = tmp;
     }
     else if (colorToolButton.mode == "Background")
     {
-        QColor tmp = QColorDialog::getColor(Config::bgColor, nullptr, "Background");
+        QColor tmp = QColorDialog::getColor(Config::bgColor, nullptr, "Background", QColorDialog::DontUseNativeDialog);
         if (tmp.isValid())
             Config::bgColor = tmp;
     }

@@ -973,7 +973,7 @@ void Viewer::doCopy(QRect box)
         redAvg = sqrt(redAvg/count);
         grnAvg = sqrt(grnAvg/count);
         bluAvg = sqrt(bluAvg/count);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#ifdef NEVER
     emit statusSig(QStringLiteral("RGB(0x%1%2%3)")
             .arg(int(redAvg + 0.5), 2, 16, QChar('0'))
             .arg(int(grnAvg + 0.5), 2, 16, QChar('0'))
