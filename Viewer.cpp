@@ -417,7 +417,10 @@ void Viewer::keyPressEvent(QKeyEvent *event)
     }
     else if (key == Qt::Key_F)
     {
-        emit zoomSig();
+        if (shft)
+            fitWindow();        // Fit window if shift is held
+        else
+            emit zoomSig();     // otherwise, activate button selection
         flag = true;
     }
     else if (event->matches(QKeySequence::Undo))

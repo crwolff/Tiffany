@@ -60,6 +60,7 @@ Right Mouse Button:
 Keyboard:
 * Escape - Cancels current command (Paste, etc)
 * 'F' - Apply most recent toolbar zoom (default: zoom to fit)
+* Shift-'F' - Fit to window independent of toolbar selection
 * Cut ('^X') - Depends on tool
     * Pointer - Fill selection with background color
     * Dropper - Set blinking pixels to background color
