@@ -505,6 +505,11 @@ void Viewer::keyPressEvent(QKeyEvent *event)
         }
         flag = true;
     }
+    else if ((key == Qt::Key_A) && ctrl)
+    {
+        doCopy(currPage.m_img.rect());
+        flag = true;
+    }
     else if (keyMatches(event, QKeySequence::Paste) != None)
     {
         if (!deskewImg.isNull())
