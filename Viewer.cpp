@@ -1620,18 +1620,22 @@ void Viewer::fitWindow()
 void Viewer::fitWidth()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
+    float newScale, oldScale;
 
     if (currPage.m_img.isNull())
         return;
 
     // If height is larger dimension, leave space for vertical scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        setScaleFactor((float)(viewW - scrollBarSize) / imageW);
+        newScale = (float)(viewW - scrollBarSize) / imageW;
     else
-        setScaleFactor((float)viewW / imageW);
+        newScale = (float)viewW / imageW;
+    oldScale = scaleFactor;
 
-    // Update scrollarea
+    setScaleFactor(newScale);
     updateGeometry();
+    updateScrollBars();
+    adjustScrollBars(newScale / oldScale);
 }
 
 //
@@ -1640,18 +1644,22 @@ void Viewer::fitWidth()
 void Viewer::fitHeight()
 {
     int scrollBarSize, viewW, viewH, imageW, imageH;
+    float newScale, oldScale;
 
     if (currPage.m_img.isNull())
         return;
 
     // If width is larger dimension, leave space for horizontal scroll bar
     if (measureAll(currPage, scrollBarSize, viewW, viewH, imageW, imageH))
-        setScaleFactor((float)(viewH - scrollBarSize) / imageH);
+        newScale = (float)(viewH - scrollBarSize) / imageH;
     else
-        setScaleFactor((float)viewH / imageH);
+        newScale = (float)viewH / imageH;
+    oldScale = scaleFactor;
 
-    // Update scrollarea
+    setScaleFactor(newScale);
     updateGeometry();
+    updateScrollBars();
+    adjustScrollBars(newScale / oldScale);
 }
 
 //
