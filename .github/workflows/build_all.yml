@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  BuildLinuxQt5:
+  BuildJammyQt5:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -27,11 +27,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LinAssetsQt5
+          name: JammyAssetsQt5
           path: Tiffany
           retention-days: 2
 
-  BuildLinuxQt6:
+  BuildJammyQt6:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -53,7 +53,33 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LinAssetsQt6
+          name: JammyAssetsQt6
+          path: Tiffany
+          retention-days: 2
+
+  BuildNobleQt6:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Qt and dependencies
+        run: |
+          sudo apt update
+          sudo apt install qt6-base-dev qt6-base-dev-tools libopencv-dev libtesseract-dev libgl-dev
+
+      - name: Build
+        run: |
+          export CC=gcc
+          qmake6 Tiffany.pro
+          make 
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NobleAssetsQt6
           path: Tiffany
           retention-days: 2
 
@@ -165,7 +191,7 @@ jobs:
 
   UpdateAssets1:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
-    needs: BuildLinuxQt5
+    needs: BuildJammyQt5
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -176,20 +202,20 @@ jobs:
       - name: Fetch artifacts
         uses: actions/download-artifact@v4
 
-      - name: Upload Linux latest pre-release
+      - name: Upload Jammy latest pre-release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Linux_Qt5"
+          automatic_release_tag: "Jammy_Qt5"
           prerelease: true
-          title: "Linux Qt5 Development Build"
+          title: "Jammy Qt5 Development Build"
           files: |
-            LinAssetsQt5/Tiffany*
+            JammyAssetsQt5/Tiffany*
             LICENSE
 
   UpdateAssets2:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
-    needs: BuildLinuxQt6
+    needs: BuildJammyQt6
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -200,18 +226,42 @@ jobs:
       - name: Fetch artifacts
         uses: actions/download-artifact@v4
 
-      - name: Upload Linux latest pre-release
+      - name: Upload Jammy latest pre-release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "Linux_Qt6"
+          automatic_release_tag: "Jammy_Qt6"
           prerelease: true
-          title: "Linux Qt6 Development Build"
+          title: "Jammy Qt6 Development Build"
           files: |
-            LinAssetsQt6/Tiffany*
+            JammyAssetsQt6/Tiffany*
             LICENSE
 
   UpdateAssets3:
+    if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
+    needs: BuildNobleQt6
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Upload Noble latest pre-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "Noble_Qt6"
+          prerelease: true
+          title: "Noble Qt6 Development Build"
+          files: |
+            NobleAssetsQt6/Tiffany*
+            LICENSE
+
+  UpdateAssets4:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
     needs: BuildMingQt5
     runs-on: ubuntu-22.04
@@ -235,7 +285,7 @@ jobs:
             WinAssetsQt5/Tiffany*
             LICENSE
 
-  UpdateAssets4:
+  UpdateAssets5:
     if: ${{ github.repository_owner == 'crwolff' && github.event_name == 'push' }}
     needs: BuildMingQt6
     runs-on: ubuntu-22.04
