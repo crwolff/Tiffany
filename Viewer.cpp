@@ -847,9 +847,13 @@ void Viewer::setTool(LeftMode tool)
         doDevoid();
     }
     else if (tool == RemoveBG)
+    {
+        setCursor(Qt::ArrowCursor);
         doRemoveBG();
+    }
     else if (tool == Deskew)
     {
+        setCursor(Qt::ArrowCursor);
         Config::deskewAngle = currPage.calcDeskew();
         emit setDeskewSig(Config::deskewAngle + 0.05);
         emit setDeskewSig(Config::deskewAngle);
