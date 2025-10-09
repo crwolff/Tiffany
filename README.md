@@ -94,7 +94,22 @@ Keyboard:
     * Replaces black pixels with foreground color
     * Replaces white pixels with background color
 
-## Dependencies
+## Run Dependencies
+```
+Qt5:
+    TBD
+
+Qt6:
+    libqt6core6t64
+    libqt6gui6t64
+    libqt6widgets6t64
+    libqt6svg6
+    qt6-image-formats-plugins
+    libopencv-imgproc406t64
+    libtesseract5 
+```
+
+## Build Dependencies
 ```
 Qt5:
     qt5-base-dev                - Develepment libraries
