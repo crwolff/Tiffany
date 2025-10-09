@@ -113,6 +113,9 @@ jobs:
       - name: CI-Build
         shell: msys2 {0}
         run: |
+          pkg-config --list-all
+          pkg-config --print-provides tesseract
+          pkg-config --print-requires tesseract
           export CC=gcc
           qmake Tiffany.pro
           make 
@@ -166,6 +169,9 @@ jobs:
       - name: CI-Build
         shell: msys2 {0}
         run: |
+          pkg-config --list-all
+          pkg-config --print-provides tesseract
+          pkg-config --print-requires tesseract
           export CC=gcc
           qmake6 Tiffany.pro
           make 
