@@ -107,7 +107,7 @@ jobs:
                 mingw-w64-ucrt-x86_64-tesseract-data-eng 
                 mingw-w64-ucrt-x86_64-opencv
 
-      - name: WinStall
+      - name: Winstall
         run: choco install 7zip
 
       - name: CI-Build
@@ -160,7 +160,7 @@ jobs:
                 mingw-w64-ucrt-x86_64-tesseract-data-eng 
                 mingw-w64-ucrt-x86_64-opencv
 
-      - name: WinStall
+      - name: Winstall
         run: choco install 7zip
 
       - name: CI-Build
