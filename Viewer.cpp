@@ -664,7 +664,7 @@ void Viewer::keyReleaseEvent(QKeyEvent *event)
     if (flag)
         event->accept();
     else
-        QWidget::keyPressEvent(event);
+        QWidget::keyReleaseEvent(event);
 }
 
 //
